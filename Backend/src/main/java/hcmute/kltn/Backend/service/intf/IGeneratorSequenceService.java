@@ -1,15 +1,19 @@
 package hcmute.kltn.Backend.service.intf;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 
-import hcmute.kltn.Backend.model.dto.ResponseObject;
+import hcmute.kltn.Backend.model.ResponseObject;
+import hcmute.kltn.Backend.model.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.entity.GeneratorSequence;
 
 public interface IGeneratorSequenceService {
-	public ResponseEntity<ResponseObject> createGeneratorSequence(GeneratorSequence newGeneratorSequence);
-	public ResponseEntity<ResponseObject> updateGeneratorSequence(long id, GeneratorSequence newGeneratorSequence);
-	public ResponseEntity<ResponseObject> getDetailGeneratorSequence(long id);
-	public ResponseEntity<ResponseObject> getAllGeneratorSequence();
-	public ResponseEntity<ResponseObject> deleteGeneratorSequence(long id);
-	public String genID(String tableName);
+	public GeneratorSequence create(GeneratorSequenceDTO generatorSequenceDTO);
+	public GeneratorSequence update(GeneratorSequenceDTO generatorSequenceDTO);
+	public GeneratorSequence getDetail(long generatorSequenceId);
+	public List<GeneratorSequence> getAll();
+	public boolean delete(long generatorSequenceId);
+	
+	public String genId(String tableName);
 }

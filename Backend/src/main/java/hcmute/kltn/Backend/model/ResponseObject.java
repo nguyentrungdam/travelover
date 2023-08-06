@@ -1,4 +1,4 @@
-package hcmute.kltn.Backend.model.dto;
+package hcmute.kltn.Backend.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

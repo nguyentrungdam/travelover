@@ -7,13 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateAccountRequest {
+public class AccountUpdateProfile {
 	private String firstName;
 	private String lastName;
-	private String password;
-	private String role;
-	private String avatar;
+	private String avatar; // Foreign key
 	private String address;
 	private String phoneNumber;
-	private String parentId;
 }

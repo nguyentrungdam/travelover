@@ -22,15 +22,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GeneratorSequence {
 	@Id
+	@Column(name = "Id")
 	@SequenceGenerator(name = "Generator_Id_Sequence", sequenceName = "Generator_Id_Sequence", allocationSize = 1)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Generator_Id_Sequence")
-	@JsonProperty(access = Access.READ_ONLY)
 	private long id;
-	@Column(nullable = false, unique = true)
+	@Column(name = "Table_Name", nullable = false, unique = true)
 	private String tableName;
-	@Column(nullable = false, unique = true)
+	@Column(name = "Prefix", nullable = false, unique = true)
 	private String prefix;
-	@Column(nullable = false)
-	private int number; // Nhớ chỉnh thành kiểu long
+	@Column(name = "Number",nullable = false)
+	private long number; 
+	@Column(name = "Description", nullable = false)
 	private String description;
 }

@@ -1,8 +1,10 @@
 package hcmute.kltn.Backend.service.intf;
 
-import hcmute.kltn.Backend.model.dto.ResponseObject;
+import org.springframework.http.ResponseEntity;
+
+import hcmute.kltn.Backend.model.ResponseObject;
 
 public interface IResponseObjectService {
-	public ResponseObject success(ResponseObject responseObject);
-	public ResponseObject failed(ResponseObject responseObject);
+	public ResponseEntity<ResponseObject> success(ResponseObject responseObject);
+	public ResponseEntity<ResponseObject> failed(ResponseObject responseObject);
 }

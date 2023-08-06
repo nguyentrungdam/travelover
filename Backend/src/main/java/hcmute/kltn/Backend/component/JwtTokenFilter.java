@@ -29,7 +29,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 	@Autowired
     private JwtTokenUtil jwtUtil;
 	@Autowired
-	private AccountRepository userRepository;
+	private AccountRepository accountRepository;
  
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -93,13 +93,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
     
     private List<GrantedAuthority> getAuthorities(String username) {
-    	Optional<Account> user = userRepository.findFirstByEmail(username);
+    	Optional<Account> user = accountRepository.findByEmail(username);
     	if (user.isPresent()) {
     		List<GrantedAuthority> authorities = new ArrayList<>();
 //			for (ERole role : user.get().getRoles()) {
 //			    authorities.add(new SimpleGrantedAuthority(role.toString()));
 //			}
-            authorities.add(new SimpleGrantedAuthority(user.get().getRole()));
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.get().getRole()));
             
             return authorities;
     	} else {

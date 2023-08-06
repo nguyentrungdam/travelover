@@ -47,13 +47,28 @@ public class DataLoader implements CommandLineRunner {
 //		user.setLastName("Tran");
 //		user.setEmail("thanhdt114@gmail.com");
 //		user.setPassword(passwordEncoder.encode("123456"));
-//		user.setRole("ROLE_ADMIN");
+//		user.setRole("ROLE_SUPER_ADMIN");
 //		user.setCreatedBy("dev");
 //		user.setCreatedAt(nowDate);
 //		user.setLastModifiedBy("dev");
 //		user.setLastModifiedAt(nowDate);
 //		accountRepository.save(user);
 //		logger.info("User generator");
+//		
+//		Account user2 = new Account();
+//		user2.setAccountId(iGeneratorSequenceService.genID("Account"));
+//		user2.setFirstName("admin");
+//		user2.setLastName("admin");
+//		user2.setEmail("admin@gmail.com");
+//		user2.setPassword(passwordEncoder.encode("123456"));
+//		user2.setRole("ROLE_SUPER_ADMIN");
+//		user2.setCreatedBy("dev");
+//		user2.setCreatedAt(nowDate);
+//		user2.setLastModifiedBy("dev");
+//		user2.setLastModifiedAt(nowDate);
+//		user2.setParentAccount(user);
+//		accountRepository.save(user2);
+//		logger.info("User2 generator");
 		
 		System.out.println("Initializr database");
 	}
