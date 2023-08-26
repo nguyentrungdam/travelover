@@ -1,9 +1,9 @@
 :root {
-  --primary-color: #ff7e01;
-  --secondary-color: #faa935;
+  --primary-color: #e81cff;
+  --secondary-color: #0974f1;
   --heading-color: #0b2727;
   --text-color: #6e7074;
-  --font-name: "Montserrat", sans-serif;
+  --font-name: "Quicksand", sans-serif;
   --subtitle-font-name: "Island Moments", cursive;
 }
 
@@ -19,7 +19,9 @@
   margin-bottom: 2rem;
   color: var(--heading-color);
 }
-
+.subtitle {
+  color: #fff !important;
+}
 .hero__content h1 .hightlight {
   color: var(--secondary-color);
 }
@@ -27,7 +29,7 @@
 .hero__content p {
   font-size: 1rem;
   color: var(--text-color);
-  line-height: 1.4rem;
+  line-height: 1.6rem;
 }
 
 .hero__img-box img,

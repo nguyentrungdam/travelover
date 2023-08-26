@@ -24,19 +24,21 @@ const Home = () => {
           <Row>
             <Col lg="6">
               <div className="hero__content">
-                <div className="hero__subtitle d-flex align-items-center">
-                  <Subtitle subtitle={"Know Before You Go"} />
+                <div className="hero__subtitle subtitle d-flex align-items-center">
+                  <Subtitle subtitle={"Biết Trước Khi Bạn Đến"} />
                   <img src={worldImg} alt="" />
                 </div>
                 <h1>
-                  Traveling opens the door to creating{" "}
+                  Du lịch mở ra cơ hội sáng tạo
                   <span className="hightlight"> memories</span>
                 </h1>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Ullam ipsum nobis asperiores soluta voluptas quas voluptates.
-                  Molestiae tempora dignissimos, animi praesentium molestias
-                  perferendis porro expedita delectus. Soluta natus porro.
+                  Du lịch là hoạt động của con người đi ra khỏi nơi sống và làm
+                  việc thường xuyên của mình, đến những nơi khác với mục đích
+                  nhất định như: tham quan, tìm hiểu, nghỉ ngơi, chữa bệnh, vui
+                  chơi giải trí, tôn giáo – tâm linh mà không nhằm mục đích kiếm
+                  tiền. Thông qua đó chúng ta sẽ có một cách nhìn mới về mọi
+                  thứ...
                 </p>
               </div>
             </Col>

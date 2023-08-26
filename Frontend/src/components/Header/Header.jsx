@@ -8,15 +8,15 @@ import { AuthContext } from "../../context/AuthContext";
 const nav__links = [
   {
     path: "/home",
-    display: "Home",
+    display: "Trang Chủ",
   },
   {
     path: "/about",
-    display: "About",
+    display: "Thông Tin",
   },
   {
     path: "/tours",
-    display: "Tours",
+    display: "Chuyến Đi",
   },
 ];
 
@@ -59,7 +59,9 @@ const Header = () => {
           <div className="nav__wrapper d-flex align-items-center justify-content-between">
             {/* ========== LOGO ========== */}
             <div className="logo">
-              <img src={Logo} alt="" />
+              <Link to="/">
+                <img src={Logo} alt="" />
+              </Link>
             </div>
             {/* ========================== */}
 
@@ -95,10 +97,10 @@ const Header = () => {
                 ) : (
                   <>
                     <Button className="btn secondary__btn">
-                      <Link to="/login">Login</Link>
+                      <Link to="/login">Đăng Nhập</Link>
                     </Button>
                     <Button className="btn primary__btn">
-                      <Link to="/register">Register</Link>
+                      <Link to="/register">Đăng Ký</Link>
                     </Button>
                   </>
                 )}
