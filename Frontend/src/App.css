@@ -6,7 +6,7 @@
   --secondary-color: #faa935;
   --heading-color: #0b2727;
   --text-color: #6e7074;
-  --font-name: "Montserrat", sans-serif;
+  --font-name: "Quicksand", sans-serif;
   --subtitle-font-name: "Island Moments", cursive;
 }
 
@@ -17,7 +17,7 @@
 }
 
 body {
-  font-family: var(--font-name);
+  font-family: var(--font-name) !important;
 }
 
 section {
@@ -86,27 +86,26 @@ ul {
   color: var(--heading-color);
 }
 
-
 /* =============== RESPONSIVE ================ */
-@media only screen and (max-width:992px) {
-   .primary__btn a,
-   .secondary__btn a {
-      font-size: 0.9rem;
-   }
+@media only screen and (max-width: 992px) {
+  .primary__btn a,
+  .secondary__btn a {
+    font-size: 0.9rem;
+  }
 
-   .primary__btn,
-   .secondary__btn,
-   .btn-dark {
-      padding: 0.2rem 1.1rem !important;
-   }
+  .primary__btn,
+  .secondary__btn,
+  .btn-dark {
+    padding: 0.2rem 1.1rem !important;
+  }
 
-   section {
-      padding: 40px 0;
-   }
+  section {
+    padding: 40px 0;
+  }
 }
 
 @media only screen and (max-width: 768px) {
-   .section__subtitle {
-      font-size: 1.3rem;
-   }
+  .section__subtitle {
+    font-size: 1.3rem;
+  }
 }
