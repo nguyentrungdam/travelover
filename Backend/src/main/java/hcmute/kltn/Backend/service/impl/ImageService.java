@@ -3,7 +3,6 @@ package hcmute.kltn.Backend.service.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.persistence.Table;
 
@@ -11,9 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 
 import hcmute.kltn.Backend.component.CloudinaryUtil;
 import hcmute.kltn.Backend.exception.CustomException;

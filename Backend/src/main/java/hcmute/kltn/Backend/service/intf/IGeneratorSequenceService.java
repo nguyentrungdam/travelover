@@ -2,9 +2,6 @@ package hcmute.kltn.Backend.service.intf;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
-
-import hcmute.kltn.Backend.model.ResponseObject;
 import hcmute.kltn.Backend.model.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.entity.GeneratorSequence;
 
