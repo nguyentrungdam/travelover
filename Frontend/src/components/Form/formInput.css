@@ -32,19 +32,21 @@ input:invalid[focused="true"] {
 input:invalid[focused="true"] ~ span {
   display: block;
 }
-.passwordContainer {
+
+.inputContainer {
   display: flex;
   align-items: center;
-  flex-direction: column;
+  position: relative;
 }
 
-.passwordIcon {
+.passwordIconContainer {
   position: absolute;
-  top: 50%;
   right: 10px;
+  top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
 }
+
 .error-container {
   display: block;
 }

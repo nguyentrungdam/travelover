@@ -14,10 +14,6 @@ const Login = () => {
   //    email: undefined,
   //    password: undefined
   // })
-  const [values, setValues] = useState({
-    email: "",
-    password: "",
-  });
   // const {dispatch} = useContext(AuthContext)
   // const navigate = useNavigate()
 
@@ -50,6 +46,11 @@ const Login = () => {
   //       dispatch({ type: "LOGIN_FAILURE", payload: err.message });
   //     }
   //   };
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(values);
@@ -63,7 +64,7 @@ const Login = () => {
       name: "email",
       type: "email",
       placeholder: "Email",
-      errorMessage: "Phải là một địa chỉ email hợp lệ!",
+      // errorMessage: "Phải là một địa chỉ email hợp lệ!",
       label: "Email",
       required: true,
     },
@@ -73,10 +74,10 @@ const Login = () => {
       type: "password",
       placeholder: "Mật Khẩu",
       maxLength: "21",
-      errorMessage:
-        "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)",
+      // errorMessage:
+      //   "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)",
       label: "Mật Khẩu",
-      pattern: `^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$`,
+      // pattern: `^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$`,
       required: true,
     },
   ];
