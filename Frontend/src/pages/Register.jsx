@@ -1,9 +1,7 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
 import "../styles/login.css";
 import { Link, useNavigate } from "react-router-dom";
-import registerImg from "../assets/images/login.png";
-import userIcon from "../assets/images/user.png";
 import { AuthContext } from "../context/AuthContext";
 import { BASE_URL, REUNICODE } from "../utils/config";
 import FormInput from "../components/Form/FormInput";
@@ -16,6 +14,8 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+  const [passwordMismatchError, setPasswordMismatchError] = useState("");
+
   const options = [
     { value: "", text: "--Bạn là?--" },
     { value: "customer", text: "Khách Hàng" },
@@ -28,10 +28,8 @@ const Register = () => {
       name: "firstname",
       type: "text",
       placeholder: "Vd: Nguyễn",
-      errorMessage: "Họ tối đa 10 kí tự và không có kí tự đặc biệt!",
       label: "Họ",
       maxLength: "10",
-      pattern: REUNICODE,
       required: true,
     },
     {
@@ -39,10 +37,8 @@ const Register = () => {
       name: "lastname",
       type: "text",
       placeholder: "Vd: Nam",
-      errorMessage: "Tên tối đa 10 kí tự và không có kí tự đặc biệt!",
       label: "Tên",
       maxLength: "10",
-      pattern: REUNICODE,
       required: true,
     },
     {
@@ -50,7 +46,6 @@ const Register = () => {
       name: "email",
       type: "email",
       placeholder: "Vd: example@gmail.com",
-      errorMessage: "Phải là một địa chỉ email hợp lệ!",
       label: "Email",
       required: true,
     },
@@ -60,12 +55,9 @@ const Register = () => {
       className: "password-input",
       name: "password",
       type: "password",
+      label: "Mật Khẩu",
       placeholder: "Vd: Test123@",
       maxLength: "21",
-      errorMessage:
-        "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)",
-      label: "Mật Khẩu",
-      pattern: `^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$`,
       required: true,
     },
     {
@@ -73,9 +65,9 @@ const Register = () => {
       name: "confirmPassword",
       type: "password",
       placeholder: "Vd: Test123@",
-      errorMessage: "Mật khẩu không khớp!",
+      // errorMessage: "Mật khẩu không khớp!",
       label: "Xác Nhận Mật Khẩu",
-      pattern: values.password,
+      // pattern: values.password,
       required: true,
     },
   ];
@@ -85,9 +77,20 @@ const Register = () => {
     console.log({ ...values, role });
   };
 
-  const onChange = (e) => {
+  useEffect(() => {
+    if (values.password !== "" && values.confirmPassword === "") {
+      setPasswordMismatchError(""); // Reset thông báo lỗi nếu mật khẩu khớp
+    } else if (values.password !== values.confirmPassword) {
+      setPasswordMismatchError("Mật khẩu và xác nhận mật khẩu không khớp!");
+    } else {
+      setPasswordMismatchError("");
+    }
+  }, [values.password, values.confirmPassword]);
+
+  const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
+
   //   const [credentials, setCredentials] = useState({
   //     userName: undefined,
   //     email: undefined,
@@ -151,9 +154,14 @@ const Register = () => {
                       key={input.id}
                       {...input}
                       value={values[input.name]}
-                      onChange={onChange}
+                      onChange={handleChange}
                     />
                   ))}
+                  {passwordMismatchError && (
+                    <span className="error-container">
+                      {passwordMismatchError}
+                    </span>
+                  )}
                   <select
                     className="mt-3"
                     value={role}

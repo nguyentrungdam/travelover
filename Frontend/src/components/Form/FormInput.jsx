@@ -2,33 +2,70 @@ import { useState } from "react";
 import "./formInput.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-
+import {
+  validateEmail,
+  validatePassword,
+  validateName,
+} from "../../utils/validate";
 const FormInput = (props) => {
   const [focused, setFocused] = useState(false);
-  const { label, errorMessage, onChange, id, ...inputProps } = props;
+  const { label, onChange, value, id, ...inputProps } = props;
   const [showPassword, setShowPassword] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const isPasswordInput = inputProps.type === "password";
+
+  const handleInputChange = (e) => {
+    if (inputProps.name === "email") {
+      const isValidEmail = validateEmail(e.target.value);
+      if (!isValidEmail) {
+        setErrorMessage("Phải là một địa chỉ email hợp lệ!");
+      } else {
+        setErrorMessage("");
+      }
+    } else if (
+      inputProps.name === "firstname" ||
+      inputProps.name === "lastname"
+    ) {
+      const isValidName = validateName(e.target.value);
+      if (!isValidName && inputProps.name === "firstname") {
+        setErrorMessage("Họ tối đa 10 kí tự và không có kí tự đặc biệt!");
+      } else if (!isValidName && inputProps.name === "lastname") {
+        setErrorMessage("Tên tối đa 10 kí tự và không có kí tự đặc biệt!");
+      } else {
+        setErrorMessage("");
+      }
+    } else if (inputProps.name === "password") {
+      const isValidPassword = validatePassword(e.target.value);
+      if (!isValidPassword) {
+        setErrorMessage(
+          "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)"
+        );
+      } else {
+        setErrorMessage("");
+      }
+    }
+    onChange(e);
+  };
+
   const handleFocus = (e) => {
     setFocused(true);
   };
+
   const togglePasswordVisibility = () => {
     if (isPasswordInput) {
       setShowPassword(!showPassword);
     }
   };
-  const handleInputChange = (e) => {
-    // Xử lý lỗi ở đây bằng cách kiểm tra errorMessage
-    setHasError(errorMessage !== ""); // Kiểm tra xem errorMessage có giá trị hay không
-  };
+
   return (
     <div className="formInput">
       <label className="text-dark">{label}</label>
-      <div className="passwordContainer">
+      <div className="inputContainer">
         <input
           {...inputProps}
           type={isPasswordInput && showPassword ? "text" : inputProps.type}
-          onChange={onChange || handleInputChange}
+          onChange={handleInputChange}
+          value={value}
           onBlur={handleFocus}
           onFocus={() =>
             inputProps.name === "confirmPassword" && setFocused(true)
@@ -36,7 +73,10 @@ const FormInput = (props) => {
           focused={focused.toString()}
         />
         {isPasswordInput && (
-          <div onClick={togglePasswordVisibility}>
+          <div
+            className="passwordIconContainer"
+            onClick={togglePasswordVisibility}
+          >
             <FontAwesomeIcon
               icon={showPassword ? faEye : faEyeSlash}
               className="passwordIcon"
@@ -44,7 +84,7 @@ const FormInput = (props) => {
           </div>
         )}
       </div>
-      {hasError && <span className="error-container">{errorMessage}</span>}
+      {errorMessage && <span className="error-container">{errorMessage}</span>}
     </div>
   );
 };
