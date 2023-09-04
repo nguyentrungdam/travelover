@@ -2,35 +2,42 @@ import React from "react";
 import "./footer.css";
 import { Container, Row, Col, ListGroup, ListGroupItem } from "reactstrap";
 import { Link } from "react-router-dom";
-import logo from "../../assets/images/logo.png";
-
+import logo from "../../assets/images/travel-love.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFacebook,
+  faGithub,
+  faInstagram,
+  faYoutube,
+} from "@fortawesome/free-brands-svg-icons";
+import {
+  faEnvelope,
+  faLocationDot,
+  faPhone,
+} from "@fortawesome/free-solid-svg-icons";
 const quick__links = [
   {
-    path: "/home",
-    display: "Home",
+    path: "/",
+    display: "Trang Chủ",
   },
   {
     path: "/about",
-    display: "About",
+    display: "Thông Tin",
   },
   {
     path: "/tours",
-    display: "Tours",
+    display: "Chuyến Đi",
   },
 ];
 
 const quick__links2 = [
   {
-    path: "/gallery",
-    display: "Gallery",
-  },
-  {
     path: "/login",
-    display: "Login",
+    display: "Đăng Nhập",
   },
   {
     path: "/register",
-    display: "Register",
+    display: "Đăng Ký",
   },
 ];
 
@@ -44,37 +51,17 @@ const Footer = () => {
           <Col lg="3">
             <div className="logo">
               <img src={logo} alt="" />
-              <p>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Commodi, enim.
-              </p>
               <div className="social__link d-flex align-items-center gap-4">
-                <span>
-                  <Link to="#">
-                    <i className="ri-youtube-line"></i>
-                  </Link>
-                </span>
-                <span>
-                  <Link to="#">
-                    <i className="ri-github-fill"></i>
-                  </Link>
-                </span>
-                <span>
-                  <Link to="#">
-                    <i className="ri-facebook-circle-line"></i>
-                  </Link>
-                </span>
-                <span>
-                  <Link to="#">
-                    <i className="ri-instagram-line"></i>
-                  </Link>
-                </span>
+                <FontAwesomeIcon icon={faYoutube} className="footer-icon" />
+                <FontAwesomeIcon icon={faGithub} className="footer-icon" />
+                <FontAwesomeIcon icon={faFacebook} className="footer-icon" />
+                <FontAwesomeIcon icon={faInstagram} className="footer-icon" />
               </div>
             </div>
           </Col>
 
           <Col lg="3">
-            <h5 className="footer__link-title">Discover</h5>
+            <h5 className="footer__link-title">Khám phá</h5>
 
             <ListGroup className="footer__quick-links">
               {quick__links.map((item, index) => (
@@ -85,7 +72,7 @@ const Footer = () => {
             </ListGroup>
           </Col>
           <Col lg="3">
-            <h5 className="footer__link-title">Quick Links</h5>
+            <h5 className="footer__link-title">Truy cập nhanh</h5>
 
             <ListGroup className="footer__quick-links">
               {quick__links2.map((item, index) => (
@@ -96,39 +83,39 @@ const Footer = () => {
             </ListGroup>
           </Col>
           <Col lg="3">
-            <h5 className="footer__link-title">Contact</h5>
+            <h5 className="footer__link-title">Liên Hệ</h5>
 
             <ListGroup className="footer__quick-links">
               <ListGroupItem className="ps-0 border-0 d-flex align-items-center gap-3">
                 <h6 className="mb-0 d-flex align-items-center gap-2">
-                  <span>
-                    <i className="ri-map-pin-line"></i>
-                  </span>
-                  Address:
+                  <FontAwesomeIcon
+                    icon={faLocationDot}
+                    className="footer-icon-2"
+                  />
+                  Địa chỉ:
                 </h6>
-                <p className="mb-0">Lorem</p>
+                <p className="mb-0">Số 1, Võ Văn Ngân</p>
               </ListGroupItem>
 
               <ListGroupItem className="ps-0 border-0 d-flex align-items-center gap-3">
                 <h6 className="mb-0 d-flex align-items-center gap-2">
-                  <span>
-                    <i className="ri-mail-line"></i>
-                  </span>
+                  <FontAwesomeIcon
+                    icon={faEnvelope}
+                    className="footer-icon-2"
+                  />
                   Email:
                 </h6>
 
-                <p className="mb-0">Lorem</p>
+                <p className="mb-0">travelover@gmail.com</p>
               </ListGroupItem>
 
               <ListGroupItem className="ps-0 border-0 d-flex align-items-center gap-3">
                 <h6 className="mb-0 d-flex align-items-center gap-2">
-                  <span>
-                    <i className="ri-phone-fill"></i>
-                  </span>
-                  Phone:
+                  <FontAwesomeIcon icon={faPhone} className="footer-icon-2" />
+                  SĐT:
                 </h6>
 
-                <p className="mb-0">Lorem</p>
+                <p className="mb-0">(+84) 394959699</p>
               </ListGroupItem>
             </ListGroup>
           </Col>

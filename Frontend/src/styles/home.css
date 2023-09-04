@@ -58,7 +58,7 @@
 
 .services__title {
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .featured__tour-title {
@@ -90,7 +90,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-color);
+  /* background: var(--primary-color);
+ */
+  background: #e1a273;
   color: #fff;
   font-size: 1.2rem;
   font-weight: 600;
@@ -98,7 +100,7 @@
 }
 
 .counter__box h6 {
-  font-size: 0.8rem;
+  font-size: 1rem;
   margin-top: 0.5rem;
   color: var(--text-color);
 }
