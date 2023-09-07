@@ -59,10 +59,19 @@ public class AccountService implements IAccountService{
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(), request.getPassword())
         );
-        
+
         User user = (User) authentication.getPrincipal();
         String accessToken = jwtUtil.generateAccessToken(user);
-        AuthResponse response = new AuthResponse(user.getUsername(), accessToken);
+        
+        Account account = accountRepository.findByEmail(request.getEmail()).get();
+        
+        AuthResponse response = new AuthResponse(
+        		account.getFirstName(), 
+        		account.getLastName(), 
+        		account.getRole(), 
+        		account.getAvatar(), 
+        		user.getUsername(), 
+        		accessToken);
         
         return response;
     }
