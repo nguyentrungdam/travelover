@@ -70,8 +70,10 @@ const Home = () => {
         <Container>
           <Row>
             <Col lg="3">
-              <h5 className="services__subtitle">What we serve</h5>
-              <h2 className="services__title">We offer our best services</h2>
+              <h5 className="services__subtitle">Chúng tôi cung cấp gì ?</h5>
+              <h2 className="services__title">
+                Chúng tôi cung cấp các dịch vụ tốt nhất
+              </h2>
             </Col>
             <ServiceList />
           </Row>
@@ -98,28 +100,30 @@ const Home = () => {
           <Row>
             <Col lg="6">
               <div className="experience__content">
-                <Subtitle subtitle={"Experience"} />
+                <Subtitle subtitle={"Trải nghiệm"} />
                 <h2>
-                  With our all experience <br /> we will serve you
+                  Với tất cả kinh nghiệm của chúng tôi <br /> chúng tôi sẽ phục
+                  vụ bạn
                 </h2>
                 <p>
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  <br /> Quas aliquam, hic tempora inventore suscipit unde.{" "}
+                  Với nhiều năm kinh nghiệm trong lĩnh vực du lịch
+                  <br /> Chúng tôi đảm bảo cung cấp cho bạn những trải nghiệm
+                  tốt nhất.{" "}
                 </p>
               </div>
 
               <div className="counter__wrapper d-flex align-items-center gap-5">
                 <div className="counter__box">
                   <span>12k+</span>
-                  <h6>Successful trip</h6>
+                  <h6>Chuyến đi</h6>
                 </div>
                 <div className="counter__box">
                   <span>2k+</span>
-                  <h6>Regular clients</h6>
+                  <h6>Khách hàng</h6>
                 </div>
                 <div className="counter__box">
                   <span>15</span>
-                  <h6>Year experience</h6>
+                  <h6>Năm kinh nghiệm</h6>
                 </div>
               </div>
             </Col>
@@ -138,10 +142,12 @@ const Home = () => {
         <Container>
           <Row>
             <Col lg="12">
-              <Subtitle subtitle={"Gallery"} />
-              <h2 className="gallery__title">
-                Visit our customers tour gallery
-              </h2>
+              <Subtitle subtitle={"Album"} />
+              <div id="album">
+                <h2 className="gallery__title">
+                  Lấy cảm hứng cho chuyến đi tiếp theo của bạn
+                </h2>
+              </div>
             </Col>
             <Col lg="12">
               <MasonryImagesGallery />

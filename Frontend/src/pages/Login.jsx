@@ -1,70 +1,82 @@
-import React, { useContext, useState } from "react";
-import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Container, Row, Col, Form, Button } from "reactstrap";
 import "../styles/login.css";
 import { Link, useNavigate } from "react-router-dom";
 import loginImg from "../assets/images/login-logo.png";
-import userIcon from "../assets/images/user.png";
-import { AuthContext } from "../context/AuthContext";
-import { BASE_URL } from "../utils/config";
 import FormInput from "../components/Form/FormInput";
-import heroVideo from "../assets/images/hero-video.mp4";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { signin } from "../slices/accountSlice";
 
 const Login = () => {
-  // const [credentials, setCredentials] = useState({
-  //    email: undefined,
-  //    password: undefined
-  // })
-  // const {dispatch} = useContext(AuthContext)
-  // const navigate = useNavigate()
-
-  // const handleChange = e => {
-  //    setCredentials(prev => ({ ...prev, [e.target.id]: e.target.value }))
-  // }
-
-  //   const handleClick = async (e) => {
-  //     e.preventDefault();
-
-  //     dispatch({ type: "LOGIN_START" });
-
-  //     try {
-  //       const res = await fetch(`${BASE_URL}/auth/login`, {
-  //         method: "post",
-  //         headers: {
-  //           "content-type": "application/json",
-  //         },
-  //         credentials: "include",
-  //         body: JSON.stringify(credentials),
-  //       });
-
-  //       const result = await res.json();
-  //       if (!res.ok) alert(result.message);
-  //       console.log(result.data);
-
-  //       dispatch({ type: "LOGIN_SUCCESS", payload: result.data });
-  //       navigate("/");
-  //     } catch (err) {
-  //       dispatch({ type: "LOGIN_FAILURE", payload: err.message });
-  //     }
-  //   };
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [values, setValues] = useState({
     email: "",
     password: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(values);
+    try {
+      const res = await dispatch(
+        signin({ email: values.email, password: values.password })
+      ).unwrap();
+      console.log(res);
+      if (res.d && res.data.account.Role === "user") {
+        notify(1);
+        setTimeout(function () {
+          console.log(res.data);
+          navigate("/");
+        }, 1500);
+        // } else if (res.data.success && res.data.account.Role === "admin") {
+        //   notify(0);
+        //   setTimeout(function () {
+        //     console.log(res.data);
+        //     navigate("/admin");
+        //   }, 1500);
+      } else {
+        notify(2);
+        setTimeout(function () {
+          navigate("/login");
+        }, 1500);
+      }
+    } catch (error) {
+      notify(2);
+      setTimeout(function () {
+        navigate("/login");
+      }, 1500);
+    }
   };
-  const onChange = (e) => {
+  const notify = (prop) => {
+    if (prop === 1) {
+      toast.success("🎂 Người dùng đăng nhập thành công!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+      });
+    } else if (prop === 0) {
+      toast.success("🎂 Admin đăng nhập thành công!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+      });
+    } else {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+      });
+    }
+  };
+  const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
+
   const inputs = [
     {
       id: 1,
       name: "email",
       type: "email",
       placeholder: "Email",
-      // errorMessage: "Phải là một địa chỉ email hợp lệ!",
       label: "Email",
       required: true,
     },
@@ -74,13 +86,11 @@ const Login = () => {
       type: "password",
       placeholder: "Mật Khẩu",
       maxLength: "21",
-      // errorMessage:
-      //   "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)",
       label: "Mật Khẩu",
-      // pattern: `^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,20}$`,
       required: true,
     },
   ];
+
   return (
     <section>
       <Container>
@@ -106,7 +116,7 @@ const Login = () => {
                       key={input.id}
                       {...input}
                       value={values[input.name]}
-                      onChange={onChange}
+                      onChange={handleChange}
                     />
                   ))}
                   <Button
@@ -124,6 +134,7 @@ const Login = () => {
           </Col>
         </Row>
       </Container>
+      <ToastContainer />
     </section>
   );
 };
