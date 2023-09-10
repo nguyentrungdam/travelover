@@ -13,19 +13,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import hcmute.kltn.Backend.model.entity.GeneratorSequence;
+import hcmute.kltn.Backend.model.dto.AccountDTO;
+import hcmute.kltn.Backend.model.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.entity.Account;
 import hcmute.kltn.Backend.repository.GeneratorSequenceRepository;
 import hcmute.kltn.Backend.repository.AccountRepository;
+import hcmute.kltn.Backend.service.intf.IAccountService;
 import hcmute.kltn.Backend.service.intf.IGeneratorSequenceService;
 
 @Component
 public class DataLoader implements CommandLineRunner {
 	@Autowired
-	private GeneratorSequenceRepository generatorSequenceRepository;
-	@Autowired
 	private IGeneratorSequenceService iGeneratorSequenceService;
 	@Autowired
-	private AccountRepository accountRepository;
+	private IAccountService iAccountService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
 
@@ -33,43 +34,71 @@ public class DataLoader implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 //		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 //		Date nowDate = new Date();
-//		
-//		GeneratorSequence genSeqUser = new GeneratorSequence();
-//		genSeqUser.setTableName("Account");
-//		genSeqUser.setPrefix("ACC");
-//		genSeqUser.setDescription("table Account");
-//		generatorSequenceRepository.save(genSeqUser);
-//		logger.info("Generator Sequence for Account table");
-//		
-//		Account user = new Account();
-//		user.setAccountId(iGeneratorSequenceService.genID("Account"));
-//		user.setFirstName("Thanh");
-//		user.setLastName("Tran");
-//		user.setEmail("thanhdt114@gmail.com");
-//		user.setPassword(passwordEncoder.encode("123456"));
-//		user.setRole("ROLE_SUPER_ADMIN");
-//		user.setCreatedBy("dev");
-//		user.setCreatedAt(nowDate);
-//		user.setLastModifiedBy("dev");
-//		user.setLastModifiedAt(nowDate);
-//		accountRepository.save(user);
-//		logger.info("User generator");
-//		
-//		Account user2 = new Account();
-//		user2.setAccountId(iGeneratorSequenceService.genID("Account"));
-//		user2.setFirstName("admin");
-//		user2.setLastName("admin");
-//		user2.setEmail("admin@gmail.com");
-//		user2.setPassword(passwordEncoder.encode("123456"));
-//		user2.setRole("ROLE_SUPER_ADMIN");
-//		user2.setCreatedBy("dev");
-//		user2.setCreatedAt(nowDate);
-//		user2.setLastModifiedBy("dev");
-//		user2.setLastModifiedAt(nowDate);
-//		user2.setParentAccount(user);
-//		accountRepository.save(user2);
-//		logger.info("User2 generator");
 		
-		System.out.println("Initializr database");
+		// GEN DATA FOR GENERATOR SEQUENCE TABLE
+		// TableName = Account, Prefix = ACC, Description = table Account
+		// TableName = Image, Prefix = IMG, Description = table Image
+		// TableName = Tour, Prefix = TR, Description = table Tour
+		boolean initCheck = true;
+		
+		GeneratorSequenceDTO genGenSeqAccount = new GeneratorSequenceDTO();
+		genGenSeqAccount.setTableName("Account");
+		genGenSeqAccount.setPrefix("ACC");
+		genGenSeqAccount.setDescription("table Account");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqAccount);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence table: "
+					+ "TableName = Account, Prefix = ACC, Description = table Account");
+		} else {
+			logger.info("Already data for Generator Sequence table: "
+					+ "TableName = Account, Prefix = ACC, Description = table Account");
+		}
+		
+		
+		GeneratorSequenceDTO genGenSeqImage = new GeneratorSequenceDTO();
+		genGenSeqImage.setTableName("Image");
+		genGenSeqImage.setPrefix("IMG");
+		genGenSeqImage.setDescription("table Image");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqImage);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence table: "
+					+ "TableName = Image, Prefix = IMG, Description = table Image");
+		} else {
+			logger.info("Already data for Generator Sequence table: "
+					+ "TableName = Image, Prefix = IMG, Description = table Image");
+		}
+		
+		GeneratorSequenceDTO genGenSeqTour = new GeneratorSequenceDTO();
+		genGenSeqTour.setTableName("Tour");
+		genGenSeqTour.setPrefix("TR");
+		genGenSeqTour.setDescription("table Tour");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqTour);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence table: "
+					+ "TableName = Tour, Prefix = TR, Description = table Tour");
+		} else {
+			logger.info("Already data for Generator Sequence table: "
+					+ "TableName = Tour, Prefix = TR, Description = table Tour");
+		}
+		
+		// GEN DATA FOR ACCOUNT TABLE
+		// FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = SUPER_ADMIN
+		
+		AccountDTO user1 = new AccountDTO();
+		user1.setFirstName("dev");
+		user1.setLastName("dev");
+		user1.setEmail("dev@gmail.com");
+		user1.setPassword("123456");
+		user1.setRole("SUPER_ADMIN");
+		initCheck = iAccountService.initData(user1);
+		if (initCheck) {
+			logger.info("Success to gen data for Account table: "
+					+ "FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = SUPER_ADMIN");
+		} else {
+			logger.info("Already data for Account table: "
+					+ "FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = SUPER_ADMIN");
+		}
+
+		System.out.println("Initialized database");
 	}
 }

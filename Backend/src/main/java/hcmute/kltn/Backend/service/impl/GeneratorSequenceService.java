@@ -126,4 +126,25 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 		}
 	}
 
+	@Override
+	public boolean initData(GeneratorSequenceDTO generatorSequenceDTO) {
+		// Check Already
+		boolean existsTableName = generatorSequenceRepository.existsByTableName(generatorSequenceDTO.getTableName());
+		boolean existsPrefix = generatorSequenceRepository.existsByPrefix(generatorSequenceDTO.getPrefix());
+		if(existsTableName || existsPrefix) {
+			return false;
+		}
+		
+		// Mapping
+		GeneratorSequence generatorSequence = new GeneratorSequence();
+		modelMapper.map(generatorSequenceDTO, generatorSequence);
+
+		// Set default value
+		generatorSequence.setNumber(0);
+		
+		generatorSequence = generatorSequenceRepository.save(generatorSequence);
+		
+		return true;
+	}
+
 }

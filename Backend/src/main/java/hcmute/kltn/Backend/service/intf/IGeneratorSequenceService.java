@@ -13,4 +13,5 @@ public interface IGeneratorSequenceService {
 	public boolean delete(long generatorSequenceId);
 	
 	public String genId(String tableName);
+	public boolean initData(GeneratorSequenceDTO generatorSequenceDTO);
 }

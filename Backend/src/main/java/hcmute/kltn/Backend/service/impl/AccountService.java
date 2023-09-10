@@ -261,4 +261,56 @@ public class AccountService implements IAccountService{
 
 		return account;
 	}
+
+	@Override
+	public boolean initData(AccountDTO accountDTO) {
+		// Check already
+		boolean existsEmail = accountRepository.existsByEmail(accountDTO.getEmail().trim());
+		if (existsEmail) {
+			return false;
+		} 
+		
+		boolean isRole = false;
+		for (ERole item : ERole.values()) {
+			if (item.name().equals(accountDTO.getRole())) {
+				isRole = true;
+				break;
+			}
+		}
+		if (isRole == false) {
+			return false;
+		}
+		
+		// Mapping
+		Account account = new Account();
+		modelMapper.map(accountDTO, account);
+
+		// Set default value
+		String accountId = iGeneratorSequenceService.genId(tableName);
+		String password = new BCryptPasswordEncoder().encode(account.getPassword());
+		Date dateNow = DateUtil.getDateNow();
+		account.setAccountId(accountId);
+		account.setPassword(password);
+		account.setStatus(true);			
+		account.setCreatedBy(accountId);
+		account.setCreatedAt(dateNow);
+		account.setLastModifiedBy(accountId);
+		account.setLastModifiedAt(dateNow);
+		
+		// Set avatar
+		if (accountDTO.getAvatar() != null && accountDTO.getAvatar() != "") {
+			Image image = iImageService.getDetail(accountDTO.getAvatar());
+			account.setAvatar(image);
+		} 
+		
+		// Set parentAccount
+		if (accountDTO.getParentAccount() != null && accountDTO.getParentAccount() != "") {
+			Account parentAccount = getDetail(accountDTO.getParentAccount());
+			account.setParentAccount(parentAccount);
+		} 
+
+		account = accountRepository.save(account);
+		
+		return true;
+	}
 }

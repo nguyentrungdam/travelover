@@ -21,4 +21,5 @@ public interface IAccountService {
 	public Account register(RegisterRequest registerRequest);
 	public Account updateProfile(MultipartFile file, AccountUpdateProfile accountUpdateProfile);
 	public AuthResponse login(AuthRequest request);
+	public boolean initData(AccountDTO accountDTO);
 }
