@@ -16,53 +16,36 @@ const Login = () => {
     email: "",
     password: "",
   });
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await dispatch(
         signin({ email: values.email, password: values.password })
       ).unwrap();
-      console.log(res);
-      if (res.d && res.data.account.Role === "user") {
+
+      if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
         notify(1);
-        setTimeout(function () {
-          console.log(res.data);
-          navigate("/");
-        }, 1500);
-        // } else if (res.data.success && res.data.account.Role === "admin") {
-        //   notify(0);
-        //   setTimeout(function () {
-        //     console.log(res.data);
-        //     navigate("/admin");
-        //   }, 1500);
+        navigate("/");
       } else {
         notify(2);
-        setTimeout(function () {
-          navigate("/login");
-        }, 1500);
+        navigate("/login");
       }
     } catch (error) {
-      notify(2);
-      setTimeout(function () {
-        navigate("/login");
-      }, 1500);
+      console.log(error);
+      navigate("/login");
     }
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("🎂 Người dùng đăng nhập thành công!", {
+      toast.success("Đăng nhập thành công ! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
-      });
-    } else if (prop === 0) {
-      toast.success("🎂 Admin đăng nhập thành công!", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 1000,
+        pauseOnHover: true,
       });
     } else {
       toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
         position: toast.POSITION.TOP_RIGHT,
+        pauseOnHover: true,
         autoClose: 1000,
       });
     }

@@ -9,10 +9,10 @@ const accountApi = {
     const url = "/accounts/register";
     return axios.post(url, user);
   },
-  // getAccountProfile: () => {
-  //   const url = "/accounts/getAccountProfile";
-  //   return axios.post(url);
-  // },
+  getAccountProfile: () => {
+    const url = "/accounts/profile/detail";
+    return axios.get(url);
+  },
 
   // isUserLoggedIn: () => {
   //   const url = "/accounts/isUserLoggedIn";

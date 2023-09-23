@@ -25,23 +25,12 @@ export const signup = createAsyncThunk(
   }
 );
 export const getAccountProfile = createAsyncThunk(
-  "accounts/getAccountProfile",
+  "accounts/profile/detail",
   async (user, { rejectWithValue, dispatch }) => {
     try {
-      const response = await accountApi.getAccountProfile();
-      await dispatch(signin(user));
-      return response;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const isUserLoggedIn = createAsyncThunk(
-  "accounts/isUserLoggedIn",
-  async (user, { rejectWithValue }) => {
-    try {
-      const response = await accountApi.isUserLoggedIn(user);
+      const response = await accountApi.getAccountProfile(
+        localStorage.getItem("token")
+      );
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -85,13 +74,13 @@ export const isUserLoggedIn = createAsyncThunk(
 //     }
 //   }
 // );
-
+const initialIsAuthenticated = localStorage.getItem("token") ? true : false;
 export const accountSlice = createSlice({
   name: "account",
   initialState: {
     account: {},
     loading: false,
-    isAuthenticated: false,
+    isAuthenticated: initialIsAuthenticated,
     error: null,
   },
   reducers: {
@@ -113,7 +102,6 @@ export const accountSlice = createSlice({
     [signin.fulfilled]: (state, action) => {
       state.loading = false;
       state.account = action.payload.data;
-      console.log(state.account);
       state.isAuthenticated = true;
       localStorage.setItem("token", action.payload.data.data.accessToken);
     },
@@ -128,7 +116,7 @@ export const accountSlice = createSlice({
       state.loading = false;
       state.account = action.payload.data;
       state.isAuthenticated = true;
-      // localStorage.setItem("token", action.payload.data.token);
+      localStorage.setItem("token", action.payload.data.data.accessToken);
     },
     [getAccountProfile.pending]: (state) => {
       state.loading = true;
@@ -140,7 +128,7 @@ export const accountSlice = createSlice({
     [getAccountProfile.fulfilled]: (state, action) => {
       state.loading = false;
       state.isAuthenticated = true;
-      state.account = action.payload.data.Account;
+      state.account = action.payload.data;
     },
     // ,
     // [isUserLoggedIn.pending]: (state) => {

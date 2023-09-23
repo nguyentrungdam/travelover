@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useContext } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Container, Row, Button } from "reactstrap";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Logo from "../../assets/images/travel-love.png";
 import "./header.css";
-import { AuthContext } from "../../context/AuthContext";
-
+import { useDispatch, useSelector } from "react-redux";
+import { signout } from "../../slices/accountSlice";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const nav__links = [
   {
     path: "/home",
@@ -24,13 +26,31 @@ const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const { user, dispatch } = useContext(AuthContext);
-
-  const logout = () => {
-    dispatch({ type: "LOGOUT" });
-    navigate("/");
+  const dispatch = useDispatch();
+  const { isAuthenticated, account } = useSelector((state) => state.account);
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    await dispatch(signout());
+    notify2(1);
+    setTimeout(function () {
+      navigate("/login");
+    }, 1500);
   };
-
+  const notify2 = (prop) => {
+    if (prop === 1) {
+      toast.success("Đăng xuất thành công! 👌", {
+        position: toast.POSITION.TOP_RIGHT,
+        pauseOnHover: true,
+        autoClose: 1000,
+      });
+    } else {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+        position: toast.POSITION.TOP_RIGHT,
+        pauseOnHover: true,
+        autoClose: 1000,
+      });
+    }
+  };
   const stickyHeaderFunc = () => {
     window.addEventListener("scroll", () => {
       if (
@@ -86,11 +106,14 @@ const Header = () => {
 
             <div className="nav__right d-flex align-items-center gap-4">
               <div className="nav__btns d-flex align-items-center gap-2">
-                {user ? (
+                {isAuthenticated ? (
                   <>
-                    {" "}
-                    <h5 className="mb-0">{user.username}</h5>
-                    <Button className="btn btn-dark" onClick={logout}>
+                    {account.data && (
+                      <h5 className="mb-0">
+                        {account.data.firstName} {account.data.lastName}
+                      </h5>
+                    )}
+                    <Button className="btn btn-dark" onClick={handleLogout}>
                       Logout
                     </Button>
                   </>
@@ -115,6 +138,7 @@ const Header = () => {
           </div>
         </Row>
       </Container>
+      <ToastContainer />
     </header>
   );
 };

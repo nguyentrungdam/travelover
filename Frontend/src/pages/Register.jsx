@@ -1,12 +1,17 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Container, Row, Col, Form, FormGroup, Button } from "reactstrap";
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Form, Button } from "reactstrap";
 import "../styles/login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import { BASE_URL, REUNICODE } from "../utils/config";
 import FormInput from "../components/Form/FormInput";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { signup } from "../slices/accountSlice";
 
 const Register = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [values, setValues] = useState({
     firstname: "",
     lastname: "",
@@ -18,8 +23,8 @@ const Register = () => {
 
   const options = [
     { value: "", text: "--Bạn là?--" },
-    { value: "customer", text: "Khách Hàng" },
-    { value: "enterprise", text: "Doanh Nghiệp" },
+    { value: "CUSTOMER", text: "Khách Hàng" },
+    { value: "ENTERPRISE", text: "Doanh Nghiệp" },
   ];
   const [role, setRole] = useState(options[0].value);
   const inputs = [
@@ -72,9 +77,34 @@ const Register = () => {
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ ...values, role });
+
+    try {
+      const res = await dispatch(
+        signup({
+          firstName: values.firstname,
+          lastName: values.lastname,
+          email: values.email,
+          password: values.password,
+          role: role,
+        })
+      ).unwrap();
+      if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
+        notify1(1);
+        navigate("/");
+      } else {
+        notify1(2);
+        setTimeout(function () {
+          navigate("/register");
+        }, 1500);
+      }
+    } catch (error) {
+      notify1(2);
+      setTimeout(function () {
+        navigate("/login");
+      }, 1500);
+    }
   };
 
   useEffect(() => {
@@ -91,40 +121,21 @@ const Register = () => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  //   const [credentials, setCredentials] = useState({
-  //     userName: undefined,
-  //     email: undefined,
-  //     password: undefined,
-  //   });
-
-  //   const { dispatch } = useContext(AuthContext);
-  //   const navigate = useNavigate();
-
-  //   const handleChange = (e) => {
-  //     setCredentials((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-  //   };
-
-  //   const handleClick = async (e) => {
-  //     e.preventDefault();
-
-  //     try {
-  //       const res = await fetch(`${BASE_URL}/auth/register`, {
-  //         method: "post",
-  //         headers: {
-  //           "content-type": "application/json",
-  //         },
-  //         body: JSON.stringify(credentials),
-  //       });
-  //       const result = await res.json();
-
-  //       if (!res.ok) alert(result.message);
-
-  //       dispatch({ type: "REGISTER_SUCCESS" });
-  //       navigate("/login");
-  //     } catch (err) {
-  //       alert(err.message);
-  //     }
-  //   };
+  const notify1 = (prop) => {
+    if (prop === 1) {
+      toast.success("Đăng ký thành công ! 👌", {
+        position: toast.POSITION.TOP_RIGHT,
+        pauseOnHover: true,
+        autoClose: 1000,
+      });
+    } else {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+        position: toast.POSITION.TOP_RIGHT,
+        pauseOnHover: true,
+        autoClose: 1000,
+      });
+    }
+  };
 
   return (
     <section>
@@ -189,6 +200,7 @@ const Register = () => {
           </Col>
         </Row>
       </Container>
+      <ToastContainer />
     </section>
   );
 };
