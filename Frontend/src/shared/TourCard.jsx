@@ -45,7 +45,10 @@ const TourCard = ({ tour }) => {
             {/* <button className=' booking__btn'>
                      <Link to={`/tours/${_id}`}>Book Now</Link>
                   </button> */}
-            <Link to={`/tours/${_id}`}>
+            {/* <Link to={`/tours/${_id}`}>
+              <button className=" booking__btn">Đặt Ngay</button>
+            </Link> */}
+            <Link to={`/tours/search-hotels/1`}>
               <button className=" booking__btn">Đặt Ngay</button>
             </Link>
           </div>

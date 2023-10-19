@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Container, Row, Col, Form, Button } from "reactstrap";
-import "../styles/login.css";
+import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
-import loginImg from "../assets/images/login-logo.png";
-import FormInput from "../components/Form/FormInput";
+import loginImg from "../../../assets/images/login-logo.png";
+import FormInput from "../../../components/Form/FormInput";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { signin } from "../slices/accountSlice";
-import Footer from "../components/Footer/Footer";
-import Header from "../components/Header/Header";
+import { signin } from "../../../slices/accountSlice";
+import Footer from "../../../components/Footer/Footer";
+import Header from "../../../components/Header/Header";
 
 const Login = () => {
   const navigate = useNavigate();

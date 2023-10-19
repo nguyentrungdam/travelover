@@ -18,15 +18,16 @@ const nav__links = [
   },
   {
     path: "/tours",
-    display: "Chuyến Đi",
+    display: "Tour",
   },
 ];
 
 const Header = () => {
-  const headerRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isSticky, setIsSticky] = useState(false);
+
   const { isAuthenticated, account } = useSelector((state) => state.account);
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -51,29 +52,25 @@ const Header = () => {
       });
     }
   };
-  const stickyHeaderFunc = () => {
-    window.addEventListener("scroll", () => {
-      if (
-        document.body.scrollTop > 80 ||
-        document.documentElement.scrollTop > 80
-      ) {
-        headerRef.current.classList.add("sticky__header");
-      } else {
-        headerRef.current.classList.remove("sticky__header");
-      }
-    });
-  };
 
   useEffect(() => {
-    stickyHeaderFunc();
-
-    return window.removeEventListener("scroll", stickyHeaderFunc);
-  });
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
 
   return (
-    <header className="header" ref={headerRef}>
+    <header className={`header ${isSticky ? "sticky__header" : ""}`}>
       <Container>
         <Row>
           <div className="nav__wrapper d-flex align-items-center justify-content-between">

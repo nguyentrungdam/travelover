@@ -22,3 +22,15 @@ export function validateName(name) {
 export function validatePasswordMatch(password, confirmPassword) {
   return password === confirmPassword;
 }
+
+export function formatCurrencyWithoutD(amount) {
+  const formatter = new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+
+  const formattedAmount = formatter.format(amount);
+
+  // Bỏ chữ "đ" ở cuối
+  return formattedAmount.replace(/\s?₫$/, "");
+}

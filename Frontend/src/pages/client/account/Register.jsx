@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button } from "reactstrap";
-import "../styles/login.css";
+import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
-import FormInput from "../components/Form/FormInput";
+import FormInput from "../../../components/Form/FormInput";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { signup } from "../slices/accountSlice";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
+import { signup } from "../../../slices/accountSlice";
+import Header from "../../../components/Header/Header";
+import Footer from "../../../components/Footer/Footer";
 
 const Register = () => {
   const dispatch = useDispatch();

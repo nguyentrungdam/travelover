@@ -70,7 +70,7 @@ const SearchBar = () => {
     });
   };
   const handleSearch = () => {
-    navigate("/hotels", { state: { destination, date, options } });
+    navigate("/tours/search-hotels", { state: { destination, date, options } });
   };
 
   return (
