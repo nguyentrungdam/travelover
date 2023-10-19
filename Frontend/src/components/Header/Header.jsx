@@ -13,7 +13,7 @@ const nav__links = [
     display: "Trang Chủ",
   },
   {
-    path: "/about",
+    path: "/dashboard",
     display: "Thông Tin",
   },
   {

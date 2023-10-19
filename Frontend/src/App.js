@@ -13,6 +13,14 @@ import { getAccountProfile } from "./slices/accountSlice";
 import Page404 from "./components/404/404";
 import Hotel from "./pages/client/hotel/Hotel";
 import List from "./pages/client/searchHotels/List";
+///import admin routes
+import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
+import Users from "./pages/admin/users/Users";
+import User from "./pages/admin/user/User";
+import LayoutAdmin from "./components/LayoutAdmin/LayoutAdmin";
+import Products from "./pages/admin/products/Products";
+import Product from "./pages/admin/product/Product";
+
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
   const dispatch = useDispatch();
@@ -26,6 +34,18 @@ function App() {
       fetchData();
     }
   }, [isAuthenticated]);
+
+  //! protected route
+  // const ProtectedRoute = ({ children }) => {
+  //   const { user } = useAuthContext();
+
+  //   if (!user) {
+  //     return <Navigate to="/login" />;
+  //   }
+
+  //   return children;
+  // };
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/home" />} />
@@ -39,6 +59,43 @@ function App() {
       <Route path="/tours/search-hotels" element={<List />} />
       <Route path="/tours/search-hotels/:id" element={<Hotel />} />
       <Route path="/*" element={<Page404 />} />
+      {/* admin route */}
+      <Route path="/" element={<LayoutAdmin />}>
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="users" element={<Users />} />
+        <Route path="users/:id" element={<User />} />
+        <Route path="products" element={<Products />} />
+        <Route path="products/:id" element={<Product />} />
+      </Route>
+      {/* <Route path="users">
+        <Route
+          index
+          element={
+            <ProtectedRoute>
+              <ListAdmin columns={userColumns} />
+              //{" "}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path=":id"
+          element={
+            <ProtectedRoute>
+              <Single />
+              //{" "}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="new"
+          element={
+            <ProtectedRoute>
+              <NewUser inputs={userInputs} title="Add New User" />
+              //{" "}
+            </ProtectedRoute>
+          }
+        />
+      </Route> */}
     </Routes>
   );
 }
