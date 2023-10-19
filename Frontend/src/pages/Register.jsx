@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { signup } from "../slices/accountSlice";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -138,70 +140,74 @@ const Register = () => {
   };
 
   return (
-    <section>
-      <Container>
-        <Row>
-          <Col lg="8" className="m-auto">
-            <div className="login__container d-flex justify-content-between">
-              <div className="login__img">
-                <img
-                  src="https://m.media-amazon.com/images/I/611rvkYeUhL._AC_UF1000,1000_QL80_.jpg"
-                  alt=""
-                />
-              </div>
-
-              <div className="login__form">
-                <div className="user">
+    <>
+      <Header />
+      <section>
+        <Container>
+          <Row>
+            <Col lg="8" className="m-auto">
+              <div className="login__container d-flex justify-content-between">
+                <div className="login__img">
                   <img
-                    src="https://static.vecteezy.com/system/resources/previews/007/167/661/original/user-blue-icon-isolated-on-white-background-free-vector.jpg"
+                    src="https://m.media-amazon.com/images/I/611rvkYeUhL._AC_UF1000,1000_QL80_.jpg"
                     alt=""
                   />
                 </div>
-                <h2 className="text-dark">Đăng Ký</h2>
 
-                <Form onSubmit={handleSubmit}>
-                  {inputs.map((input) => (
-                    <FormInput
-                      key={input.id}
-                      {...input}
-                      value={values[input.name]}
-                      onChange={handleChange}
+                <div className="login__form">
+                  <div className="user">
+                    <img
+                      src="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+                      alt=""
                     />
-                  ))}
-                  {passwordMismatchError && (
-                    <span className="error-container">
-                      {passwordMismatchError}
-                    </span>
-                  )}
-                  <select
-                    className="mt-3"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                  >
-                    {options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.text}
-                      </option>
+                  </div>
+                  <h2 className="text-dark">Đăng Ký</h2>
+
+                  <Form onSubmit={handleSubmit}>
+                    {inputs.map((input) => (
+                      <FormInput
+                        key={input.id}
+                        {...input}
+                        value={values[input.name]}
+                        onChange={handleChange}
+                      />
                     ))}
-                  </select>
-                  <Button
-                    className="btn secondary__btn auth__btn mt-3  "
-                    type="submit"
-                  >
-                    Tạo Tài Khoản
-                  </Button>
-                </Form>
-                <p className="text-dark">
-                  Bạn đã có tài khoản?{" "}
-                  <Link to="/login">Đăng nhập tại đây</Link>
-                </p>
+                    {passwordMismatchError && (
+                      <span className="error-container">
+                        {passwordMismatchError}
+                      </span>
+                    )}
+                    <select
+                      className="mt-3 login-select"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                    >
+                      {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.text}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      className="btn secondary__btn auth__btn mt-3  "
+                      type="submit"
+                    >
+                      Tạo Tài Khoản
+                    </Button>
+                  </Form>
+                  <p className="text-dark">
+                    Bạn đã có tài khoản?{" "}
+                    <Link to="/login">Đăng nhập tại đây</Link>
+                  </p>
+                </div>
               </div>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-      <ToastContainer />
-    </section>
+            </Col>
+          </Row>
+        </Container>
+        <ToastContainer />
+      </section>
+      <Footer />
+    </>
   );
 };
 

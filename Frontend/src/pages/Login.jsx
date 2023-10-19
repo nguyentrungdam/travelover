@@ -8,6 +8,8 @@ import FormInput from "../components/Form/FormInput";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { signin } from "../slices/accountSlice";
+import Footer from "../components/Footer/Footer";
+import Header from "../components/Header/Header";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -75,50 +77,54 @@ const Login = () => {
   ];
 
   return (
-    <section>
-      <Container>
-        <Row>
-          <Col lg="8" className="m-auto">
-            <div className="login__container d-flex justify-content-between">
-              <div className="login__img">
-                <img src={loginImg} alt="" />
-              </div>
-
-              <div className="login__form login--form">
-                <div className="user">
-                  <img
-                    src="https://static.vecteezy.com/system/resources/previews/007/167/661/original/user-blue-icon-isolated-on-white-background-free-vector.jpg"
-                    alt=""
-                  />
+    <>
+      <Header />
+      <section>
+        <Container>
+          <Row>
+            <Col lg="8" className="m-auto">
+              <div className="login__container d-flex justify-content-between">
+                <div className="login__img">
+                  <img src={loginImg} alt="" />
                 </div>
-                <h2 className="text-dark">Đăng Nhập</h2>
 
-                <Form onSubmit={handleSubmit}>
-                  {inputs.map((input) => (
-                    <FormInput
-                      key={input.id}
-                      {...input}
-                      value={values[input.name]}
-                      onChange={handleChange}
+                <div className="login__form login--form">
+                  <div className="user">
+                    <img
+                      src="https://w7.pngwing.com/pngs/178/595/png-transparent-user-profile-computer-icons-login-user-avatars-thumbnail.png"
+                      alt=""
                     />
-                  ))}
-                  <Button
-                    className="btn secondary__btn auth__btn mt-4"
-                    type="submit"
-                  >
-                    Đăng Nhập
-                  </Button>
-                </Form>
-                <p className="text-dark">
-                  Bạn chưa có tài khoản? <Link to="/register">Tạo ở đây</Link>
-                </p>
+                  </div>
+                  <h2 className="text-dark">Đăng Nhập</h2>
+
+                  <Form onSubmit={handleSubmit}>
+                    {inputs.map((input) => (
+                      <FormInput
+                        key={input.id}
+                        {...input}
+                        value={values[input.name]}
+                        onChange={handleChange}
+                      />
+                    ))}
+                    <Button
+                      className="btn secondary__btn auth__btn mt-4"
+                      type="submit"
+                    >
+                      Đăng Nhập
+                    </Button>
+                  </Form>
+                  <p className="text-dark">
+                    Bạn chưa có tài khoản? <Link to="/register">Tạo ở đây</Link>
+                  </p>
+                </div>
               </div>
-            </div>
-          </Col>
-        </Row>
-      </Container>
-      <ToastContainer />
-    </section>
+            </Col>
+          </Row>
+        </Container>
+        <ToastContainer />
+      </section>
+      <Footer />
+    </>
   );
 };
 

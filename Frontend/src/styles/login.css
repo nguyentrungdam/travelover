@@ -1,12 +1,10 @@
 .login__img {
   width: 60%;
-  text-align: center;
 }
 
 .login__img img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
 }
 
 .login__form {
@@ -85,12 +83,13 @@
 .auth__btn:hover {
   background: var(--heading-color) !important;
 }
-select {
+.login-select {
   width: 8.5rem;
   height: 1.7rem;
   background-color: white;
   box-shadow: 0 2px 0 #ccc;
   border-radius: 4px;
+  border: none;
 }
 
 /* =============== RESPONSIVE ================ */

@@ -6,7 +6,6 @@ import heroImg02 from "../assets/images/hero-img02.jpg";
 import heroVideo from "../assets/images/hero-video.mp4";
 import worldImg from "../assets/images/world.png";
 import experienceImg from "../assets/images/experience.png";
-
 import Subtitle from "./../shared/subtitle";
 import SearchBar from "./../shared/SearchBar";
 import ServiceList from "../services/ServiceList";
@@ -14,12 +13,16 @@ import FeaturedTourList from "../components/Featured-tours/FeaturedTourList";
 import MasonryImagesGallery from "../components/Image-gallery/MasonryImagesGallery";
 import Testimonials from "../components/Testimonial/Testimonials";
 import NewsLetter from "../shared/Newsletter";
+import ScrollToTop from "../shared/ScrollToTop";
+import Header from "../components/Header/Header";
+import Footer from "../components/Footer/Footer";
 
 const Home = () => {
   return (
     <>
+      <Header />
       {/* ========== HERO SECTION ========== */}
-      <section>
+      <section className="padding-top-0">
         <Container>
           <Row>
             <Col lg="6">
@@ -28,10 +31,7 @@ const Home = () => {
                   <Subtitle subtitle={"Biết Trước Khi Bạn Đến"} />
                   <img src={worldImg} alt="" />
                 </div>
-                <h1>
-                  Du lịch mở ra cơ hội sáng tạo
-                  <span className="hightlight"> memories</span>
-                </h1>
+                <h1>Du lịch mở ra cơ hội sáng tạo</h1>
                 <p>
                   Du lịch là hoạt động của con người đi ra khỏi nơi sống và làm
                   việc thường xuyên của mình, đến những nơi khác với mục đích
@@ -85,8 +85,8 @@ const Home = () => {
         <Container>
           <Row>
             <Col lg="12" className="mb-5">
-              <Subtitle subtitle={"Explore"} />
-              <h2 className="featured__tour-title">Our featured tours</h2>
+              <Subtitle subtitle={"Tour"} />
+              <h2 className="featured__tour-title">Các tour của chúng tôi</h2>
             </Col>
             <FeaturedTourList />
           </Row>
@@ -173,6 +173,8 @@ const Home = () => {
       </section>
       {/* ========== TESTIMONIAL SECTION END ================== */}
       <NewsLetter />
+      <ScrollToTop />
+      <Footer />
     </>
   );
 };

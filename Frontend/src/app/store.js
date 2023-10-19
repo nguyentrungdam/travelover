@@ -33,7 +33,6 @@ import accountReducer from "../slices/accountSlice";
 // });
 
 // const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 const store = configureStore({
   reducer: {
     account: accountReducer,

@@ -5,7 +5,7 @@
 }
 
 .logo img {
-  width: 24%;
+  width: 30%;
 }
 
 .menu {
@@ -35,20 +35,27 @@
 
 .sticky__header {
   width: 100%;
-  height: 80px;
+  height: 100%;
   line-height: 80px;
   background: #fff;
   position: sticky;
   top: 0;
   left: 0;
-  box-shadow: 3px 3px 8px -3px #ddd;
+  box-shadow: 3px 8px 8px -3px #ddd;
   z-index: 999;
+}
+.btn {
+  transition: transform 0.3s;
+}
+.btn:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
 }
 
 /* =============== RESPONSIVE ================ */
 @media only screen and (max-width: 992px) {
   .logo img {
-    width: 20%;
+    width: 30%;
   }
 
   .navigation {
@@ -87,7 +94,7 @@
 /* =============== RESPONSIVE ================ */
 @media only screen and (max-width: 768px) {
   .logo img {
-    width: 45%;
+    width: 35%;
   }
 
   .menu {
