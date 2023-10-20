@@ -20,3 +20,6 @@
 .menu .item .listItem:hover {
   background-color: #384256;
 }
+.listItemTitle {
+  color: #ddd;
+}
