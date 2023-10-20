@@ -10,6 +10,8 @@ import Newsletter from "../shared/Newsletter";
 import useFetch from "../hooks/useFetch";
 import { BASE_URL } from "../utils/config";
 import { AuthContext } from "../context/AuthContext";
+import tours from "../assets/data/tours";
+import tourImg01 from "../assets/images/tour-img01.jpg";
 
 const TourDetails = () => {
   const { id } = useParams();
@@ -20,19 +22,42 @@ const TourDetails = () => {
   // fetch data from database
   const { data: tour, loading, error } = useFetch(`${BASE_URL}/tours/${id}`);
 
-  const {
-    photo,
-    title,
-    desc,
-    price,
-    reviews,
-    city,
-    address,
-    distance,
-    maxGroupSize,
-  } = tourData;
+  // const {
+  //   photo,
+  //   title,
+  //   desc,
+  //   price,
+  //   reviews,
+  //   city,
+  //   address,
+  //   distance,
+  //   maxGroupSize,
+  // } = tour;
+  const tours = {
+    id: "01",
+    title: "Westminister Bridge",
+    city: "London",
+    distance: 300,
+    address: "SomeWhere",
+    price: 99,
+    maxGroupSize: 10,
+    desc: "this is the description",
+    reviews: [
+      {
+        name: "jhon doe",
+        rating: 4.6,
+      },
+      {
+        name: "jhon doe",
+        rating: 5,
+      },
+    ],
+    avgRating: 4.5,
+    photo: tourImg01,
+    featured: true,
+  };
 
-  const { totalRating, avgRating } = calculateAvgRating(reviews);
+  const { totalRating, avgRating } = calculateAvgRating(tours.reviews);
 
   const options = { day: "numeric", month: "long", year: "numeric" };
 
@@ -76,16 +101,16 @@ const TourDetails = () => {
   return (
     <section>
       <Container>
-        {loading && <h4 className="text-center pt-5">LOADING.........</h4>}
-        {error && <h4 className="text-center pt-5">{error}</h4>}
+        {/* {loading && <h4 className="text-center pt-5">LOADING.........</h4>}
+        {error && <h4 className="text-center pt-5">{error}</h4>} */}
         {/* {!loading && !error && ( */}
         <Row>
           <Col lg="8">
             <div className="tour__content">
-              <img src={photo} alt="" />
+              <img src={tours.photo} alt="" />
 
               <div className="tour__info">
-                <h2>{title}</h2>
+                <h2>{tours.title}</h2>
                 <div className="d-flex align-items-center gap-5">
                   <span className="tour__rating d-flex align-items-center gap-1">
                     <i
@@ -96,37 +121,39 @@ const TourDetails = () => {
                     {avgRating === 0 ? (
                       "Not rated"
                     ) : (
-                      <span>({reviews?.length})</span>
+                      <span>({tours.reviews?.length})</span>
                     )}
                   </span>
 
                   <span>
-                    <i className="ri-map-pin-fill"></i> {address}
+                    <i className="ri-map-pin-fill"></i> {tours.address}
                   </span>
                 </div>
 
                 <div className="tour__extra-details">
                   <span>
-                    <i className="ri-map-pin-2-line"></i> {city}
+                    <i className="ri-map-pin-2-line"></i> {tours.city}
                   </span>
                   <span>
-                    <i className="ri-money-dollar-circle-line"></i> {price}/ per
-                    person
+                    <i className="ri-money-dollar-circle-line"></i>{" "}
+                    {tours.price}/ per person
                   </span>
                   <span>
-                    <i className="ri-map-pin-time-line"></i> {distance} k/m
+                    <i className="ri-map-pin-time-line"></i> {tours.distance}{" "}
+                    k/m
                   </span>
                   <span>
-                    <i className="ri-group-line"></i> {maxGroupSize} people
+                    <i className="ri-group-line"></i> {tours.maxGroupSize}{" "}
+                    people
                   </span>
                 </div>
                 <h5>Description</h5>
-                <p>{desc}</p>
+                <p>{tours.desc}</p>
               </div>
 
               {/* ============ TOUR REVIEWS SECTION START ============ */}
               <div className="tour__reviews mt-4">
-                <h4>Reviews ({reviews?.length} reviews)</h4>
+                <h4>Reviews ({tours.reviews?.length} reviews)</h4>
 
                 <Form onSubmit={submitHandler}>
                   <div className="d-flex align-items-center gap-3 mb-4 rating__group">
@@ -164,7 +191,7 @@ const TourDetails = () => {
                 </Form>
 
                 <ListGroup className="user__reviews">
-                  {reviews?.map((review) => (
+                  {tours.reviews?.map((review) => (
                     <div className="review__item">
                       <img src={avatar} alt="" />
 

@@ -5,7 +5,6 @@ import ThankYou from "./pages/ThankYou";
 import Home from "./pages/client/home/Home";
 import Login from "./pages/client/account/Login";
 import Register from "./pages/client/account/Register";
-import SearchResultList from "././pages/SearchResultList";
 import TourDetails from "././pages/TourDetails";
 import Tours from "././pages/Tours";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,7 +51,7 @@ function App() {
       <Route path="/home" element={<Home />} />
       <Route path="/tours" element={<Tours />} />
       {/* <Route path="/tours/:id" element={<TourDetails />} /> */}
-      {/* <Route path="/tours-detail" element={<TourDetails />} /> */}
+      <Route path="/tours-detail" element={<TourDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       {/* <Route path="/thank-you" element={<ThankYou />} /> */}
