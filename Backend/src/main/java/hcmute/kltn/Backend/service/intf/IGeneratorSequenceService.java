@@ -8,9 +8,9 @@ import hcmute.kltn.Backend.model.entity.GeneratorSequence;
 public interface IGeneratorSequenceService {
 	public GeneratorSequence create(GeneratorSequenceDTO generatorSequenceDTO);
 	public GeneratorSequence update(GeneratorSequenceDTO generatorSequenceDTO);
-	public GeneratorSequence getDetail(long generatorSequenceId);
+	public GeneratorSequence getDetail(String generatorSequenceId);
 	public List<GeneratorSequence> getAll();
-	public boolean delete(long generatorSequenceId);
+	public boolean delete(String generatorSequenceId);
 	
 	public String genId(String tableName);
 	public boolean initData(GeneratorSequenceDTO generatorSequenceDTO);

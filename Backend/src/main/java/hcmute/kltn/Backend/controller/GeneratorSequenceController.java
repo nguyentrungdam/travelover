@@ -32,8 +32,8 @@ public class GeneratorSequenceController {
 	private IResponseObjectService iResponseObjectService;
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(summary = "Get all Generator Sequence - SUPER_ADMIN")
-	@PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    @Operation(summary = "Get all Generator Sequence - ADMIN")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> getAllPrefixId() {
         List<GeneratorSequence> generatorSequenceList = iGeneratorSequenceService.getAll();
         
@@ -47,9 +47,9 @@ public class GeneratorSequenceController {
     }
     
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @Operation(summary = "Get detail Generator Sequence - SUPER_ADMIN")
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
-    ResponseEntity<ResponseObject> findById(@PathVariable long id) {
+    @Operation(summary = "Get detail Generator Sequence - ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    ResponseEntity<ResponseObject> findById(@PathVariable String id) {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.getDetail(id);
     	
     	return iResponseObjectService.success(new ResponseObject() {
@@ -61,8 +61,8 @@ public class GeneratorSequenceController {
     }
     
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    @Operation(summary = "Create Generator Sequence - SUPER_ADMIN")
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    @Operation(summary = "Create Generator Sequence - ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> createPrefixId(@RequestBody GeneratorSequenceDTO newGeneratorSequenceDTO) {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.create(newGeneratorSequenceDTO);
         
@@ -75,8 +75,8 @@ public class GeneratorSequenceController {
     }
     
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
-    @Operation(summary = "Update Generator Sequence - SUPER_ADMIN")
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    @Operation(summary = "Update Generator Sequence - ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> updateProduct(@PathVariable long generatorSequenceId, @RequestBody GeneratorSequenceDTO generatorSequenceDTO) {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.update(generatorSequenceDTO);
     	
@@ -91,7 +91,7 @@ public class GeneratorSequenceController {
     
 //    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
 //    @Operation(summary = "Delete Generator Sequence")
-//    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 //    ResponseEntity<ResponseObject> deleteProduct(@PathVariable long id) {
 //    	boolean delete = iGeneratorSequenceService.delete(id);
 //    	

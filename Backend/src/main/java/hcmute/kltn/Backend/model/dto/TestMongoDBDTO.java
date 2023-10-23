@@ -7,12 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthRequest {
-//	@NotNull
-//	@Email
-//	@Length(min = 5, max = 50)
-	private String email;
-//	@NotNull
-//	@Length(min = 6, max = 50)
-	private String password;
+public class TestMongoDBDTO {
+	private String id;
+	private String tableName;
+	private String prefix;
+	private long number; 
+	private String description;
 }

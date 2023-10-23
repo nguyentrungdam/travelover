@@ -17,5 +17,5 @@ public class AccountDTO {
 	private String avatar; // Foreign key
 	private String address;
 	private String phoneNumber;
-	private String parentAccount; // Foreign key
+//	private String parentAccount; // Foreign key
 }

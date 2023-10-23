@@ -2,13 +2,8 @@ package hcmute.kltn.Backend.model.entity;
 
 import java.util.Collection;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,36 +16,27 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "Account")
+//@Entity
+//@Table(name = "Account")
+@Document(collection = "account")
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Account extends BaseEntity implements UserDetails{
 	@Id
-	@Column(name = "Account_Id")
 	private String accountId;
-	@Column(name = "First_Name", nullable = false)
-	private String firstName;
-	@Column(name = "Last_Name", nullable = false)
-	private String lastName;
-	@Column(name = "Email", unique = true, nullable = false)
-	private String email;
-	@Column(name = "Password", nullable = false)
-	private String password;
-	@Column(name = "Role", nullable = false)
-	private String role;
-	@OneToOne
-    @JoinColumn(name = "avatar", nullable = true)
-	private Image avatar;
-	@Column(name = "Address", nullable = true)
+	private String firstName; // not null
+	private String lastName; // not null
+	private String email; // not null, unique
+	private String password; // not null
+	private String role; 
+	private String avatar;
 	private String address;
-	@Column(name = "Phone_Number", nullable = true)
 	private String phoneNumber;
-	@OneToOne
-    @JoinColumn(name = "Parent_Id", nullable = true)
-	private Account parentAccount;
+//	@OneToOne
+//    @JoinColumn(name = "Parent_Id", nullable = true)
+//	private Account parentAccount;
 	
 	@Override
 	@JsonIgnore

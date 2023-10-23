@@ -22,9 +22,9 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 	@Override
 	public GeneratorSequence create(GeneratorSequenceDTO generatorSequenceDTO) {
 		// Check Already
-		boolean existsTableName = generatorSequenceRepository.existsByTableName(generatorSequenceDTO.getTableName());
+		boolean existsTableName = generatorSequenceRepository.existsByCollectionName(generatorSequenceDTO.getCollectionName());
 		if (existsTableName) {
-			throw new CustomException("Table Name is already");
+			throw new CustomException("Collection Name is already");
 		} 
 
 		boolean existsPrefix = generatorSequenceRepository.existsByPrefix(generatorSequenceDTO.getPrefix());
@@ -38,6 +38,8 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 
 		// Set default value
 		generatorSequence.setNumber(0);
+		
+		
 		
 		generatorSequence = generatorSequenceRepository.save(generatorSequence);
 		
@@ -58,10 +60,10 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 		
 		// Check already
 		List<GeneratorSequence> listByTableName = generatorSequenceRepository
-				.findAllByTableName(generatorSequence.getTableName());
+				.findAllByCollectionName(generatorSequence.getCollectionName());
 		for (GeneratorSequence item : listByTableName) {
-			if (item.getTableName() == generatorSequence.getTableName() && item.getId() != generatorSequence.getId()) {
-				throw new CustomException("Table name is already");
+			if (item.getCollectionName() == generatorSequence.getCollectionName() && item.getId() != generatorSequence.getId()) {
+				throw new CustomException("Collection name is already");
 			}
 		}
 		
@@ -79,7 +81,7 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 	}
 
 	@Override
-	public GeneratorSequence getDetail(long generatorSequenceId) {
+	public GeneratorSequence getDetail(String generatorSequenceId) {
 		// Check exists
 		boolean exists = generatorSequenceRepository.existsById(generatorSequenceId);
 		if (!exists) {
@@ -101,7 +103,7 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 	}
 
 	@Override
-	public boolean delete(long generatorSequenceId) {
+	public boolean delete(String generatorSequenceId) {
 		// Check exists
 		boolean exists = generatorSequenceRepository.existsById(generatorSequenceId);
 		if (!exists) {
@@ -115,7 +117,7 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 
 	@Override
 	public String genId(String tableName) {
-		GeneratorSequence generatorSequence = generatorSequenceRepository.findByTableName(tableName);
+		GeneratorSequence generatorSequence = generatorSequenceRepository.findByCollectionName(tableName);
 		if (generatorSequence != null) {
 			String id = generatorSequence.getPrefix() + String.format("%012d", generatorSequence.getNumber() + 1);
 			generatorSequence.setNumber(generatorSequence.getNumber() + 1);
@@ -129,7 +131,7 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 	@Override
 	public boolean initData(GeneratorSequenceDTO generatorSequenceDTO) {
 		// Check Already
-		boolean existsTableName = generatorSequenceRepository.existsByTableName(generatorSequenceDTO.getTableName());
+		boolean existsTableName = generatorSequenceRepository.existsByCollectionName(generatorSequenceDTO.getCollectionName());
 		boolean existsPrefix = generatorSequenceRepository.existsByPrefix(generatorSequenceDTO.getPrefix());
 		if(existsTableName || existsPrefix) {
 			return false;
@@ -140,7 +142,6 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 		modelMapper.map(generatorSequenceDTO, generatorSequence);
 
 		// Set default value
-		generatorSequence.setNumber(0);
 		
 		generatorSequence = generatorSequenceRepository.save(generatorSequence);
 		

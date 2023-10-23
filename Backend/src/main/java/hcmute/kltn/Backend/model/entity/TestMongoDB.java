@@ -7,15 +7,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document("generator_sequence")
+@Document("test_mongodb")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GeneratorSequence {
+public class TestMongoDB {
 	@Id
 	private String id;
-	private String collectionName; // not null, unique
-	private String prefix; // not null, unique
+	private String tableName; // unique
+	private String prefix; // unique
 	private long number; // not null
 	private String description;
 }

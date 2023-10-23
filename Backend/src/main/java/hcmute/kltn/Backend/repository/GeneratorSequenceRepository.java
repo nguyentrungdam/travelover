@@ -2,14 +2,14 @@ package hcmute.kltn.Backend.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import hcmute.kltn.Backend.model.entity.GeneratorSequence;
 
-public interface GeneratorSequenceRepository extends JpaRepository<GeneratorSequence, Long>{
-	GeneratorSequence findByTableName(String tableName);
-	boolean existsByTableName(String tableName);
+public interface GeneratorSequenceRepository extends MongoRepository<GeneratorSequence, String>{
+	GeneratorSequence findByCollectionName(String tableName);
+	boolean existsByCollectionName(String tableName);
 	boolean existsByPrefix(String prefix);
-	List<GeneratorSequence> findAllByTableName(String tableName);
+	List<GeneratorSequence> findAllByCollectionName(String tableName);
 	List<GeneratorSequence> findAllByPrefix(String prefix);
 }

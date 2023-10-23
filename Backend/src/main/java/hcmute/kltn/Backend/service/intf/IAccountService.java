@@ -14,8 +14,8 @@ import hcmute.kltn.Backend.model.entity.Account;
 public interface IAccountService {
 	public Account create(AccountDTO accountDTO);
 	public Account update(AccountDTO accountDTO);
-	public boolean delete(String id);
 	public Account getDetail(String accountId);
+	public boolean delete(String id);
 	public List<Account> getAll();
 	
 	public Account register(RegisterRequest registerRequest);

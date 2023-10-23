@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GeneratorSequenceDTO {
-	private long id;
-	private String tableName;
+	private String id;
+	private String collectionName;
 	private String prefix;
 	private long number; 
 	private String description;

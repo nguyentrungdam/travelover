@@ -120,8 +120,8 @@ public class AccountController {
 //	}
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	@Operation(summary = "Get all Account - SUPER_ADMIN")
-	@PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+	@Operation(summary = "Get all Account - ADMIN")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> getAllAccounts() {
 		List<Account> accountList = iAccountService.getAll();
 		
