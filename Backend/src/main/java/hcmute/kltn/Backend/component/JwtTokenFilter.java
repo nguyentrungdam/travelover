@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import hcmute.kltn.Backend.model.entity.Account;
-import hcmute.kltn.Backend.repository.AccountRepository;
+import hcmute.kltn.Backend.model.account.dto.entity.Account;
+import hcmute.kltn.Backend.model.account.repository.AccountRepository;
 
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {

@@ -11,8 +11,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import hcmute.kltn.Backend.model.ResponseObject;
-import hcmute.kltn.Backend.service.intf.IResponseObjectService;
+import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
+import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 
 @ControllerAdvice
 public class ExceptionHandlerController {

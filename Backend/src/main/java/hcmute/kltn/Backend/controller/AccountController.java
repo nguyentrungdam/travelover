@@ -16,16 +16,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import hcmute.kltn.Backend.model.ResponseObject;
-import hcmute.kltn.Backend.model.dto.AccountUpdateProfile;
-import hcmute.kltn.Backend.model.dto.AuthRequest;
-import hcmute.kltn.Backend.model.dto.AuthResponse;
-import hcmute.kltn.Backend.model.dto.RegisterRequest;
-import hcmute.kltn.Backend.model.entity.Account;
-import hcmute.kltn.Backend.service.AccountDetailsService;
-import hcmute.kltn.Backend.service.intf.IAccountService;
-import hcmute.kltn.Backend.service.intf.IResponseObjectService;
-
+import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
+import hcmute.kltn.Backend.model.account.dto.AuthRequest;
+import hcmute.kltn.Backend.model.account.dto.AuthResponse;
+import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
+import hcmute.kltn.Backend.model.account.dto.entity.Account;
+import hcmute.kltn.Backend.model.account.service.IAccountService;
+import hcmute.kltn.Backend.model.account.service.impl.AccountDetailsService;
+import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
+import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

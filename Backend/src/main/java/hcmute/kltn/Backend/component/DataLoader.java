@@ -1,5 +1,8 @@
 package hcmute.kltn.Backend.component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,10 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import hcmute.kltn.Backend.model.dto.AccountDTO;
-import hcmute.kltn.Backend.model.dto.GeneratorSequenceDTO;
-import hcmute.kltn.Backend.service.intf.IAccountService;
-import hcmute.kltn.Backend.service.intf.IGeneratorSequenceService;
+import hcmute.kltn.Backend.model.account.dto.AccountDTO;
+import hcmute.kltn.Backend.model.account.dto.extend.Notification;
+import hcmute.kltn.Backend.model.account.service.IAccountService;
+import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
+import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -83,6 +87,24 @@ public class DataLoader implements CommandLineRunner {
 			logger.info("Success to gen data for Account table: "
 					+ "FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = ADMIN");
 		} 
+		
+//		List<Notification> notiList2 = new ArrayList();
+//		Notification noti2 = new Notification();
+//		AccountDTO user2 = new AccountDTO();
+//		user2.setFirstName("test");
+//		user2.setLastName("test");
+//		user2.setEmail("test@gmail.com");
+//		user2.setPassword("123456");
+//		user2.setRole("ADMIN");
+//		noti2.setTitle("Login success");
+//		noti2.setLink("google.com");
+//		notiList2.add(noti2);
+//		user2.setNotification(notiList2);
+//		initCheck = iAccountService.initData(user2);
+//		if (initCheck) {
+//			logger.info("Success to gen data for Account table: "
+//					+ "FirstName = test, LastName = test, Email = test@gmail.com, Password = 123456, Role = ADMIN");
+//		}
 
     	String linkServer = "http://localhost:" + portServer + "/swagger-ui/index.html";
 		

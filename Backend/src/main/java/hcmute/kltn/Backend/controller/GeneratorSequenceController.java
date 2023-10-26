@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import hcmute.kltn.Backend.model.ResponseObject;
-import hcmute.kltn.Backend.model.dto.GeneratorSequenceDTO;
-import hcmute.kltn.Backend.model.entity.GeneratorSequence;
-import hcmute.kltn.Backend.service.intf.IGeneratorSequenceService;
-import hcmute.kltn.Backend.service.intf.IResponseObjectService;
-
+import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
+import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceCreate;
+import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
+import hcmute.kltn.Backend.model.generatorSequence.dto.entity.GeneratorSequence;
+import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,8 +63,8 @@ public class GeneratorSequenceController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     @Operation(summary = "Create Generator Sequence - ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    ResponseEntity<ResponseObject> createPrefixId(@RequestBody GeneratorSequenceDTO newGeneratorSequenceDTO) {
-    	GeneratorSequence generatorSequence = iGeneratorSequenceService.create(newGeneratorSequenceDTO);
+    ResponseEntity<ResponseObject> createPrefixId(@RequestBody GeneratorSequenceCreate generatorSequenceCreate) {
+    	GeneratorSequence generatorSequence = iGeneratorSequenceService.createGenSeq(generatorSequenceCreate);
         
         return iResponseObjectService.success(new ResponseObject() {
 					{
