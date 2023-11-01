@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import accountReducer from "../slices/accountSlice";
+import userReducer from "../slices/userSlice";
 // import productReducer from "../slices/productSlice";
 // import categoryReducer from "../slices/categorySlice";
 // import cartReducer from "../slices/cartSlice";
@@ -36,6 +37,7 @@ import accountReducer from "../slices/accountSlice";
 const store = configureStore({
   reducer: {
     account: accountReducer,
+    user: userReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

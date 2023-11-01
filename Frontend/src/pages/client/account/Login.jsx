@@ -28,6 +28,9 @@ const Login = () => {
       if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
         notify(1);
         navigate("/");
+      } else if (res.data.status === "ok" && res.data.data.role === "ADMIN") {
+        notify(1);
+        navigate("/dashboard");
       } else {
         notify(2);
         navigate("/login");

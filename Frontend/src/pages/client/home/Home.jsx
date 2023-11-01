@@ -67,7 +67,6 @@ const Home = () => {
         </Container>
       </section>
       {/* ============================================================== */}
-
       {/* ==================== HERO SECTION START ====================== */}
       <section className="section-nonepadding">
         <Container>

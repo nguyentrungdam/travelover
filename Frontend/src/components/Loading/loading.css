@@ -1,6 +1,11 @@
 .container2 {
   height: 100vh;
-  width: 100vw;
+}
+.vw-80 {
+  width: 80vw;
+}
+.vw-98 {
+  width: 98vw;
 }
 
 .loader2 {
@@ -58,7 +63,9 @@
   margin: auto;
 }
 .loader--text:after {
-  content: "Loading";
+  content: "Đang tải";
+  display: block;
+  width: 5rem;
   font-weight: bold;
   animation-name: loading-text;
   animation-duration: 3s;
@@ -81,15 +88,15 @@
 }
 @keyframes loading-text {
   0% {
-    content: "Loading";
+    content: "Đang tải";
   }
   25% {
-    content: "Loading.";
+    content: "Đang tải.";
   }
   50% {
-    content: "Loading..";
+    content: "Đang tải..";
   }
   75% {
-    content: "Loading...";
+    content: "Đang tải...";
   }
 }

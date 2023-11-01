@@ -59,6 +59,8 @@ function App() {
       <Route path="/tours/search-hotels/:id" element={<Hotel />} />
       <Route path="/*" element={<Page404 />} />
       {/* admin route */}
+      {/* "email": "admind@gmail.com",
+  "password": "123456@Aa" */}
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />
