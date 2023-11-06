@@ -43,11 +43,11 @@ public class DataLoader implements CommandLineRunner {
 		genGenSeqAccount.setCollectionName("account");
 		genGenSeqAccount.setPrefix("ACC");
 		genGenSeqAccount.setNumber(0);
-		genGenSeqAccount.setDescription("table Account");
+		genGenSeqAccount.setDescription("Account collection");
 		initCheck = iGeneratorSequenceService.initData(genGenSeqAccount);
 		if (initCheck) {
-			logger.info("Success to gen data for Generator Sequence table: "
-					+ "TableName = Account, Prefix = ACC, Description = table Account");
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Account, Prefix = ACC, Description = Account collection");
 		} 
 		
 		
@@ -55,22 +55,44 @@ public class DataLoader implements CommandLineRunner {
 		genGenSeqImage.setCollectionName("image");
 		genGenSeqImage.setPrefix("IMG");
 		genGenSeqImage.setNumber(0);
-		genGenSeqImage.setDescription("table Image");
+		genGenSeqImage.setDescription("Image collection");
 		initCheck = iGeneratorSequenceService.initData(genGenSeqImage);
 		if (initCheck) {
-			logger.info("Success to gen data for Generator Sequence table: "
-					+ "TableName = Image, Prefix = IMG, Description = table Image");
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Image, Prefix = IMG, Description = Image collection");
 		} 
 		
 		GeneratorSequenceDTO genGenSeqTour = new GeneratorSequenceDTO();
 		genGenSeqTour.setCollectionName("tour");
 		genGenSeqTour.setPrefix("TR");
 		genGenSeqTour.setNumber(0);
-		genGenSeqTour.setDescription("table Tour");
+		genGenSeqTour.setDescription("Tour collection");
 		initCheck = iGeneratorSequenceService.initData(genGenSeqTour);
 		if (initCheck) {
-			logger.info("Success to gen data for Generator Sequence table: "
-					+ "TableName = Tour, Prefix = TR, Description = table Tour");
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Tour, Prefix = TR, Description = Tour collection");
+		} 
+		
+		GeneratorSequenceDTO genGenSeqOrder = new GeneratorSequenceDTO();
+		genGenSeqOrder.setCollectionName("order");
+		genGenSeqOrder.setPrefix("ODR");
+		genGenSeqOrder.setNumber(0);
+		genGenSeqOrder.setDescription("Order collection");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqOrder);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Tour, Prefix = TR, Description = Order collection");
+		} 
+		
+		GeneratorSequenceDTO genGenSeqHotel = new GeneratorSequenceDTO();
+		genGenSeqHotel.setCollectionName("hotel");
+		genGenSeqHotel.setPrefix("HTL");
+		genGenSeqHotel.setNumber(0);
+		genGenSeqHotel.setDescription("Hotel collection");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqHotel);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Tour, Prefix = TR, Description = Hotel collection");
 		} 
 		
 		// GEN DATA FOR ACCOUNT TABLE

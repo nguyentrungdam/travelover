@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.extend.Contact;
@@ -22,6 +24,7 @@ import lombok.NoArgsConstructor;
 public class Hotel extends BaseEntity {
 	@Id
 	private String hotelId;
+	@JsonProperty("eHotelId")
 	private String eHotelId;
 	private String hotelName; // not null
 	private String hotelDescription;
