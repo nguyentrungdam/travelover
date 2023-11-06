@@ -105,14 +105,32 @@ const Header = () => {
               <div className="nav__btns d-flex align-items-center gap-2">
                 {isAuthenticated ? (
                   <>
-                    {account.data && (
-                      <h5 className="mb-0">
-                        {account.data.firstName} {account.data.lastName}
-                      </h5>
+                    {account?.data && (
+                      <div className="userwraper">
+                        <h5 className="mb-0">
+                          {account.data.firstName} {account.data.lastName}
+                        </h5>
+                        <img
+                          className="user-avatar"
+                          src={account.data.avatar || "/noavatar.png"}
+                          alt={account.data.lastName}
+                        />
+                        <div className="DropDownContent">
+                          <Link className="link1" to="/account">
+                            <span className="SubA">Tài Khoản</span>
+                          </Link>
+                          <Link className="link1" to="/user/purchase">
+                            <span className="SubA">Đơn Mua</span>
+                          </Link>
+                          <span
+                            className="SubA seperate"
+                            onClick={handleLogout}
+                          >
+                            Đăng Xuất
+                          </span>
+                        </div>
+                      </div>
                     )}
-                    <Button className="btn btn-dark" onClick={handleLogout}>
-                      Logout
-                    </Button>
                   </>
                 ) : (
                   <>

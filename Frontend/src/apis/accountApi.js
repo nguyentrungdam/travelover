@@ -1,4 +1,4 @@
-import axios from "./axios";
+import { axiosInstance as axios, axiosMultipart } from "./axios";
 
 const accountApi = {
   signin: (user) => {
@@ -12,6 +12,10 @@ const accountApi = {
   getAccountProfile: () => {
     const url = "/accounts/profile/detail";
     return axios.get(url);
+  },
+  updateUserInfo: (user) => {
+    const url = "/accounts/profile/update";
+    return axiosMultipart.put(url, user);
   },
 
   // isUserLoggedIn: () => {

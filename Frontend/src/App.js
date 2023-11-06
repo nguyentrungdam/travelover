@@ -19,6 +19,7 @@ import User from "./pages/admin/user/User";
 import LayoutAdmin from "./components/LayoutAdmin/LayoutAdmin";
 import Products from "./pages/admin/products/Products";
 import Product from "./pages/admin/product/Product";
+import AccountDetail from "./pages/client/accountDetail/AccountDetail";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -54,11 +55,14 @@ function App() {
       <Route path="/tours-detail" element={<TourDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/account" element={<AccountDetail />} />
       {/* <Route path="/thank-you" element={<ThankYou />} /> */}
       <Route path="/tours/search-hotels" element={<List />} />
       <Route path="/tours/search-hotels/:id" element={<Hotel />} />
       <Route path="/*" element={<Page404 />} />
       {/* admin route */}
+      {/* "email": "admind@gmail.com",
+  "password": "123456@Aa" */}
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />

@@ -1,15 +1,17 @@
 import "./users.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { userRows } from "../../../assets/data/dataAdmin";
 import DataTable from "../../../components/dataTable/DataTable";
 import Add from "../../../components/add/Add";
-// import { useQuery } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllUsers } from "../../../slices/userSlice";
+import Loading from "../../../components/Loading/Loading";
 
 const columns = [
   { field: "id", headerName: "ID", width: 50 },
   {
     field: "img",
-    headerName: "Avatar",
+    headerName: "Ảnh",
     width: 100,
     renderCell: (params) => {
       return <img src={params.row.img || "/noavatar.png"} alt="" />;
@@ -18,13 +20,13 @@ const columns = [
   {
     field: "firstName",
     type: "string",
-    headerName: "First name",
+    headerName: "Họ",
     width: 150,
   },
   {
     field: "lastName",
     type: "string",
-    headerName: "Last name",
+    headerName: "Tên",
     width: 150,
   },
   {
@@ -34,14 +36,14 @@ const columns = [
     width: 200,
   },
   {
-    field: "phone",
+    field: "role",
     type: "string",
-    headerName: "Phone",
+    headerName: "Vai trò",
     width: 150,
   },
   {
     field: "createdAt",
-    headerName: "Created At",
+    headerName: "Ngày tạo",
     width: 120,
     type: "string",
   },
@@ -55,16 +57,25 @@ const columns = [
 
 const Users = () => {
   const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const { loading, users } = useSelector((state) => state.user);
+  const transformedData =
+    users && Array.isArray(users)
+      ? users.map((item, index) => ({
+          id: index + 1,
+          img: item.avatar,
+          lastName: item.lastName,
+          firstName: item.firstName,
+          email: item.email,
+          role: item.role,
+          createdAt: item.createdAt,
+          verified: item.status,
+        }))
+      : [];
 
-  // TEST THE API
-
-  // const { isLoading, data } = useQuery({
-  //   queryKey: ["allusers"],
-  //   queryFn: () =>
-  //     fetch("http://localhost:8800/api/users").then(
-  //       (res) => res.json()
-  //     ),
-  // });
+  useEffect(() => {
+    dispatch(getAllUsers()).unwrap();
+  }, []);
 
   return (
     <div className="users">
@@ -72,14 +83,12 @@ const Users = () => {
         <h1>Users</h1>
         <button onClick={() => setOpen(true)}>Add New User</button>
       </div>
-      <DataTable slug="users" columns={columns} rows={userRows} />
-      {/* TEST THE API */}
 
-      {/* {isLoading ? (
-        "Loading..."
+      {loading ? (
+        <Loading isTable />
       ) : (
-        <DataTable slug="users" columns={columns} rows={data} />
-      )} */}
+        <DataTable slug="users" columns={columns} rows={transformedData} />
+      )}
       {open && <Add slug="user" columns={columns} setOpen={setOpen} />}
     </div>
   );
