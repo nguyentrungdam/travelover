@@ -6,12 +6,13 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import hcmute.kltn.Backend.model.base.BaseEntity;
-import hcmute.kltn.Backend.model.tour.dto.extend.Address;
+import hcmute.kltn.Backend.model.base.extend.Address;
+import hcmute.kltn.Backend.model.base.extend.Image;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
-import hcmute.kltn.Backend.model.tour.dto.extend.Image;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.Reviewer;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

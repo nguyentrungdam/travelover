@@ -1,11 +1,16 @@
 package hcmute.kltn.Backend.model.account.service.impl;
 
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,12 +28,13 @@ import hcmute.kltn.Backend.model.account.dto.AuthResponse;
 import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.repository.AccountRepository;
+import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.dto.Image;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
-//import hcmute.kltn.Backend.service.intf.IImageService;
-import hcmute.kltn.Backend.util.DateUtil;
+import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
+import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
 public class AccountService implements IAccountService{
@@ -43,7 +49,7 @@ public class AccountService implements IAccountService{
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
-	private AccountDetailsService accountDetailsService;
+	private IAccountDetailService iAccountDetailService;
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -51,6 +57,167 @@ public class AccountService implements IAccountService{
         String collectionName = mongoTemplate.getCollectionName(Account.class);
         return collectionName;
     }
+    
+    private void checkFieldCondition(AccountDTO accountDTO) {
+		// check null
+		if (accountDTO.getEmail() == null || accountDTO.getEmail().equals("")) {
+			throw new CustomException("Email is not null");
+		} 
+		if (accountDTO.getFirstName() == null || accountDTO.getFirstName().equals("")) {
+			throw new CustomException("First Name is not null");
+		} 
+		if (accountDTO.getLastName() == null || accountDTO.getLastName().equals("")) {
+			throw new CustomException("First Name is not null");
+		} 
+		if (accountDTO.getPassword() == null || accountDTO.getPassword().equals("")) {
+			throw new CustomException("First Name is not null");
+		}
+		
+		// check unique
+		if(accountDTO.getAccountId() == null || accountDTO.getAccountId().equals("")) {
+			if (accountRepository.existsByEmail(accountDTO.getEmail().trim())) {
+				throw new CustomException("Email is already");
+			} 
+		} else {
+			Account account = accountRepository.findById(accountDTO.getAccountId()).get();
+			List<Account> listByEmail = accountRepository.findAllByEmail(account.getEmail());
+			for (Account item : listByEmail) {
+				if (item.getEmail() == account.getEmail() && item.getAccountId() != account.getAccountId()) {
+					throw new CustomException("Email is already");
+				}
+			}
+		}
+	}
+    
+    private Account create(AccountDTO accountDTO) {
+		// check field condition
+		checkFieldCondition(accountDTO); 
+		
+		// get account from db
+		Account account = new Account();
+		
+		// Mapping
+		modelMapper.map(accountDTO, account);
+
+		// Set default value
+		String accountId = iGeneratorSequenceService.genId(getCollectionName());
+		String password = new BCryptPasswordEncoder().encode(account.getPassword());
+		LocalDate dateNow = LocalDateUtil.getDateNow();
+		account.setAccountId(accountId);
+		account.setPassword(password);
+		account.setRole("CUSTOMER");
+		account.setStatus(true);			
+		account.setCreatedBy(accountId);
+		account.setCreatedAt(dateNow);
+		account.setLastModifiedBy(accountId);
+		account.setLastModifiedAt(dateNow);
+
+		// create account
+		account = accountRepository.save(account);
+		
+		return account;
+	}
+
+	private Account update(AccountDTO accountDTO) {
+		// Check exists
+		if (!accountRepository.existsById(accountDTO.getAccountId())) {
+			throw new CustomException("Cannot find account");
+		} 
+		
+		// check field condition
+		checkFieldCondition(accountDTO); 
+		
+		// check role
+		boolean isRole = false;
+		for (ERole item : ERole.values()) {
+			if (item.name().equals(accountDTO.getRole())) {
+				isRole = true;
+				break;
+			}
+		}
+		if (isRole == false) {
+			throw new CustomException("Role does not exist");
+		}
+		
+		// get account from db
+		Account account = accountRepository.findById(accountDTO.getAccountId()).get();
+		
+		// Mapping
+		modelMapper.map(accountDTO, account);
+		
+		// Set default value
+		String currentAccountId = iAccountDetailService.getCurrentAccount().getAccountId();
+		String password = new BCryptPasswordEncoder().encode(account.getPassword());
+		account.setPassword(password);
+		account.setLastModifiedBy(currentAccountId);
+		account.setLastModifiedAt(LocalDateUtil.getDateNow());
+
+		// update account
+		account = accountRepository.save(account);
+
+		return account;
+	}
+	
+	private Account getDetail(String accountId) {
+		// check exists
+		if (!accountRepository.existsById(accountId)) {
+			throw new CustomException("Cannot find Account");
+		} 
+		
+		// get account from db
+		Account account = accountRepository.findById(accountId).get();
+		
+		return account;
+	}
+	
+	private List<Account> getAll() {
+		// get all account from db
+		List<Account> foundAccount = accountRepository.findAll();
+		
+		return foundAccount;
+	}
+	
+	private boolean delete(String id) {
+		// check exists
+		if (!accountRepository.existsById(id)) {
+			throw new CustomException("Cannot find Account");
+		} 
+		
+		// delete account
+		accountRepository.deleteById(id);
+		
+		return true;
+	}
+
+	private List<Account> search(String keyword) {
+		// init Account List
+		List<Account> accountList = new ArrayList<>();
+		
+		if(keyword == null || keyword.equals("")) {
+			accountList = getAll();
+		} else {
+			// create list field name
+			List<Criteria> criteriaList = new ArrayList<>();
+			for(Field itemField : Account.class.getDeclaredFields()) {
+				 if (itemField.getType() == String.class) {
+					 criteriaList.add(Criteria.where(itemField.getName()).regex(keyword, "i"));
+				 }
+	    	}
+
+			// create criteria
+			Criteria criteria = new Criteria();
+	        criteria.orOperator(criteriaList.toArray(new Criteria[0]));
+	        
+	        // create query
+	        Query query = new Query();
+	        query.addCriteria(criteria);
+			
+			// search
+			accountList = mongoTemplate.find(query, Account.class);
+		}
+		
+		return accountList;
+	}
 	
 	@Override
 	public AuthResponse login(AuthRequest request) {
@@ -87,7 +254,7 @@ public class AccountService implements IAccountService{
 	@Override
 	public Account updateProfile(MultipartFile file, AccountUpdateProfile accountUpdateProfile) {
 		// Get Id Account 
-		Account account = accountDetailsService.getCurrentAccount();
+		Account account = iAccountDetailService.getCurrentAccount();
 		
 		// Check field foreign key
 		if (accountUpdateProfile.getAvatar() != null 
@@ -116,111 +283,36 @@ public class AccountService implements IAccountService{
 		
 		return update(accountDTO);
 	}
-
+	
 	@Override
-	public Account create(AccountDTO accountDTO) {
-		// check field condition
-		checkFieldCondition(accountDTO); 
-		
-		// get account from db
-		Account account = new Account();
-		
-		// Mapping
-		modelMapper.map(accountDTO, account);
+	public Account getProfile() {
+		Account account = iAccountDetailService.getCurrentAccount();
 
-		// Set default value
-		String accountId = iGeneratorSequenceService.genId(getCollectionName());
-		String password = new BCryptPasswordEncoder().encode(account.getPassword());
-		Date dateNow = DateUtil.getDateNow();
-		account.setAccountId(accountId);
-		account.setPassword(password);
-		account.setRole("CUSTOMER");
-		account.setStatus(true);			
-		account.setCreatedBy(accountId);
-		account.setCreatedAt(dateNow);
-		account.setLastModifiedBy(accountId);
-		account.setLastModifiedAt(dateNow);
-
-		// create account
-		account = accountRepository.save(account);
-		
 		return account;
 	}
 
 	@Override
-	public Account update(AccountDTO accountDTO) {
-		// Check exists
-		if (!accountRepository.existsById(accountDTO.getAccountId())) {
-			throw new CustomException("Cannot find account");
-		} 
-		
-		// check field condition
-		checkFieldCondition(accountDTO); 
-		
-		// check role
-		boolean isRole = false;
-		for (ERole item : ERole.values()) {
-			if (item.name().equals(accountDTO.getRole())) {
-				isRole = true;
-				break;
-			}
-		}
-		if (isRole == false) {
-			throw new CustomException("Role does not exist");
-		}
-		
-		// get account from db
-		Account account = accountRepository.findById(accountDTO.getAccountId()).get();
-		
-		// Mapping
-		modelMapper.map(accountDTO, account);
-		
-		// Set default value
-		String currentAccountId = accountDetailsService.getCurrentAccount().getAccountId();
-		String password = new BCryptPasswordEncoder().encode(account.getPassword());
-		account.setPassword(password);
-		account.setLastModifiedBy(currentAccountId);
-		account.setLastModifiedAt(DateUtil.getDateNow());
+	public List<Account> getAllAccount() {
+		List<Account> accountList = getAll();
 
-		// update account
-		account = accountRepository.save(account);
+		return accountList;
+	}
+	
+	@Override
+	public Account getDetailAccount(String accountId) {
+		Account account = getDetail(accountId);
 
 		return account;
 	}
-	
+
 	@Override
-	public Account getDetail(String accountId) {
-		// check exists
-		if (!accountRepository.existsById(accountId)) {
-			throw new CustomException("Cannot find Account");
-		} 
-		
-		// get account from db
-		Account account = accountRepository.findById(accountId).get();
-		
-		return account;
+	public List<Account> searchAccount(String keyword) {
+		List<Account> accountList = search(keyword);
+
+		return accountList;
 	}
+
 	
-	@Override
-	public boolean delete(String id) {
-		// check exists
-		if (!accountRepository.existsById(id)) {
-			throw new CustomException("Cannot find Account");
-		} 
-		
-		// delete account
-		accountRepository.deleteById(id);
-		
-		return true;
-	}
-	
-	@Override
-	public List<Account> getAll() {
-		// get all account from db
-		List<Account> foundAccount = accountRepository.findAll();
-		
-		return foundAccount;
-	}
 
 	@Override
 	public boolean initData(AccountDTO accountDTO) {
@@ -248,7 +340,7 @@ public class AccountService implements IAccountService{
 		// Set default value
 		String accountId = iGeneratorSequenceService.genId(getCollectionName());
 		String password = new BCryptPasswordEncoder().encode(account.getPassword());
-		Date dateNow = DateUtil.getDateNow();
+		LocalDate dateNow = LocalDateUtil.getDateNow();
 		account.setAccountId(accountId);
 		account.setPassword(password);
 		account.setStatus(true);			
@@ -273,35 +365,5 @@ public class AccountService implements IAccountService{
 		
 		return true;
 	}
-	
-	private void checkFieldCondition(AccountDTO accountDTO) {
-		// check null
-		if (accountDTO.getEmail() == null || accountDTO.getEmail().equals("")) {
-			throw new CustomException("Email is not null");
-		} 
-		if (accountDTO.getFirstName() == null || accountDTO.getFirstName().equals("")) {
-			throw new CustomException("First Name is not null");
-		} 
-		if (accountDTO.getLastName() == null || accountDTO.getLastName().equals("")) {
-			throw new CustomException("First Name is not null");
-		} 
-		if (accountDTO.getPassword() == null || accountDTO.getPassword().equals("")) {
-			throw new CustomException("First Name is not null");
-		}
-		
-		// check unique
-		if(accountDTO.getAccountId() == null || accountDTO.getAccountId().equals("")) {
-			if (accountRepository.existsByEmail(accountDTO.getEmail().trim())) {
-				throw new CustomException("Email is already");
-			} 
-		} else {
-			Account account = accountRepository.findById(accountDTO.getAccountId()).get();
-			List<Account> listByEmail = accountRepository.findAllByEmail(account.getEmail());
-			for (Account item : listByEmail) {
-				if (item.getEmail() == account.getEmail() && item.getAccountId() != account.getAccountId()) {
-					throw new CustomException("Email is already");
-				}
-			}
-		}
-	}
+
 }

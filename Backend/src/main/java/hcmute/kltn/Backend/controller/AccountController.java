@@ -43,7 +43,7 @@ public class AccountController {
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@Operation(summary = "Login Account")
-	ResponseEntity<ResponseObject> login(@RequestBody @Valid AuthRequest request) {
+	ResponseEntity<ResponseObject> login(@RequestBody AuthRequest request) {
 		AuthResponse response = iAccountService.login(request);
 		
 		return iResponseObjectService.success(new ResponseObject() {
@@ -97,7 +97,7 @@ public class AccountController {
 	@Operation(summary = "Get profile Account - LOGIN")
 	@PreAuthorize("isAuthenticated()")
 	ResponseEntity<ResponseObject> getProfile() {
-		Account account = accountDetailsService.getCurrentAccount();
+		Account account = iAccountService.getProfile();
 		
 		return iResponseObjectService.success(new ResponseObject() {
 			{
@@ -120,13 +120,28 @@ public class AccountController {
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@Operation(summary = "Get all Account - ADMIN")
-	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> getAllAccounts() {
-		List<Account> accountList = iAccountService.getAll();
+		List<Account> accountList = iAccountService.getAllAccount();
 		
 		return iResponseObjectService.success(new ResponseObject() {
 			{
 				setMessage("Get all Accounts");
+				setCountData(accountList.size());
+				setData(accountList);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@Operation(summary = "Search Account by keyword - ADMIN")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	ResponseEntity<ResponseObject> getProfile(@RequestParam String keyword) {
+		List<Account> accountList = iAccountService.searchAccount(keyword);
+		
+		return iResponseObjectService.success(new ResponseObject() {
+			{
+				setMessage("Search Account successfully");
 				setCountData(accountList.size());
 				setData(accountList);
 			}

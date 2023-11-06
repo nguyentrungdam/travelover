@@ -2,34 +2,27 @@ package hcmute.kltn.Backend.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
-import hcmute.kltn.Backend.model.tour.dto.TourDTO;
+import hcmute.kltn.Backend.model.tour.dto.TourSearch;
+import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
-import hcmute.kltn.Backend.model.tour.dto.extend.Address;
-import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
+
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -49,13 +42,12 @@ public class TourController {
 			+ "- 'numberOfDay': ''\n"
 			+ "- 'address': ''\n"
 			+ "- 'TourDetail': ''\n"
-			+ "- 'reasonableTime': dữ liệu Date có định dạng dd/mm''\n";
+			+ "- 'reasonableTime': ''\n";
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	@Operation(summary = "Create tour - STAFF", description = createTourDescription)
+	@Operation(summary = "Create tour - ADMIN / STAFF", description = createTourDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> createTour(
 			@RequestBody TourCreate tourCreate) {
-		
 		Tour tour = iTourService.createTour(tourCreate);
 		
 		return iResponseObjectService.success(new ResponseObject() {
@@ -73,9 +65,9 @@ public class TourController {
 			+ "- 'numberOfDay': ''\n"
 			+ "- 'address': ''\n"
 			+ "- 'TourDetail': ''\n"
-			+ "- 'reasonableTime': dữ liệu Date có định dạng dd/mm''\n";
+			+ "- 'reasonableTime': ''\n";
 	@RequestMapping(value = "/update/", method = RequestMethod.PUT)
-	@Operation(summary = "Update tour - STAFF", description = updateTourDescription)
+	@Operation(summary = "Update tour - ADMIN / STAFF", description = updateTourDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> updateTour(
 			@RequestBody TourUpdate tourUpdate) {
@@ -89,10 +81,10 @@ public class TourController {
 		});
 	}
 	
-	@RequestMapping(value = "/detail/{tourId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/detail", method = RequestMethod.GET)
 	@Operation(summary = "Get tour detail")
-	ResponseEntity<ResponseObject> getDetail(@PathVariable String tourId) {
-		Tour tour = iTourService.getDetail(tourId);
+	ResponseEntity<ResponseObject> getDetail(@RequestParam String tourId) {
+		Tour tour = iTourService.getDetailTour(tourId);
 		
 		return iResponseObjectService.success(new ResponseObject() {
 			{
@@ -103,15 +95,31 @@ public class TourController {
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	@Operation(summary = "Get all tour")
+	@Operation(summary = "Get all tour - ADMIN / STAFF")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> getAllTour() {
-		List<Tour> list = iTourService.getAll();
+		List<Tour> list = iTourService.getAllTour();
 		
 		return iResponseObjectService.success(new ResponseObject() {
 			{
 				setMessage("Get all tour successfully");
 				setCountData(list.size());
 				setData(list);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@Operation(summary = "Search tour - ADMIN / STAFF")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> searchTour(@ModelAttribute TourSearch tourSearch) {
+		List<TourSearchRes> tourList = iTourService.searchTour(tourSearch);
+		
+		return iResponseObjectService.success(new ResponseObject() {
+			{
+				setMessage("Search tour successfully");
+				setCountData(tourList.size());
+				setData(tourList);
 			}
 		});
 	}

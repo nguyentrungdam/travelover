@@ -1,6 +1,9 @@
 package hcmute.kltn.Backend.model.tour.dto.extend;
 
+import java.time.LocalDate;
 import java.util.Date;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -12,8 +15,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReasonableTime {
-	@JsonFormat(pattern = "dd/MM")
-	private Date startDate;
-	@JsonFormat(pattern = "dd/MM")
-	private Date endDate;
+	@DateTimeFormat(pattern="yyyy-MM-dd")
+	private LocalDate startDate;
+	@DateTimeFormat(pattern="yyyy-MM-dd")
+	private LocalDate endDate;
 }

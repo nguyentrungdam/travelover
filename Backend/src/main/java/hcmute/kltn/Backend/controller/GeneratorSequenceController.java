@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
@@ -31,39 +32,10 @@ public class GeneratorSequenceController {
 	@Autowired
 	private IResponseObjectService iResponseObjectService;
 	
-	@RequestMapping(value = "/list", method = RequestMethod.GET)
-    @Operation(summary = "Get all Generator Sequence - ADMIN")
-	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    ResponseEntity<ResponseObject> getAllPrefixId() {
-        List<GeneratorSequence> generatorSequenceList = iGeneratorSequenceService.getAll();
-        
-        return iResponseObjectService.success(new ResponseObject() {
-			{
-				setMessage("Get all Generator Sequence");
-				setCountData(generatorSequenceList.size());
-				setData(generatorSequenceList);
-			}
-		});
-    }
-    
-    @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
-    @Operation(summary = "Get detail Generator Sequence - ADMIN")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    ResponseEntity<ResponseObject> findById(@PathVariable String id) {
-    	GeneratorSequence generatorSequence = iGeneratorSequenceService.getDetail(id);
-    	
-    	return iResponseObjectService.success(new ResponseObject() {
-					{
-						setMessage("Get detail Generator Sequence successfully");
-						setData(generatorSequence);
-					}
-				});
-    }
-    
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
     @Operation(summary = "Create Generator Sequence - ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    ResponseEntity<ResponseObject> createPrefixId(@RequestBody GeneratorSequenceCreate generatorSequenceCreate) {
+    ResponseEntity<ResponseObject> createGenSeq(@RequestBody GeneratorSequenceCreate generatorSequenceCreate) {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.createGenSeq(generatorSequenceCreate);
         
         return iResponseObjectService.success(new ResponseObject() {
@@ -73,12 +45,12 @@ public class GeneratorSequenceController {
 					}
 				});
     }
-    
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
+	
+	@RequestMapping(value = "/update", method = RequestMethod.PUT)
     @Operation(summary = "Update Generator Sequence - ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    ResponseEntity<ResponseObject> updateProduct(@PathVariable long generatorSequenceId, @RequestBody GeneratorSequenceDTO generatorSequenceDTO) {
-    	GeneratorSequence generatorSequence = iGeneratorSequenceService.update(generatorSequenceDTO);
+    ResponseEntity<ResponseObject> updateGenSeq(@RequestBody GeneratorSequenceDTO generatorSequenceDTO) {
+    	GeneratorSequence generatorSequence = iGeneratorSequenceService.updateGenSeq(generatorSequenceDTO);
     	
     	return iResponseObjectService
 				.success(new ResponseObject() {
@@ -88,8 +60,38 @@ public class GeneratorSequenceController {
 					}
 				});
     }
+	
+	@RequestMapping(value = "/detail", method = RequestMethod.GET)
+    @Operation(summary = "Get detail Generator Sequence - ADMIN")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    ResponseEntity<ResponseObject> getDetailGenSeq(@RequestParam String id) {
+    	GeneratorSequence generatorSequence = iGeneratorSequenceService.getDetailGenSeq(id);
+    	
+    	return iResponseObjectService.success(new ResponseObject() {
+					{
+						setMessage("Get detail Generator Sequence successfully");
+						setData(generatorSequence);
+					}
+				});
+    }
+	
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+    @Operation(summary = "Get all Generator Sequence - ADMIN")
+	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    ResponseEntity<ResponseObject> getAllGenSeq() {
+        List<GeneratorSequence> generatorSequenceList = iGeneratorSequenceService.getAllGenSeq();
+        
+        return iResponseObjectService.success(new ResponseObject() {
+			{
+				setMessage("Get all Generator Sequence");
+				setCountData(generatorSequenceList.size());
+				setData(generatorSequenceList);
+			}
+		});
+    }
+
     
-//    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+//    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
 //    @Operation(summary = "Delete Generator Sequence")
 //    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 //    ResponseEntity<ResponseObject> deleteProduct(@PathVariable long id) {

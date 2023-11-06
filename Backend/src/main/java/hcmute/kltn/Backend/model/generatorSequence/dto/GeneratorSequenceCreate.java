@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 public class GeneratorSequenceCreate {
 	private String collectionName; // not null, unique
 	private String prefix; // not null, unique
-	private long number; // not null
 	private String description;
 }

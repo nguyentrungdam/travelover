@@ -1,6 +1,8 @@
 package hcmute.kltn.Backend.model.account.dto.extend;
 
-import java.util.Date;
+import java.time.LocalDate;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +16,7 @@ public class Notification {
 	private String description;
 	private String link;
 	private String imageUrl;
-	private Date createAt;
+	@DateTimeFormat(pattern="yyyy-MM-dd")
+	private LocalDate createAt;
 	private boolean status;
 }

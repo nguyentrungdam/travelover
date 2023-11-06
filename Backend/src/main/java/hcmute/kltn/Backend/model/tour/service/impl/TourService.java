@@ -1,25 +1,34 @@
 package hcmute.kltn.Backend.model.tour.service.impl;
 
-import java.util.Date;
+import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.exception.CustomException;
-import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
+import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
+import hcmute.kltn.Backend.model.hotel.service.IHotelService;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
+import hcmute.kltn.Backend.model.tour.dto.TourSearch;
+import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
+import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
+import hcmute.kltn.Backend.model.tour.dto.extend.Room;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
-import hcmute.kltn.Backend.util.DateUtil;
+import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
 public class TourService implements ITourService{
@@ -33,133 +42,15 @@ public class TourService implements ITourService{
 	private IAccountDetailService iAccountDetailService;
 	@Autowired
     private MongoTemplate mongoTemplate;
+	@Autowired
+	private IHotelService iHotelService;
 
     public String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Tour.class);
         return collectionName;
     }
-
-	@Override
-	public Tour create(TourDTO tourDTO) {
-		// check field condition
-		checkFieldCondition(tourDTO);
-		
-		// Mapping
-		Tour tour = new Tour();
-		modelMapper.map(tourDTO, tour);
-
-		// Set default value
-		String tourId = iGeneratorSequenceService.genId(getCollectionName());
-		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
-		Date dateNow = DateUtil.getDateNow();
-		tour.setTourId(tourId);
-		tour.setStatus(true);
-		tour.setCreatedBy(accountId);
-		tour.setCreatedAt(dateNow);
-		tour.setLastModifiedBy(accountId);
-		tour.setLastModifiedAt(dateNow);
-		
-		tour = tourRepository.save(tour);
-		
-		return tour;
-	}
-
-	@Override
-	public Tour update(TourDTO tourDTO) {
-		// Check exists
-		if (!tourRepository.existsById(tourDTO.getTourId())) {
-			throw new CustomException("Cannot find tour");
-		}
-				
-		// check field condition
-		checkFieldCondition(tourDTO);
-		
-		// get tour from database
-		Tour tour = tourRepository.findById(tourDTO.getTourId()).get();
-
-		// Mapping
-		modelMapper.map(tourDTO, tour);
-
-		// Set default value
-		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
-		Date dateNow = DateUtil.getDateNow();
-		tour.setLastModifiedBy(accountId);
-		tour.setLastModifiedAt(dateNow);
-		
-		// update tour
-		tour = tourRepository.save(tour);
-		
-		return tour;
-	}
-
-	@Override
-	public Tour getDetail(String tourId) {
-		// Check exists
-		if (!tourRepository.existsById(tourId)) {
-			throw new CustomException("Cannot find tour");
-		}
-		
-		// Find tour
-		Tour tour = tourRepository.findById(tourId).get();
-		
-		return tour;
-	}
-
-	@Override
-	public List<Tour> getAll() {
-		// Find tour
-		List<Tour> list = tourRepository.findAll();
-		
-		return list;
-	}
-
-	@Override
-	public boolean delete(String tourId) {
-		// Check exists
-		if (!tourRepository.existsById(tourId)) {
-			throw new CustomException("Cannot find tour");
-		}
-		
-		// Delete tour
-		tourRepository.deleteById(tourId);
-		
-		return true;
-	}
-
-	@Override
-	public Tour createTour(TourCreate tourCreate) {
-		// mapping tourDTO
-		TourDTO tourDTO = new TourDTO();
-		modelMapper.map(tourCreate, tourDTO);
-		
-		// create tour
-		Tour tour = new Tour();
-		tour = create(tourDTO);
-		
-		return tour;
-	}
-
-	@Override
-	public Tour updateTour(TourUpdate tourUpdate) {
-		// check exists
-		if(!tourRepository.existsById(tourUpdate.getTourId())) {
-			throw new CustomException("Can not find tour");
-		}
-		
-		// mapping tourDTO
-		TourDTO tourDTO = new TourDTO();
-		modelMapper.map(tourUpdate, tourDTO);
-		
-		// check condition
-		checkFieldCondition(tourDTO);
-		
-		// update tour
-		Tour tourNew = update(tourDTO);
-		
-		return tourNew;
-	}
-	
-	private void checkFieldCondition(TourDTO tourDTO) {
+    
+    private void checkFieldCondition(TourDTO tourDTO) {
 		// check null
 		if(tourDTO.getTourTitle() == null || tourDTO.getTourTitle().equals("")) {
 			throw new CustomException("Title is not null");
@@ -191,5 +82,264 @@ public class TourService implements ITourService{
 				}
 			}
 		}
+	}
+
+	private Tour create(TourDTO tourDTO) {
+		// check field condition
+		checkFieldCondition(tourDTO);
+		
+		// Mapping
+		Tour tour = new Tour();
+		modelMapper.map(tourDTO, tour);
+
+		// Set default value
+		String tourId = iGeneratorSequenceService.genId(getCollectionName());
+		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+		LocalDate dateNow = LocalDateUtil.getDateNow();
+		tour.setTourId(tourId);
+		tour.setStatus(true);
+		tour.setCreatedBy(accountId);
+		tour.setCreatedAt(dateNow);
+		tour.setLastModifiedBy(accountId);
+		tour.setLastModifiedAt(dateNow);
+		
+		tour = tourRepository.save(tour);
+		
+		return tour;
+	}
+
+	private Tour update(TourDTO tourDTO) {
+		// Check exists
+		if (!tourRepository.existsById(tourDTO.getTourId())) {
+			throw new CustomException("Cannot find tour");
+		}
+				
+		// check field condition
+		checkFieldCondition(tourDTO);
+		
+		// get tour from database
+		Tour tour = tourRepository.findById(tourDTO.getTourId()).get();
+
+		// Mapping
+		modelMapper.map(tourDTO, tour);
+
+		// Set default value
+		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+		LocalDate dateNow = LocalDateUtil.getDateNow();
+		tour.setLastModifiedBy(accountId);
+		tour.setLastModifiedAt(dateNow);
+		
+		// update tour
+		tour = tourRepository.save(tour);
+		
+		return tour;
+	}
+
+	private Tour getDetail(String tourId) {
+		// Check exists
+		if (!tourRepository.existsById(tourId)) {
+			throw new CustomException("Cannot find tour");
+		}
+		
+		// Find tour
+		Tour tour = tourRepository.findById(tourId).get();
+		
+		return tour;
+	}
+
+	private List<Tour> getAll() {
+		// Find tour
+		List<Tour> list = tourRepository.findAll();
+		
+		return list;
+	}
+
+	private boolean delete(String tourId) {
+		// Check exists
+		if (!tourRepository.existsById(tourId)) {
+			throw new CustomException("Cannot find tour");
+		}
+		
+		// Delete tour
+		tourRepository.deleteById(tourId);
+		
+		return true;
+	}
+	
+	private List<Tour> search(String keyword) {
+		// init Tour List
+		List<Tour> tourList = new ArrayList<>();
+		
+		if(keyword == null || keyword.equals("")) {
+			tourList = getAll();
+		} else {
+			// create list field name
+			List<Criteria> criteriaList = new ArrayList<>();
+			for(Field itemField : Tour.class.getDeclaredFields()) {
+				 if (itemField.getType() == String.class) {
+					 criteriaList.add(Criteria.where(itemField.getName()).regex(keyword, "i"));
+				 }
+	    	}
+
+			// create criteria
+			Criteria criteria = new Criteria();
+	        criteria.orOperator(criteriaList.toArray(new Criteria[0]));
+	        
+	        // create query
+	        Query query = new Query();
+	        query.addCriteria(criteria);
+			
+			// search
+			tourList = mongoTemplate.find(query, Tour.class);
+		}
+		
+		return tourList;
+	}
+
+	@Override
+	public Tour createTour(TourCreate tourCreate) {
+		// mapping tourDTO
+		TourDTO tourDTO = new TourDTO();
+		modelMapper.map(tourCreate, tourDTO);
+		
+		// create tour
+		Tour tour = new Tour();
+		tour = create(tourDTO);
+		
+		return tour;
+	}
+
+	@Override
+	public Tour updateTour(TourUpdate tourUpdate) {
+		// mapping tourDTO
+		TourDTO tourDTO = new TourDTO();
+		modelMapper.map(tourUpdate, tourDTO);
+		
+		// check condition
+		checkFieldCondition(tourDTO);
+		
+		// update tour
+		Tour tourNew = update(tourDTO);
+		
+		return tourNew;
+	}
+
+	@Override
+	public Tour getDetailTour(String tourId) {
+		Tour tour  = getDetail(tourId);
+
+		return tour;
+	}
+
+	@Override
+	public List<Tour> getAllTour() {
+		List<Tour> tourList = getAll();
+
+		return tourList;
+	}
+	
+	@Override
+	public List<TourSearchRes> searchTour(TourSearch tourSearch) {
+		// search with keyword
+		List<Tour> tourList = search(tourSearch.getKeyword());
+		
+		// search with province
+		if(tourSearch.getProvince() != null && !tourSearch.getProvince().equals("")) {
+			for(Tour itemTour : tourList) {
+				if(!itemTour.getAddress().getProvince().equals(tourSearch.getProvince())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with city
+		if(tourSearch.getCity() != null && !tourSearch.getCity().equals("")) {
+			for(Tour itemTour : tourList) {
+				if(!itemTour.getAddress().getCity().equals(tourSearch.getCity())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with district
+		if(tourSearch.getDistrict() != null && !tourSearch.getDistrict().equals("")) {
+			for(Tour itemTour : tourList) {
+				if(!itemTour.getAddress().getDistrict().equals(tourSearch.getDistrict())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with commune
+		if(tourSearch.getCommune() != null && !tourSearch.getCommune().equals("")) {
+			for(Tour itemTour : tourList) {
+				if(!itemTour.getAddress().getCommune().equals(tourSearch.getCommune())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with start date
+		
+		// search with number of people
+		
+		List<TourSearchRes> tourSearchResList = new ArrayList<>(); 
+		for(Tour itemTour : tourList) {
+			TourSearchRes tourSearchRes = new TourSearchRes();
+			tourSearchRes.setTour(itemTour);
+			
+			// search hotel
+			HotelSearch hotelSearch = new HotelSearch();
+			hotelSearch.setProvince(tourSearch.getProvince());
+			hotelSearch.setCity(tourSearch.getCity());
+			hotelSearch.setDistrict(tourSearch.getDistrict());
+			hotelSearch.setCommune(tourSearch.getCommune());
+			List<hcmute.kltn.Backend.model.hotel.dto.entity.Hotel> hotelList = iHotelService.searchHotel(hotelSearch);
+			
+			// search room in hotel
+			for(hcmute.kltn.Backend.model.hotel.dto.entity.Hotel itemHotel : hotelList) {
+				RoomSearch roomSearch = new RoomSearch();
+				roomSearch.setEHotelId(itemHotel.getEHotelId());
+				roomSearch.setStartDate(tourSearch.getStartDate());
+				roomSearch.setEndDate(tourSearch.getStartDate().plusDays(itemTour.getNumberOfDay()));
+				roomSearch.setNumberOfPeople(tourSearch.getNumberOfPeople());
+				List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = iHotelService.searchRoom(roomSearch);
+				if(roomList.size() > 0) {
+					// mapping hotel
+					Hotel hotel = new Hotel();
+					modelMapper.map(itemHotel, hotel);
+					
+					// mapping room
+					List<Room> roomListRes = new ArrayList<>();
+					for(hcmute.kltn.Backend.model.hotel.dto.extend.Room itemRoom : roomList) {
+						Room room = new Room();
+						modelMapper.map(itemRoom, room);
+						roomListRes.add(room);
+					}
+
+					hotel.setRoom(roomListRes);
+					
+					tourSearchRes.setHotel(hotel);
+
+					break;
+				}
+			}
+			
+			tourSearchResList.add(tourSearchRes);
+		}
+
+		return tourSearchResList;
 	}
 }

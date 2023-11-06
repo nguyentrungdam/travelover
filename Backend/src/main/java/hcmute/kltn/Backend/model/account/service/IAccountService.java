@@ -12,14 +12,12 @@ import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
 
 public interface IAccountService {
-	public Account create(AccountDTO accountDTO);
-	public Account update(AccountDTO accountDTO);
-	public Account getDetail(String accountId);
-	public boolean delete(String id);
-	public List<Account> getAll();
-	
 	public Account register(RegisterRequest registerRequest);
 	public Account updateProfile(MultipartFile file, AccountUpdateProfile accountUpdateProfile);
+	public Account getProfile();
 	public AuthResponse login(AuthRequest request);
+	public List<Account> getAllAccount();
+	public List<Account> searchAccount(String keyword);
+	public Account getDetailAccount(String accountId);
 	public boolean initData(AccountDTO accountDTO);
 }

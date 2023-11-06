@@ -2,9 +2,10 @@ package hcmute.kltn.Backend.model.tour.dto;
 
 import java.util.List;
 
-import hcmute.kltn.Backend.model.tour.dto.extend.Address;
+import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
