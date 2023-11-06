@@ -26,11 +26,22 @@ export const signup = createAsyncThunk(
 );
 export const getAccountProfile = createAsyncThunk(
   "accounts/profile/detail",
-  async (user, { rejectWithValue, dispatch }) => {
+  async ({ rejectWithValue }) => {
     try {
       const response = await accountApi.getAccountProfile(
         localStorage.getItem("token")
       );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const updateUserInfo = createAsyncThunk(
+  "accounts/profile/update",
+  async (user, { rejectWithValue }) => {
+    try {
+      const response = await accountApi.updateUserInfo(user);
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -129,6 +140,19 @@ export const accountSlice = createSlice({
       state.loading = false;
       state.isAuthenticated = true;
       state.account = action.payload.data;
+    },
+    [updateUserInfo.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateUserInfo.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [updateUserInfo.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.isAuthenticated = true;
+      state.account = action.payload.data;
+      console.log(state.account);
     },
     // ,
     // [isUserLoggedIn.pending]: (state) => {

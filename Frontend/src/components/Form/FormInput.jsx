@@ -59,9 +59,10 @@ const FormInput = (props) => {
 
   return (
     <div className="formInput">
-      <label className="text-dark">{label}</label>
+      <label className="text-dark label-form">{label}</label>
       <div className="inputContainer">
         <input
+          className="input-form"
           {...inputProps}
           type={isPasswordInput && showPassword ? "text" : inputProps.type}
           onChange={handleInputChange}

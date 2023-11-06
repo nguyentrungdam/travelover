@@ -105,7 +105,7 @@ const Header = () => {
               <div className="nav__btns d-flex align-items-center gap-2">
                 {isAuthenticated ? (
                   <>
-                    {account.data && (
+                    {account?.data && (
                       <div className="userwraper">
                         <h5 className="mb-0">
                           {account.data.firstName} {account.data.lastName}
@@ -116,7 +116,7 @@ const Header = () => {
                           alt={account.data.lastName}
                         />
                         <div className="DropDownContent">
-                          <Link className="link1" to="/user/account/profile">
+                          <Link className="link1" to="/account">
                             <span className="SubA">Tài Khoản</span>
                           </Link>
                           <Link className="link1" to="/user/purchase">

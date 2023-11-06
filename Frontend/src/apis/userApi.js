@@ -1,4 +1,4 @@
-import axios from "./axios";
+import { axiosInstance as axios } from "./axios";
 
 const userApi = {
   getAllUsers: () => {
