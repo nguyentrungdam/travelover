@@ -20,6 +20,10 @@
 .menu .item .listItem:hover {
   background-color: #384256;
 }
+.listItem img {
+  width: 20px;
+  height: 20px;
+}
 .listItemTitle {
   color: #ddd;
 }
