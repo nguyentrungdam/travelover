@@ -1,8 +1,7 @@
 import { useState } from "react";
-import "./products.css";
+import "./tours.css";
 import DataTable from "../../../components/dataTable/DataTable";
 import { products } from "../../../assets/data/dataAdmin";
-import Add from "../../../components/add/Add";
 
 const columns = [
   { field: "id", headerName: "ID", width: 40 },
@@ -52,7 +51,7 @@ const columns = [
   },
 ];
 
-const Products = () => {
+const ToursList = () => {
   const [open, setOpen] = useState(false);
 
   // TEST THE API
@@ -69,7 +68,7 @@ const Products = () => {
     <div className="products">
       <div className="info">
         <h1>Tours</h1>
-        <a href="/tours/add-new">Thêm tour mới</a>
+        <a href="/tours-list/add-new">Thêm tour mới</a>
       </div>
       <DataTable slug="products" columns={columns} rows={products} />
       {/* TEST THE API */}
@@ -84,4 +83,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ToursList;

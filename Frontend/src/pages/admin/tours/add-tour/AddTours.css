@@ -1,12 +1,21 @@
-.products .info {
+.info {
   display: flex;
   align-items: center;
   gap: 20px;
   margin-bottom: 20px;
 }
-.products .info a {
+.info a {
   padding: 5px;
   cursor: pointer;
   background-color: #fff;
   color: black;
+}
+.row-1 {
+  margin-right: 0 !important;
+}
+.border-top {
+  border-top: 1px solid gainsboro;
+}
+.select-location select {
+  padding: 2px;
 }

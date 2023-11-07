@@ -20,6 +20,8 @@ import LayoutAdmin from "./components/LayoutAdmin/LayoutAdmin";
 import Products from "./pages/admin/products/Products";
 import Product from "./pages/admin/product/Product";
 import AccountDetail from "./pages/client/accountDetail/AccountDetail";
+import ToursList from "./pages/admin/tours/tours";
+import AddTours from "./pages/admin/tours/add-tour/AddTours";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -67,8 +69,9 @@ function App() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />
         <Route path="users/:id" element={<User />} />
-        <Route path="products" element={<Products />} />
-        <Route path="products/:id" element={<Product />} />
+        <Route path="tours-list" element={<ToursList />} />
+        <Route path="tours-list/add-new" element={<AddTours />} />
+        {/* <Route path="products/:id" element={<Product />} /> */}
       </Route>
       {/* <Route path="users">
         <Route
