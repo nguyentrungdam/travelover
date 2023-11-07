@@ -218,23 +218,14 @@ public class HotelService implements IHotelService{
 	public List<Hotel> searchHotel(HotelSearch hotelsearch) {
 		// search with keyword
 		List<Hotel> hotelList = search(hotelsearch.getKeyword());
+		List<Hotel> hotelListClone = new ArrayList<>();
 		
 		// search with province
 		if(hotelsearch.getProvince() != null && !hotelsearch.getProvince().equals("")) {
-			for(Hotel itemHotel : hotelList) {
+			hotelListClone.clear();
+			hotelListClone.addAll(hotelList);
+			for(Hotel itemHotel : hotelListClone) {
 				if(!itemHotel.getAddress().getProvince().equals(hotelsearch.getProvince())) {
-					hotelList.remove(itemHotel);
-					if(hotelList.size() == 0) {
-						break;
-					}
-				}
-			}
-		}
-		
-		// search with city
-		if(hotelsearch.getCity() != null && !hotelsearch.getCity().equals("")) {
-			for(Hotel itemHotel : hotelList) {
-				if(!itemHotel.getAddress().getCity().equals(hotelsearch.getCity())) {
 					hotelList.remove(itemHotel);
 					if(hotelList.size() == 0) {
 						break;
@@ -245,7 +236,9 @@ public class HotelService implements IHotelService{
 		
 		// search with district
 		if(hotelsearch.getDistrict() != null && !hotelsearch.getDistrict().equals("")) {
-			for(Hotel itemHotel : hotelList) {
+			hotelListClone.clear();
+			hotelListClone.addAll(hotelList);
+			for(Hotel itemHotel : hotelListClone) {
 				if(!itemHotel.getAddress().getDistrict().equals(hotelsearch.getDistrict())) {
 					hotelList.remove(itemHotel);
 					if(hotelList.size() == 0) {
@@ -257,7 +250,9 @@ public class HotelService implements IHotelService{
 		
 		// search with commune
 		if(hotelsearch.getCommune() != null && !hotelsearch.getCommune().equals("")) {
-			for(Hotel itemHotel : hotelList) {
+			hotelListClone.clear();
+			hotelListClone.addAll(hotelList);
+			for(Hotel itemHotel : hotelListClone) {
 				if(!itemHotel.getAddress().getCommune().equals(hotelsearch.getCommune())) {
 					hotelList.remove(itemHotel);
 					if(hotelList.size() == 0) {

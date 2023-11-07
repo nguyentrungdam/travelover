@@ -242,23 +242,14 @@ public class TourService implements ITourService{
 	public List<TourSearchRes> searchTour(TourSearch tourSearch) {
 		// search with keyword
 		List<Tour> tourList = search(tourSearch.getKeyword());
+		List<Tour> tourListClone = new ArrayList<>();
 		
 		// search with province
 		if(tourSearch.getProvince() != null && !tourSearch.getProvince().equals("")) {
-			for(Tour itemTour : tourList) {
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
 				if(!itemTour.getAddress().getProvince().equals(tourSearch.getProvince())) {
-					tourList.remove(itemTour);
-					if(tourList.size() == 0) {
-						break;
-					}
-				}
-			}
-		}
-		
-		// search with city
-		if(tourSearch.getCity() != null && !tourSearch.getCity().equals("")) {
-			for(Tour itemTour : tourList) {
-				if(!itemTour.getAddress().getCity().equals(tourSearch.getCity())) {
 					tourList.remove(itemTour);
 					if(tourList.size() == 0) {
 						break;
@@ -269,7 +260,9 @@ public class TourService implements ITourService{
 		
 		// search with district
 		if(tourSearch.getDistrict() != null && !tourSearch.getDistrict().equals("")) {
-			for(Tour itemTour : tourList) {
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
 				if(!itemTour.getAddress().getDistrict().equals(tourSearch.getDistrict())) {
 					tourList.remove(itemTour);
 					if(tourList.size() == 0) {
@@ -281,8 +274,28 @@ public class TourService implements ITourService{
 		
 		// search with commune
 		if(tourSearch.getCommune() != null && !tourSearch.getCommune().equals("")) {
-			for(Tour itemTour : tourList) {
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
 				if(!itemTour.getAddress().getCommune().equals(tourSearch.getCommune())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with number of day
+		
+		if(tourSearch.getNumberOfDay() != null || !tourSearch.getNumberOfDay().equals("")) {
+			String[] noDaySplit = tourSearch.getNumberOfDay().split("-");
+			int startDay = Integer.parseInt(noDaySplit[0]);
+			int endDay = Integer.parseInt(noDaySplit[1]);
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
+				if(itemTour.getNumberOfDay() < startDay || itemTour.getNumberOfDay() > endDay) {
 					tourList.remove(itemTour);
 					if(tourList.size() == 0) {
 						break;
@@ -303,7 +316,6 @@ public class TourService implements ITourService{
 			// search hotel
 			HotelSearch hotelSearch = new HotelSearch();
 			hotelSearch.setProvince(tourSearch.getProvince());
-			hotelSearch.setCity(tourSearch.getCity());
 			hotelSearch.setDistrict(tourSearch.getDistrict());
 			hotelSearch.setCommune(tourSearch.getCommune());
 			List<hcmute.kltn.Backend.model.hotel.dto.entity.Hotel> hotelList = iHotelService.searchHotel(hotelSearch);

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Address {
 	private String province;
-	private String city;
 	private String district;
 	private String commune;
 	private String moreLocation;

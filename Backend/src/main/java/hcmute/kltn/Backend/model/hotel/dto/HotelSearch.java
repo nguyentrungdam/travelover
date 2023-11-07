@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 public class HotelSearch {
 	private String keyword;
 	private String province;
-	private String city;
 	private String district;
 	private String commune;
 }

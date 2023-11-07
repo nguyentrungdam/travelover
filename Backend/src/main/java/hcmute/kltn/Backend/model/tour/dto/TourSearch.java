@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 public class TourSearch {
 	private String keyword;
 	private String province;
-	private String city;
 	private String district;
 	private String commune;
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate startDate;
+	private String numberOfDay;
 	private int numberOfPeople;
 }

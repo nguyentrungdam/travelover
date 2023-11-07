@@ -351,6 +351,7 @@ public class EHotelService implements IEHotelService{
 		
 		// get all room with hotelId from db
 		List<Room> roomList = eHotel.getRoom();
+		List<Room> roomListClone = new ArrayList<>();
 		
 		// check order
 		if(eHotel.getOrder() != null) {
@@ -372,7 +373,9 @@ public class EHotelService implements IEHotelService{
 			}
 			
 			// search with startDate and numberOfPeople
-			for(Room itemRoom : roomList) {
+			roomListClone.clear();
+			roomListClone.addAll(roomList);
+			for(Room itemRoom : roomListClone) {
 				for(String itemRoomId : roomIdList) {
 					if(itemRoomId.equals(itemRoom.getRoomId())) {
 						roomList.remove(itemRoom);
@@ -387,8 +390,9 @@ public class EHotelService implements IEHotelService{
 
 		// search with numberOfPeople
 		int totalCaptity = 0;
-		List<Room> roomListBackup = new ArrayList<>(roomList);
-		for(Room itemRoom : roomListBackup) {
+		roomListClone.clear();
+		roomListClone.addAll(roomList);
+		for(Room itemRoom : roomListClone) {
 			if(totalCaptity >= roomSearch.getNumberOfPeople()) {
 				roomList.remove(itemRoom);
 			}
