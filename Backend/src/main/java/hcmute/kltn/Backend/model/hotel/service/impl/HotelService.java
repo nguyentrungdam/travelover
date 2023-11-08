@@ -215,17 +215,22 @@ public class HotelService implements IHotelService{
 	}
 
 	@Override
-	public List<Hotel> searchHotel(HotelSearch hotelsearch) {
+	public List<Hotel> searchHotel(HotelSearch hotelSearch) {
 		// search with keyword
-		List<Hotel> hotelList = search(hotelsearch.getKeyword());
+		List<Hotel> hotelList = new ArrayList<>();
 		List<Hotel> hotelListClone = new ArrayList<>();
+		if(hotelSearch.getKeyword() != null) {
+			hotelList = search(hotelSearch.getKeyword());
+		} else {
+			hotelList = getAll();
+		}
 		
 		// search with province
-		if(hotelsearch.getProvince() != null && !hotelsearch.getProvince().equals("")) {
+		if(hotelSearch.getProvince() != null && !hotelSearch.getProvince().equals("")) {
 			hotelListClone.clear();
 			hotelListClone.addAll(hotelList);
 			for(Hotel itemHotel : hotelListClone) {
-				if(!itemHotel.getAddress().getProvince().equals(hotelsearch.getProvince())) {
+				if(!itemHotel.getAddress().getProvince().equals(hotelSearch.getProvince())) {
 					hotelList.remove(itemHotel);
 					if(hotelList.size() == 0) {
 						break;
@@ -235,11 +240,11 @@ public class HotelService implements IHotelService{
 		}
 		
 		// search with district
-		if(hotelsearch.getDistrict() != null && !hotelsearch.getDistrict().equals("")) {
+		if(hotelSearch.getDistrict() != null && !hotelSearch.getDistrict().equals("")) {
 			hotelListClone.clear();
 			hotelListClone.addAll(hotelList);
 			for(Hotel itemHotel : hotelListClone) {
-				if(!itemHotel.getAddress().getDistrict().equals(hotelsearch.getDistrict())) {
+				if(!itemHotel.getAddress().getDistrict().equals(hotelSearch.getDistrict())) {
 					hotelList.remove(itemHotel);
 					if(hotelList.size() == 0) {
 						break;
@@ -249,11 +254,11 @@ public class HotelService implements IHotelService{
 		}
 		
 		// search with commune
-		if(hotelsearch.getCommune() != null && !hotelsearch.getCommune().equals("")) {
+		if(hotelSearch.getCommune() != null && !hotelSearch.getCommune().equals("")) {
 			hotelListClone.clear();
 			hotelListClone.addAll(hotelList);
 			for(Hotel itemHotel : hotelListClone) {
-				if(!itemHotel.getAddress().getCommune().equals(hotelsearch.getCommune())) {
+				if(!itemHotel.getAddress().getCommune().equals(hotelSearch.getCommune())) {
 					hotelList.remove(itemHotel);
 					if(hotelList.size() == 0) {
 						break;

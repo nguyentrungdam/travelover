@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 public class HotelDetail {
 	private String roomId;
 	private int capacity;
-	private int numberOfDay;
 	private int price;
 }

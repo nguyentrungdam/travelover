@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TourDetail {
+public class VOTourDetail {
 	private String tourTitle;
 	private String thumbnailUrl;
 	private int price;

@@ -241,8 +241,15 @@ public class TourService implements ITourService{
 	@Override
 	public List<TourSearchRes> searchTour(TourSearch tourSearch) {
 		// search with keyword
-		List<Tour> tourList = search(tourSearch.getKeyword());
+		List<Tour> tourList = new ArrayList<>();
 		List<Tour> tourListClone = new ArrayList<>();
+		List<TourSearchRes> tourSearchResList = new ArrayList<>(); 
+		TourSearchRes tourSearchRes = new TourSearchRes();
+		if(tourSearch.getKeyword() != null) {
+			tourList = search(tourSearch.getKeyword());
+		} else {
+			tourList = getAll();
+		}
 		
 		// search with province
 		if(tourSearch.getProvince() != null && !tourSearch.getProvince().equals("")) {
@@ -288,7 +295,7 @@ public class TourService implements ITourService{
 		
 		// search with number of day
 		
-		if(tourSearch.getNumberOfDay() != null || !tourSearch.getNumberOfDay().equals("")) {
+		if(tourSearch.getNumberOfDay() != null && !tourSearch.getNumberOfDay().equals("")) {
 			String[] noDaySplit = tourSearch.getNumberOfDay().split("-");
 			int startDay = Integer.parseInt(noDaySplit[0]);
 			int endDay = Integer.parseInt(noDaySplit[1]);
@@ -308,44 +315,44 @@ public class TourService implements ITourService{
 		
 		// search with number of people
 		
-		List<TourSearchRes> tourSearchResList = new ArrayList<>(); 
 		for(Tour itemTour : tourList) {
-			TourSearchRes tourSearchRes = new TourSearchRes();
 			tourSearchRes.setTour(itemTour);
 			
-			// search hotel
-			HotelSearch hotelSearch = new HotelSearch();
-			hotelSearch.setProvince(tourSearch.getProvince());
-			hotelSearch.setDistrict(tourSearch.getDistrict());
-			hotelSearch.setCommune(tourSearch.getCommune());
-			List<hcmute.kltn.Backend.model.hotel.dto.entity.Hotel> hotelList = iHotelService.searchHotel(hotelSearch);
-			
-			// search room in hotel
-			for(hcmute.kltn.Backend.model.hotel.dto.entity.Hotel itemHotel : hotelList) {
-				RoomSearch roomSearch = new RoomSearch();
-				roomSearch.setEHotelId(itemHotel.getEHotelId());
-				roomSearch.setStartDate(tourSearch.getStartDate());
-				roomSearch.setEndDate(tourSearch.getStartDate().plusDays(itemTour.getNumberOfDay()));
-				roomSearch.setNumberOfPeople(tourSearch.getNumberOfPeople());
-				List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = iHotelService.searchRoom(roomSearch);
-				if(roomList.size() > 0) {
-					// mapping hotel
-					Hotel hotel = new Hotel();
-					modelMapper.map(itemHotel, hotel);
-					
-					// mapping room
-					List<Room> roomListRes = new ArrayList<>();
-					for(hcmute.kltn.Backend.model.hotel.dto.extend.Room itemRoom : roomList) {
-						Room room = new Room();
-						modelMapper.map(itemRoom, room);
-						roomListRes.add(room);
+			if(tourSearch.getStartDate() != null && tourSearch.getNumberOfPeople() > 0) {
+				// search hotel
+				HotelSearch hotelSearch = new HotelSearch();
+				hotelSearch.setProvince(tourSearch.getProvince());
+				hotelSearch.setDistrict(tourSearch.getDistrict());
+				hotelSearch.setCommune(tourSearch.getCommune());
+				List<hcmute.kltn.Backend.model.hotel.dto.entity.Hotel> hotelList = iHotelService.searchHotel(hotelSearch);
+				
+				// search room in hotel
+				for(hcmute.kltn.Backend.model.hotel.dto.entity.Hotel itemHotel : hotelList) {
+					RoomSearch roomSearch = new RoomSearch();
+					roomSearch.setEHotelId(itemHotel.getEHotelId());
+					roomSearch.setStartDate(tourSearch.getStartDate());
+					roomSearch.setEndDate(tourSearch.getStartDate().plusDays(itemTour.getNumberOfDay()));
+					roomSearch.setNumberOfPeople(tourSearch.getNumberOfPeople());
+					List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = iHotelService.searchRoom(roomSearch);
+					if(roomList.size() > 0) {
+						// mapping hotel
+						Hotel hotel = new Hotel();
+						modelMapper.map(itemHotel, hotel);
+						
+						// mapping room
+						List<Room> roomListRes = new ArrayList<>();
+						for(hcmute.kltn.Backend.model.hotel.dto.extend.Room itemRoom : roomList) {
+							Room room = new Room();
+							modelMapper.map(itemRoom, room);
+							roomListRes.add(room);
+						}
+
+						hotel.setRoom(roomListRes);
+						
+						tourSearchRes.setHotel(hotel);
+
+						break;
 					}
-
-					hotel.setRoom(roomListRes);
-					
-					tourSearchRes.setHotel(hotel);
-
-					break;
 				}
 			}
 			

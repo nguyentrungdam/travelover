@@ -19,6 +19,7 @@ import hcmute.kltn.Backend.model.order.dto.OrderCreate;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
 import hcmute.kltn.Backend.model.order.dto.entity.Order;
+import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
 import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.util.LocalDateUtil;
