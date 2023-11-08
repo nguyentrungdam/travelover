@@ -51,3 +51,12 @@
 .icon-setting {
   margin-right: 10px;
 }
+.userwraper1 {
+  margin-right: 10px;
+}
+.DropDownContent1 {
+  left: -28px;
+}
+.userwraper1::after {
+  left: -28px;
+}

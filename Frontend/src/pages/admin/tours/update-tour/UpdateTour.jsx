@@ -1,12 +1,34 @@
-import React, { useState } from "react";
-import "./AddTours.css";
-import LocationSelect from "./LocationSelect";
-import { useDispatch } from "react-redux";
-import { createTour } from "../../../../slices/tourSlice";
+import React, { useEffect, useState } from "react";
+import "./UpdateTours.css";
+import LocationSelect from "../add-tour/LocationSelect";
+import { useDispatch, useSelector } from "react-redux";
+import { getTourDetail, updateTour } from "../../../../slices/tourSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-const AddTours = () => {
+import { useParams } from "react-router-dom";
+import { validateOriginalDate } from "../../../../utils/validate";
+const UpdateTour = () => {
   const dispatch = useDispatch();
+  const { id } = useParams();
+  const calculateIdFull = (id) => {
+    const idFull = `TR${"0".repeat(12 - id.toString().length)}${id}`;
+    return idFull;
+  };
+  const { loading, tour } = useSelector((state) => state.tour);
+  useEffect(() => {
+    const idFull = calculateIdFull(id);
+    dispatch(getTourDetail(idFull)).unwrap();
+  }, []);
+
+  const [selectedLocation, setSelectedLocation] = useState({
+    province: "",
+    district: "",
+    commune: "",
+  });
+
+  const handleSelectLocation = (location) => {
+    setSelectedLocation(location);
+  };
   const [formData, setFormData] = useState({
     tourTitle: "",
     video: "",
@@ -22,88 +44,70 @@ const AddTours = () => {
     suitablePerson: "",
     termAndCondition: "",
   });
-  const [selectedLocation, setSelectedLocation] = useState({
-    province: "",
-    district: "",
-    commune: "",
-  });
-
-  const handleSelectLocation = (location) => {
-    setSelectedLocation(location);
-  };
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Kiểm tra tên trường của giá trị đang được thay đổi
+    const updatedFormData = { ...formData }; // Tạo một bản sao của formData
     if (name === "startDate" || name === "endDate") {
-      // Tách ngày và tháng từ giá trị nhập liệu
-      const [day, month] = value.split("-");
-      // Lấy ngày hiện tại
-      const today = new Date();
-      // Tạo ngày mới với năm hiện tại, tháng (lấy tháng - 1 vì tháng bắt đầu từ 0), và ngày từ giá trị nhập liệu
-      const newDate = new Date(today.getFullYear(), month - 1, day);
-      // Định dạng ngày thành "YYYY-MM-DD"
-      const formattedDate = newDate.toISOString().split("T")[0];
-      // Cập nhật giá trị trong formData tương ứng
-      setFormData({
-        ...formData,
-        [name]: formattedDate,
-      });
+      const inputDate = e.target.value;
+      const regex = /^(\d{2})-(\d{2})$/;
+      if (regex.test(inputDate)) {
+        const [day, month] = inputDate.split("-");
+        const currentYear = new Date().getFullYear();
+        const formattedDate = `${currentYear}-${month}-${day}`;
+        updatedFormData[name] = formattedDate;
+      }
     } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+      updatedFormData[name] = value;
     }
+    setFormData(updatedFormData);
     console.log(formData);
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    // Tạo đối tượng FormData
-    const formDataObject = new FormData();
+    const formDataUpdate = new FormData();
 
-    // Thêm các trường dữ liệu vào formDataObject
-    formDataObject.append("tourTitle", formData.tourTitle);
-    formDataObject.append("video", formData.video);
-    formDataObject.append("numberOfDay", formData.numberOfDay);
-    formDataObject.append("tourDescription", formData.tourDescription);
+    // Thêm các trường dữ liệu vào formDataUpdate
+    formDataUpdate.append("tourId", calculateIdFull(id));
+    formDataUpdate.append("tourTitle", formData.tourTitle);
+    formDataUpdate.append("video", formData.video);
+    formDataUpdate.append("numberOfDay", formData.numberOfDay);
+    formDataUpdate.append("tourDescription", formData.tourDescription);
 
     // Thêm địa chỉ
-    formDataObject.append("address[province]", selectedLocation.province);
-    formDataObject.append("address[district]", selectedLocation.district);
-    formDataObject.append("address[commune]", selectedLocation.commune);
-    formDataObject.append("address[moreLocation]", formData.moreLocation);
-    formDataObject.append("reasonableTime[startDate]", formData.startDate);
-    formDataObject.append("reasonableTime[endDate]", formData.endDate);
+    formDataUpdate.append("address[province]", selectedLocation.province);
+    formDataUpdate.append("address[district]", selectedLocation.district);
+    formDataUpdate.append("address[commune]", selectedLocation.commune);
+    formDataUpdate.append("address[moreLocation]", formData.moreLocation);
+    formDataUpdate.append("reasonableTime[startDate]", formData.startDate);
+    formDataUpdate.append("reasonableTime[endDate]", formData.endDate);
 
     // Thêm tourDetail (dựa trên tourDetail[0] trong form)
-    formDataObject.append("tourDetail[0][day]", formData.day);
-    formDataObject.append("tourDetail[0][description]", formData.description);
-    formDataObject.append("tourDetail[0][imageUrl]", formData.imageUrl);
-    formDataObject.append("tourDetail[0][price]", formData.price);
+    formDataUpdate.append("tourDetail[0][day]", formData.day);
+    formDataUpdate.append("tourDetail[0][description]", formData.description);
+    formDataUpdate.append("tourDetail[0][imageUrl]", formData.imageUrl);
+    formDataUpdate.append("tourDetail[0][price]", formData.price);
 
-    formDataObject.append("suitablePerson", formData.suitablePerson);
-    formDataObject.append("termAndCondition", formData.termAndCondition);
-
-    // Gửi formDataObject lên API hoặc xử lý dữ liệu tại đây
-    for (const [name, value] of formDataObject.entries()) {
+    formDataUpdate.append("suitablePerson", formData.suitablePerson);
+    formDataUpdate.append("termAndCondition", formData.termAndCondition);
+    for (const [name, value] of formDataUpdate.entries()) {
       console.log(name, ":", value);
     }
     try {
-      const res = await dispatch(createTour(formDataObject)).unwrap();
+      const res = await dispatch(updateTour(formDataUpdate)).unwrap();
       console.log(res);
       if (res.data.status === "ok") {
         notify(1);
         window.location.reload();
       }
     } catch (err) {
-      notify(2);
-      // alert("Vui lòng kiểm tra lại các thông tin cho chính xác!");
+      // notify(2);
+      alert(err.message);
     }
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Thêm tour thành công ! 👌", {
+      toast.success("Cập nhật tour thành công ! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
@@ -116,25 +120,10 @@ const AddTours = () => {
       });
     }
   };
-  //========= sample data =================================
-  /* 
-Phương tiện di chuyển: Xe du lịch
-Ưu đãi: Đã bao gồm ưu đãi trong giá tour
-Khách sạn: Khách sạn 3 sao
-
-Ngày 1 - TP. HỒ CHÍ MINH – ĐÀ LẠT Số bữa ăn: 3 bữa (Ăn sáng, trưa, chiều)
-Ngày 2 - ĐÀ LẠT - THÀNH PHỐ NGÀN HOA Số bữa ăn: 3 bữa (Ăn sáng, trưa, chiều)
-Ngày 3 - ĐÀ LẠT - NHA TRANG Số bữa ăn: 3 bữa (Ăn sáng, trưa, chiều)
-Ngày 4 - NHA TRANG - HÒN LAO - VINWONDERS NHA TRANG Số bữa ăn: 2 bữa (Ăn sáng, trưa, tự túc ăn chiều)
-Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
-
-- Khi đăng ký đặt cọc 50% số tiền tour
-- Thanh toán hết trước ngày khởi hành 5 ngày (tour ngày thường), trước ngày khởi hành 10 ngày (tour lễ tết)
-*/
   return (
     <>
       <div className="info">
-        <h1>Thêm Tour Mới</h1>
+        <h1>Cập Nhật Tour</h1>
         <a href="/tours-list">Quay lại</a>
       </div>
       <div className="row row-1">
@@ -150,17 +139,17 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                       name="tourTitle"
                       className="form-control"
                       type="text"
-                      placeholder="Điền tên tour"
+                      placeholder={tour.tourTitle}
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-4">
                     <label className="small mb-1">Số ngày</label>
                     <input
+                      placeholder={tour.numberOfDay}
                       name="numberOfDay"
                       className="form-control"
                       type="text"
-                      placeholder="Điền số ngày"
                       onChange={handleChange}
                     />
                   </div>
@@ -168,13 +157,12 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                 <div className="row gx-3 mb-3">
                   <label className="small mb-1">Địa chỉ</label>
                   <LocationSelect onSelectLocation={handleSelectLocation} />
-
                   <div className="mt-2">
                     <input
+                      placeholder={tour.address?.moreLocation}
                       name="moreLocation"
                       className="form-control"
                       type="text"
-                      placeholder="Nhập địa chỉ (số nhà, tên đường)"
                       onChange={handleChange}
                     />
                   </div>
@@ -183,20 +171,20 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                   <div className="col-md-8">
                     <label className="small mb-1">Mô tả</label>
                     <textarea
+                      placeholder={tour.tourDescription}
                       name="tourDescription"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Nhập mô tả"
                       rows="4"
                     />
                   </div>
                   <div className="col-md-4">
                     <label className="small mb-1">Đối tượng phù hợp</label>
                     <input
+                      placeholder={tour.suitablePerson}
                       name="suitablePerson"
                       className="form-control"
                       type="text"
-                      placeholder="Mọi người"
                       onChange={handleChange}
                     />
                   </div>
@@ -205,9 +193,11 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                   <div className="col-md-6 d-flex  align-items-center">
                     <label className="small mb-1">Mùa thích hợp từ ngày</label>
                     <input
+                      placeholder={validateOriginalDate(
+                        tour.reasonableTime?.startDate
+                      )}
                       name="startDate"
                       className="form-control w-50 ms-2"
-                      placeholder="Vd: 15-05"
                       onChange={handleChange}
                     />
                   </div>
@@ -215,8 +205,10 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                     <label className="small mb-1">đến ngày</label>
                     <input
                       name="endDate"
+                      placeholder={validateOriginalDate(
+                        tour.reasonableTime?.endDate
+                      )}
                       className="form-control w-50 ms-2"
-                      placeholder="Vd: 15-07"
                       onChange={handleChange}
                     />
                   </div>
@@ -225,28 +217,30 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                   <div className="col-md-8 border-top">
                     <label className="pt-1 mb-1">Mô tả chi tiết tour</label>
                     <textarea
+                      placeholder={
+                        tour.tourDetail && tour.tourDetail[0]?.description
+                      }
                       name="description"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Nhập mô tả"
                       rows="4"
                     />
                   </div>
                   <div className="col-md-4 border-top">
                     <label className="pt-1 small mb-1">Số ngày</label>
                     <input
+                      placeholder={tour.tourDetail && tour.tourDetail[0]?.day}
                       name="day"
                       className="form-control mb-2"
                       type="text"
-                      placeholder="Điền số ngày"
                       onChange={handleChange}
                     />{" "}
                     <label className="small ">Giá tiền</label>
                     <input
+                      placeholder={tour.tourDetail && tour.tourDetail[0]?.price}
                       name="price"
                       className="form-control"
                       type="text"
-                      placeholder="Điền giá tiền"
                       onChange={handleChange}
                     />
                   </div>
@@ -254,19 +248,19 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                 <div className="row gx-3 mb-3">
                   <label className="small mb-1">Chính sách và điều khoản</label>
                   <textarea
+                    placeholder={tour.termAndCondition}
                     name="termAndCondition"
                     className="form-control"
                     onChange={handleChange}
-                    placeholder="Nhập chính sách và điều khoản"
                     rows="3"
                   />
                 </div>
                 <button
                   className="btn btn-primary"
                   type="button"
-                  onClick={handleSubmit}
+                  onClick={handleUpdate}
                 >
-                  Tạo tour
+                  Cập nhật tour
                 </button>
               </form>
             </div>
@@ -336,4 +330,4 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
   );
 };
 
-export default AddTours;
+export default UpdateTour;
