@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TourDetail {
-	private int day;
+	private String title;
 	private String description;
-	private String imageUrl;
-	private int price;
 }

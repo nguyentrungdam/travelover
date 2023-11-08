@@ -26,6 +26,7 @@ import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
+import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.util.LocalDateUtil;
@@ -44,6 +45,24 @@ public class TourService implements ITourService{
     private MongoTemplate mongoTemplate;
 	@Autowired
 	private IHotelService iHotelService;
+	
+	private List<TourDetail> deteilToList(String tourDetail) {
+		List<TourDetail> tourDetailList = new ArrayList<>();
+		
+		String[] tourDetailSplit = tourDetail.split("\\n");
+		if(tourDetailSplit.length % 2 != 0) {
+			throw new CustomException("The number of titles and descriptions does not match");
+		}
+		
+		for(int i = 0; i < tourDetailSplit.length; i += 2) {
+			TourDetail tourDetailNew = new TourDetail();
+			tourDetailNew.setTitle(tourDetailSplit[i]);
+			tourDetailNew.setDescription(tourDetailSplit[i + 1]);
+			tourDetailList.add(tourDetailNew);
+		}
+		
+		return tourDetailList;
+	}
 
     public String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Tour.class);
@@ -91,6 +110,9 @@ public class TourService implements ITourService{
 		// Mapping
 		Tour tour = new Tour();
 		modelMapper.map(tourDTO, tour);
+		
+		// set tour detail list
+		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 
 		// Set default value
 		String tourId = iGeneratorSequenceService.genId(getCollectionName());
@@ -122,6 +144,9 @@ public class TourService implements ITourService{
 
 		// Mapping
 		modelMapper.map(tourDTO, tour);
+		
+		// set tour detail list
+		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 
 		// Set default value
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();

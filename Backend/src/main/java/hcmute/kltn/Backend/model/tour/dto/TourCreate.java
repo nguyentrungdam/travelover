@@ -19,7 +19,7 @@ public class TourCreate {
 	private int numberOfDay; // not null
 	private Address address; // not null
 	private String tourDescription;
-	private List<TourDetail> tourDetail; // not null
+	private String tourDetail; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;
 	private String termAndCondition;

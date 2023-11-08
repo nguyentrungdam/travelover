@@ -33,7 +33,9 @@ public class Tour extends BaseEntity{
 	private int numberOfDay; // not null
 	private Address address; // not null
 	private String tourDescription;
-	private List<TourDetail> tourDetail; // not null
+	private int price;
+	private String tourDetail;
+	private List<TourDetail> tourDetailList; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;
 	private String termAndCondition;
