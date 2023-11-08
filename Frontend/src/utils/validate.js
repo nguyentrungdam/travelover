@@ -23,6 +23,17 @@ export function validatePasswordMatch(password, confirmPassword) {
   return password === confirmPassword;
 }
 
+export function validateOriginalDate(day) {
+  const formattedDate = day
+    ? new Date(day)
+        .toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+        })
+        .replace(/\//g, "-")
+    : "";
+  return formattedDate;
+}
 export function formatCurrencyWithoutD(amount) {
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",

@@ -1,17 +1,17 @@
 export const menu = [
   {
     id: 1,
-    title: "main",
+    title: "Cá nhân",
     listItems: [
       {
         id: 1,
-        title: "Homepage",
+        title: "Trang chủ",
         url: "/dashboard",
         icon: "/home.svg",
       },
       {
         id: 2,
-        title: "Profile",
+        title: "Hồ sơ",
         url: "/users/1",
         icon: "/user.svg",
       },
@@ -19,11 +19,11 @@ export const menu = [
   },
   {
     id: 2,
-    title: "lists",
+    title: "Danh sách",
     listItems: [
       {
         id: 1,
-        title: "Users",
+        title: "Người dùng",
         url: "/users",
         icon: "/user.svg",
       },

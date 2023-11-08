@@ -22,6 +22,7 @@ import Product from "./pages/admin/product/Product";
 import AccountDetail from "./pages/client/accountDetail/AccountDetail";
 import ToursList from "./pages/admin/tours/tours";
 import AddTours from "./pages/admin/tours/add-tour/AddTours";
+import UpdateTour from "./pages/admin/tours/update-tour/UpdateTour";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -70,6 +71,7 @@ function App() {
         <Route path="users" element={<Users />} />
         <Route path="users/:id" element={<User />} />
         <Route path="tours-list" element={<ToursList />} />
+        <Route path="tours-list/:id" element={<UpdateTour />} />
         <Route path="tours-list/add-new" element={<AddTours />} />
         {/* <Route path="products/:id" element={<Product />} /> */}
       </Route>

@@ -5,13 +5,12 @@ const LocationSelect = ({ onSelectLocation }) => {
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  // console.log(defaultValue);
   const [selectedCity, setSelectedCity] = useState("");
   const [cityCode, setCityCode] = useState();
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [districtCode, setDistrictCode] = useState();
   const [selectedWard, setSelectedWard] = useState("");
-  const [result, setResult] = useState("");
-
   useEffect(() => {
     const host = "https://provinces.open-api.vn/api/";
 
@@ -52,6 +51,8 @@ const LocationSelect = ({ onSelectLocation }) => {
 
   const handleSetCity = (e) => {
     setSelectedCity(e);
+    setSelectedDistrict("");
+    setSelectedWard("");
     const cityName = e;
     const cityCode1 = cities.find((city) => city.name === cityName);
     if (cityCode1) {
@@ -61,6 +62,7 @@ const LocationSelect = ({ onSelectLocation }) => {
 
   const handleSetDistrict = (e) => {
     setSelectedDistrict(e);
+    setSelectedWard("");
     const districtName = e;
     const districtCode1 = districts.find(
       (district) => district.name === districtName
@@ -79,7 +81,7 @@ const LocationSelect = ({ onSelectLocation }) => {
       >
         <option value="">Chọn tỉnh/thành phố</option>
         {cities.map((city) => (
-          <option key={city.code} value={city.name}>
+          <option key={city?.code} value={city.name}>
             {city.name}
           </option>
         ))}

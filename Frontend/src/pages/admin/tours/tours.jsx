@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./tours.css";
 import DataTable from "../../../components/dataTable/DataTable";
 import { products } from "../../../assets/data/dataAdmin";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllTours } from "../../../slices/tourSlice";
+import Loading from "../../../components/Loading/Loading";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 40 },
+  { field: "id", headerName: "ID", width: 40, type: "string" },
   {
     field: "img",
     headerName: "Image",
@@ -16,25 +19,13 @@ const columns = [
   {
     field: "title",
     type: "string",
-    headerName: "Title",
-    width: 250,
+    headerName: "Tên tour",
+    width: 650,
   },
   {
-    field: "color",
+    field: "days",
     type: "string",
-    headerName: "Color",
-    width: 150,
-  },
-  {
-    field: "price",
-    type: "string",
-    headerName: "Price",
-    width: 150,
-  },
-  {
-    field: "producer",
-    headerName: "Producer",
-    type: "string",
+    headerName: "Sồ ngày",
     width: 150,
   },
   {
@@ -43,26 +34,25 @@ const columns = [
     width: 100,
     type: "string",
   },
-  {
-    field: "inStock",
-    headerName: "In Stock",
-    width: 100,
-    type: "boolean",
-  },
 ];
 
 const ToursList = () => {
-  const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const { loading, tours } = useSelector((state) => state.tour);
+  const transformedData =
+    tours && Array.isArray(tours)
+      ? tours.map((item, index) => ({
+          id: item.tourId.slice(-2),
+          img: item.avatar,
+          title: item.tourTitle,
+          days: item.numberOfDay,
+          createdAt: item.createdAt,
+        }))
+      : [];
 
-  // TEST THE API
-
-  // const { isLoading, data } = useQuery({
-  //   queryKey: ["allproducts"],
-  //   queryFn: () =>
-  //     fetch("http://localhost:8800/api/products").then(
-  //       (res) => res.json()
-  //     ),
-  // });
+  useEffect(() => {
+    dispatch(getAllTours()).unwrap();
+  }, []);
 
   return (
     <div className="products">
@@ -70,15 +60,13 @@ const ToursList = () => {
         <h1>Tours</h1>
         <a href="/tours-list/add-new">Thêm tour mới</a>
       </div>
-      <DataTable slug="products" columns={columns} rows={products} />
       {/* TEST THE API */}
 
-      {/* {isLoading ? (
-        "Loading..."
+      {loading ? (
+        <Loading isTable />
       ) : (
-        <DataTable slug="products" columns={columns} rows={data} />
-      )} */}
-      {/* {open && <Add slug="product" columns={columns} setOpen={setOpen} />} */}
+        <DataTable slug="tours-list" columns={columns} rows={transformedData} />
+      )}
     </div>
   );
 };
