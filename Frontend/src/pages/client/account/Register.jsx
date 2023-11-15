@@ -92,9 +92,10 @@ const Register = () => {
           role: role,
         })
       ).unwrap();
+      console.log(res);
       if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
         notify1(1);
-        navigate("/");
+        navigate("/login");
       } else {
         notify1(2);
         setTimeout(function () {

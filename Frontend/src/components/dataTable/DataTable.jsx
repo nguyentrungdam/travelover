@@ -24,7 +24,7 @@ const DataTable = (props) => {
 
   const actionColumn = {
     field: "action",
-    headerName: "Action",
+    headerName: "Hành động",
     width: 200,
     renderCell: (params) => {
       return (
@@ -60,7 +60,7 @@ const DataTable = (props) => {
             quickFilterProps: { debounceMs: 500 },
           },
         }}
-        pageSizeOptions={[5]}
+        pageSizeOptions={[5, 10, 20, 50]}
         checkboxSelection
         disableRowSelectionOnClick
         disableColumnFilter

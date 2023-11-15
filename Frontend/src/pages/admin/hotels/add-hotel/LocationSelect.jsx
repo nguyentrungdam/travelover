@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./AddTours.css";
-const LocationSelect = ({ onSelectLocation, pickProvince, searchProvince }) => {
+const LocationSelect = ({ onSelectLocation }) => {
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -71,72 +71,48 @@ const LocationSelect = ({ onSelectLocation, pickProvince, searchProvince }) => {
       setDistrictCode(districtCode1);
     }
   };
-  const sortByName = (object) => {
-    return object.slice().sort((a, b) => a.name.localeCompare(b.name));
-  };
+
   return (
     <div className="select-location">
-      {pickProvince ? (
-        <select
-          id="city"
-          onChange={(e) => handleSetCity(e.target.value)}
-          value={selectedCity}
-          className={`select-custom ${searchProvince ? "selectSearch" : ""}`}
-        >
-          {searchProvince ? (
-            <option value={searchProvince}>{searchProvince}</option>
-          ) : (
-            <option value="">Nơi bạn muốn đi ?</option>
-          )}
+      <select
+        id="city"
+        onChange={(e) => handleSetCity(e.target.value)}
+        value={selectedCity}
+      >
+        <option value="">Chọn tỉnh/thành phố</option>
+        {cities.map((city) => (
+          <option key={city?.code} value={city.name}>
+            {city.name}
+          </option>
+        ))}
+      </select>
 
-          {sortByName(cities).map((city) => (
-            <option key={city?.code} value={city.name}>
-              {city.name}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <>
-          <select
-            id="city"
-            onChange={(e) => handleSetCity(e.target.value)}
-            value={selectedCity}
-          >
-            <option value="">Chọn tỉnh/thành phố</option>
-            {sortByName(cities).map((city) => (
-              <option key={city?.code} value={city.name}>
-                {city.name}
-              </option>
-            ))}
-          </select>
-          <select
-            id="district"
-            onChange={(e) => handleSetDistrict(e.target.value)}
-            value={selectedDistrict}
-            className="mx-2"
-          >
-            <option value="">Chọn quận/huyện</option>
-            {sortByName(districts).map((district) => (
-              <option key={district.code} value={district.name}>
-                {district.name}
-              </option>
-            ))}
-          </select>
+      <select
+        id="district"
+        onChange={(e) => handleSetDistrict(e.target.value)}
+        value={selectedDistrict}
+        className="mx-2"
+      >
+        <option value="">Chọn quận/huyện</option>
+        {districts.map((district) => (
+          <option key={district.code} value={district.name}>
+            {district.name}
+          </option>
+        ))}
+      </select>
 
-          <select
-            id="ward"
-            onChange={(e) => setSelectedWard(e.target.value)}
-            value={selectedWard}
-          >
-            <option value="">Chọn phường/xã</option>
-            {sortByName(wards).map((ward) => (
-              <option key={ward.code} value={ward.name}>
-                {ward.name}
-              </option>
-            ))}
-          </select>
-        </>
-      )}
+      <select
+        id="ward"
+        onChange={(e) => setSelectedWard(e.target.value)}
+        value={selectedWard}
+      >
+        <option value="">Chọn phường/xã</option>
+        {wards.map((ward) => (
+          <option key={ward.code} value={ward.name}>
+            {ward.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };

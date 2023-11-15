@@ -52,20 +52,22 @@ const ProfilePage = () => {
     form.append("lastName", userInfo.lastName);
     form.append("address", userInfo.address);
     form.append("phoneNumber", userInfo.phoneNumber);
-    // if (userInfo.profilePictureToChange) {
-    //   form.append("avatar", userInfo.profilePictureToChange);
-    // }
-    try {
-      const res = await dispatch(updateUserInfo(form)).unwrap();
-      console.log(res);
-      if (res.data.status === "ok") {
-        alert("OK");
-        window.location.reload();
-      }
-    } catch (err) {
-      alert(err.message);
-      // alert("Vui lòng kiểm tra lại các thông tin cho chính xác!");
+    if (userInfo.profilePictureToChange) {
+      form.append("avatar", userInfo.profilePictureToChange);
     }
+    console.log(userInfo.avatar);
+    console.log(userInfo.profilePictureToChange);
+    // try {
+    //   const res = await dispatch(updateUserInfo(form)).unwrap();
+    //   console.log(res);
+    //   if (res.data.status === "ok") {
+    //     alert("OK");
+    //     window.location.reload();
+    //   }
+    // } catch (err) {
+    //   alert(err.message);
+    //   // alert("Vui lòng kiểm tra lại các thông tin cho chính xác!");
+    // }
   };
   const handleChangeFirstName = (e) => {
     setUserInfo({ ...userInfo, firstName: e.target.value });

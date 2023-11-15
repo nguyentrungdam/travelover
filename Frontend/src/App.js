@@ -5,24 +5,24 @@ import ThankYou from "./pages/ThankYou";
 import Home from "./pages/client/home/Home";
 import Login from "./pages/client/account/Login";
 import Register from "./pages/client/account/Register";
-import TourDetails from "././pages/TourDetails";
-import Tours from "././pages/Tours";
 import { useDispatch, useSelector } from "react-redux";
 import { getAccountProfile } from "./slices/accountSlice";
 import Page404 from "./components/404/404";
-import Hotel from "./pages/client/hotel/Hotel";
 import List from "./pages/client/searchHotels/List";
+import TourDetail from "./pages/client/tour/TourDetail";
+
 ///import admin routes
 import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
 import Users from "./pages/admin/users/Users";
 import User from "./pages/admin/user/User";
 import LayoutAdmin from "./components/LayoutAdmin/LayoutAdmin";
-import Products from "./pages/admin/products/Products";
-import Product from "./pages/admin/product/Product";
 import AccountDetail from "./pages/client/accountDetail/AccountDetail";
 import ToursList from "./pages/admin/tours/tours";
 import AddTours from "./pages/admin/tours/add-tour/AddTours";
 import UpdateTour from "./pages/admin/tours/update-tour/UpdateTour";
+import Hotels from "./pages/admin/hotels/Hotels";
+import Tours from "./pages/Tours";
+import TourBooking from "./pages/client/booking/TourBooking";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -54,14 +54,14 @@ function App() {
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
       <Route path="/tours" element={<Tours />} />
-      {/* <Route path="/tours/:id" element={<TourDetails />} /> */}
-      <Route path="/tours-detail" element={<TourDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<AccountDetail />} />
       {/* <Route path="/thank-you" element={<ThankYou />} /> */}
-      <Route path="/tours/search-hotels" element={<List />} />
-      <Route path="/tours/search-hotels/:id" element={<Hotel />} />
+      <Route path="/tours/search-tour" element={<List />} />
+      <Route path="/tours/tour-detail/:tourId" element={<TourDetail />} />
+      <Route path="/tours/tour-booking" element={<TourBooking />} />
+
       <Route path="/*" element={<Page404 />} />
       {/* admin route */}
       {/* "email": "admind@gmail.com",
@@ -73,7 +73,9 @@ function App() {
         <Route path="tours-list" element={<ToursList />} />
         <Route path="tours-list/:id" element={<UpdateTour />} />
         <Route path="tours-list/add-new" element={<AddTours />} />
-        {/* <Route path="products/:id" element={<Product />} /> */}
+        <Route path="hotels" element={<Hotels />} />
+        {/* <Route path="hotels/:id" element={<UpdateTour />} />
+        <Route path="hotels/add-new" element={<AddTours />} /> */}
       </Route>
       {/* <Route path="users">
         <Route

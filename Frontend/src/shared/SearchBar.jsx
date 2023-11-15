@@ -1,78 +1,75 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./search-bar.css";
 import { Col } from "reactstrap";
-import { BASE_URL } from "../utils/config";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCalendarDay,
   faLocationDot,
   faMagnifyingGlass,
   faCalendarDays,
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
-
-import { DateRange } from "react-date-range";
-import "react-date-range/dist/styles.css"; // main css file
-import "react-date-range/dist/theme/default.css"; // theme css file
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import LocationSelect from "../pages/admin/tours/add-tour/LocationSelect";
 
 const SearchBar = () => {
-  // const locationRef = useRef("");
-  // const distanceRef = useRef(0);
-  // const maxGroupSizeRef = useRef(0);
-  // const navigate = useNavigate();
-
-  // const searchHandler = async () => {
-  //   const location = locationRef.current.value;
-  //   const distance = distanceRef.current.value;
-  //   const maxGroupSize = maxGroupSizeRef.current.value;
-
-  //   if (location === "" || distance === "" || maxGroupSize === "") {
-  //     return alert("All fields are required!");
-  //   }
-
-  //   const res = await fetch(
-  //     `${BASE_URL}/tours/search/getTourBySearch?city=${location}&distance=${distance}&maxGroupSize=${maxGroupSize}`
-  //   );
-
-  //   if (!res.ok) alert("Something went wrong");
-
-  //   const result = await res.json();
-
-  //   navigate(
-  //     `/tours/search?city=${location}&distance=${distance}&maxGroupSize=${maxGroupSize}`,
-  //     { state: result.data }
-  //   );
-  // };
   const navigate = useNavigate();
-  const [destination, setDestination] = useState("");
-  const [openDate, setOpenDate] = useState(false);
-  const [date, setDate] = useState([
-    {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: "selection",
-    },
-  ]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [startDate, setStartDate] = useState("");
+  const [numberOfDay, setNumberOfDay] = useState("");
   const [openOptions, setOpenOptions] = useState(false);
-  const [options, setOptions] = useState({
-    adult: 1,
-    children: 0,
-    room: 1,
+  const optionsRef = useRef(null);
+  const [numberOfPeople, setNumberOfPeople] = useState(1);
+  const [selectedLocation, setSelectedLocation] = useState({
+    province: "",
   });
-  const handleOption = (name, operation) => {
-    setOptions((prev) => {
-      return {
-        ...prev,
-        [name]: operation === "i" ? options[name] + 1 : options[name] - 1,
-      };
+
+  const handleSearch = () => {
+    navigate("/tours/search-tour", {
+      state: {
+        ...selectedLocation,
+        startDate,
+        numberOfDay,
+        numberOfPeople,
+        selectedDate,
+      },
     });
   };
-  const handleSearch = () => {
-    navigate("/tours/search-hotels", { state: { destination, date, options } });
+  const handleDateChange = (date) => {
+    const formattedDisplayDate = format(date, "yyyy-MM-dd");
+    setSelectedDate(date);
+    setStartDate(formattedDisplayDate);
   };
 
+  const handleSelectLocation = (location) => {
+    setSelectedLocation(location);
+  };
+  const handleOption = (operation) => {
+    if (operation === "decrease" && numberOfPeople > 1) {
+      setNumberOfPeople(numberOfPeople - 1);
+    } else if (operation === "increase") {
+      setNumberOfPeople(numberOfPeople + 1);
+    }
+  };
+  const handleClickOutside = (event) => {
+    if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+      setOpenOptions(false);
+    }
+  };
+  const handlePeopleClick = (e) => {
+    e.stopPropagation(); // Ngăn chặn sự kiện click từ lan truyền lên
+    setOpenOptions(!openOptions);
+  };
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
     <Col lg="12">
       <div className="search__bar">
@@ -81,108 +78,70 @@ const SearchBar = () => {
             <FontAwesomeIcon className="icon-search" icon={faLocationDot} />
             <div className="headerSearch-location">
               <h5>Địa điểm</h5>
-              <input
-                className="headerSearchInput"
-                type="text"
-                placeholder="Nơi bạn muốn đi?"
-                onChange={(e) => setDestination(e.target.value)}
+              <LocationSelect
+                onSelectLocation={handleSelectLocation}
+                pickProvince
+              />
+            </div>
+          </div>
+          <div className="headerSearchItem form__group-fast">
+            <FontAwesomeIcon icon={faCalendarDay} className="icon-search" />
+            <div className="headerSearch-date">
+              <h5>Ngày đi </h5>
+              <DatePicker
+                id="datepicker"
+                className="datepicker "
+                selected={selectedDate}
+                onChange={handleDateChange}
+                locale={vi} // Thiết lập ngôn ngữ Tiếng Việt
+                dateFormat="dd-MM-yyyy" // Định dạng ngày tháng
+                minDate={new Date()} // Chỉ cho phép chọn ngày từ hôm nay trở đi
               />
             </div>
           </div>
           <div className="headerSearchItem form__group-fast">
             <FontAwesomeIcon icon={faCalendarDays} className="icon-search" />
-            <div className="headerSearch-location">
-              <h5>Ngày đi</h5>
-              <span
-                onClick={() => setOpenDate(!openDate)}
-                className="headerSearchText"
-              >{`${format(date[0].startDate, "dd/MM/yyyy")} - ${format(
-                date[0].endDate,
-                "dd/MM/yyyy"
-              )}`}</span>
-              {openDate && (
-                <DateRange
-                  editableDateInputs={true}
-                  onChange={(item) => setDate([item.selection])}
-                  moveRangeOnFirstSelection={false}
-                  ranges={date}
-                  className="date"
-                  minDate={new Date()}
-                  locale={vi}
-                  dateDisplayFormat="dd, MMM, yyyy"
-                />
-              )}
+            <div className="headerSearch-date">
+              <h5>Số ngày </h5>
+              <select
+                value={numberOfDay}
+                className="select-search "
+                onChange={(event) => {
+                  setNumberOfDay(event.target.value);
+                }}
+              >
+                <option value="1-3">1-3 ngày</option>
+                <option value="4-7">4-7 ngày</option>
+                <option value="8-14">8-14 ngày</option>
+                <option value="15-30">15 ngày trở lên</option>
+              </select>
             </div>
           </div>
-          <div className="headerSearchItem  ">
+          <div className="headerSearchItem headerSearchItem1 ">
             <FontAwesomeIcon icon={faPerson} className="icon-search" />
             <div className="headerSearch-location">
               <h5>Số người</h5>
-
-              <span
-                onClick={() => setOpenOptions(!openOptions)}
-                className="headerSearchText"
-              >{`${options.adult} người lớn · ${options.children} trẻ em · ${options.room} phòng`}</span>
+              <span onClick={handlePeopleClick} className="headerSearchText ">
+                {numberOfPeople} người
+              </span>
               {openOptions && (
-                <div className="options">
+                <div className="options" ref={optionsRef}>
                   <div className="optionItem">
-                    <span className="optionText">Người lớn</span>
+                    <span className="optionText">Số người </span>
                     <div className="optionCounter">
                       <button
-                        disabled={options.adult <= 1}
+                        disabled={numberOfPeople <= 1}
                         className="optionCounterButton"
-                        onClick={() => handleOption("adult", "d")}
+                        onClick={() => handleOption("decrease")}
                       >
                         -
                       </button>
                       <span className="optionCounterNumber">
-                        {options.adult}
+                        {numberOfPeople}
                       </span>
                       <button
                         className="optionCounterButton"
-                        onClick={() => handleOption("adult", "i")}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="optionItem">
-                    <span className="optionText">Trẻ em</span>
-                    <div className="optionCounter">
-                      <button
-                        disabled={options.children <= 0}
-                        className="optionCounterButton"
-                        onClick={() => handleOption("children", "d")}
-                      >
-                        -
-                      </button>
-                      <span className="optionCounterNumber">
-                        {options.children}
-                      </span>
-                      <button
-                        className="optionCounterButton"
-                        onClick={() => handleOption("children", "i")}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="optionItem">
-                    <span className="optionText">Phòng</span>
-                    <div className="optionCounter">
-                      <button
-                        disabled={options.room <= 1}
-                        className="optionCounterButton"
-                        onClick={() => handleOption("room", "d")}
-                      >
-                        -
-                      </button>
-                      <span className="optionCounterNumber">
-                        {options.room}
-                      </span>
-                      <button
-                        className="optionCounterButton"
-                        onClick={() => handleOption("room", "i")}
+                        onClick={() => handleOption("increase")}
                       >
                         +
                       </button>
