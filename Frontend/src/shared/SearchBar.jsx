@@ -16,28 +16,29 @@ import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import LocationSelect from "../pages/admin/tours/add-tour/LocationSelect";
 
-const SearchBar = () => {
+const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [startDate, setStartDate] = useState("");
-  const [numberOfDay, setNumberOfDay] = useState("");
+  const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [numberOfDay, setNumberOfDay] = useState("1-3");
   const [openOptions, setOpenOptions] = useState(false);
   const optionsRef = useRef(null);
   const [numberOfPeople, setNumberOfPeople] = useState(1);
-  const [selectedLocation, setSelectedLocation] = useState({
-    province: "",
-  });
-
+  const [selectedLocation, setSelectedLocation] = useState("");
   const handleSearch = () => {
-    navigate("/tours/search-tour", {
-      state: {
-        ...selectedLocation,
-        startDate,
-        numberOfDay,
-        numberOfPeople,
-        selectedDate,
-      },
-    });
+    const newState = {
+      selectedLocation,
+      startDate,
+      numberOfDay,
+      numberOfPeople,
+      selectedDate,
+    };
+    if (isTours) {
+      updateParentState(newState);
+      onSearch(newState);
+    } else {
+      navigate("/tours/search-tour", { state: newState });
+    }
   };
   const handleDateChange = (date) => {
     const formattedDisplayDate = format(date, "yyyy-MM-dd");

@@ -25,13 +25,16 @@ const List = () => {
   const dispatch = useDispatch();
   const { loading, tours } = useSelector((state) => state.tour);
 
-  const [province, setProvince] = useState(location.state.province);
+  const [province, setProvince] = useState(
+    location.state.selectedLocation
+      ? location.state.selectedLocation.province
+      : ""
+  );
   const [startDate, setStartDate] = useState(location.state.startDate);
   const [numberOfDay, setNumberOfDay] = useState(location.state.numberOfDay);
   const [numberOfPeople, setNumberOfPeople] = useState(
     location.state.numberOfPeople
   );
-
   const [selectedDate, setSelectedDate] = useState(location.state.selectedDate);
   const [isHeaderVisible, setHeaderVisible] = useState(true);
   const [isChecked1, setIsChecked1] = useState(false);
@@ -51,7 +54,9 @@ const List = () => {
   //   setCurrentPage(selectedPage);
   // };
   console.log(tours);
+
   useEffect(() => {
+    setProvince(location.state.selectedLocation.province);
     dispatch(
       searchTour({
         province,
@@ -73,6 +78,7 @@ const List = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await dispatch(
@@ -87,7 +93,7 @@ const List = () => {
     };
     fetchData();
   }, [dispatch, province, startDate, numberOfDay, numberOfPeople]);
-
+  console.log(province, startDate, numberOfDay, numberOfPeople);
   const handleSelectLocation = (location) => {
     setProvince(location.province);
   };
@@ -140,7 +146,7 @@ const List = () => {
                 <div className="tour-search-result__filter__heading  px-1 py-2 d-flex justify-content-between align-items-center">
                   <h5 className="s-title me-1 mt-1 ">Điểm đến: </h5>
                   <LocationSelect
-                    searchProvince={location.state.province}
+                    searchProvince={location.state.selectedLocation.province}
                     onSelectLocation={handleSelectLocation}
                     pickProvince
                   />

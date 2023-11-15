@@ -1,28 +1,27 @@
 import "./App.css";
 import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAccountProfile } from "./slices/accountSlice";
 import ThankYou from "./pages/ThankYou";
+import Page404 from "./components/404/404";
 import Home from "./pages/client/home/Home";
 import Login from "./pages/client/account/Login";
 import Register from "./pages/client/account/Register";
-import { useDispatch, useSelector } from "react-redux";
-import { getAccountProfile } from "./slices/accountSlice";
-import Page404 from "./components/404/404";
-import List from "./pages/client/searchHotels/List";
 import TourDetail from "./pages/client/tour/TourDetail";
-
+import TourBooking from "./pages/client/booking/TourBooking";
+import Tours from "./pages/client/tour/Tours";
+import List from "./pages/client/searchTour/List";
+import AccountDetail from "./pages/client/accountDetail/AccountDetail";
 ///import admin routes
 import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
 import Users from "./pages/admin/users/Users";
 import User from "./pages/admin/user/User";
 import LayoutAdmin from "./components/LayoutAdmin/LayoutAdmin";
-import AccountDetail from "./pages/client/accountDetail/AccountDetail";
 import ToursList from "./pages/admin/tours/tours";
 import AddTours from "./pages/admin/tours/add-tour/AddTours";
 import UpdateTour from "./pages/admin/tours/update-tour/UpdateTour";
 import Hotels from "./pages/admin/hotels/Hotels";
-import Tours from "./pages/Tours";
-import TourBooking from "./pages/client/booking/TourBooking";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
