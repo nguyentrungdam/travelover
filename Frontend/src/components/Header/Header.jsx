@@ -22,13 +22,14 @@ const nav__links = [
   },
 ];
 
-const Header = () => {
+const Header = ({ noneSticky }) => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isSticky, setIsSticky] = useState(false);
 
   const { isAuthenticated, account } = useSelector((state) => state.account);
+
   const handleLogout = async (e) => {
     e.preventDefault();
     await dispatch(signout());
@@ -56,7 +57,11 @@ const Header = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 100) {
-        setIsSticky(true);
+        if (noneSticky) {
+          setIsSticky(false);
+        } else {
+          setIsSticky(true);
+        }
       } else {
         setIsSticky(false);
       }

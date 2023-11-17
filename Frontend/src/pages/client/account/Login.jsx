@@ -27,17 +27,26 @@ const Login = () => {
 
       if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
         notify(1);
-        navigate("/");
+        setTimeout(() => {
+          navigate("/");
+        }, 1500);
       } else if (res.data.status === "ok" && res.data.data.role === "ADMIN") {
         notify(1);
-        navigate("/dashboard");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
       } else {
         notify(2);
-        navigate("/login");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       }
     } catch (error) {
       console.log(error);
-      navigate("/login");
+      notify(2);
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     }
   };
   const notify = (prop) => {

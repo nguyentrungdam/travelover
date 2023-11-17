@@ -62,7 +62,7 @@ const Home = () => {
               </div>
             </Col>
 
-            <SearchBar />
+            <SearchBar isTours={false} />
           </Row>
         </Container>
       </section>

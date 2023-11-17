@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
-import "./tours.css";
+import { useEffect } from "react";
+import "../tours/tours.css";
 import DataTable from "../../../components/dataTable/DataTable";
+import { products } from "../../../assets/data/dataAdmin";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllTours } from "../../../slices/tourSlice";
 import Loading from "../../../components/Loading/Loading";
@@ -18,13 +19,19 @@ const columns = [
   {
     field: "title",
     type: "string",
-    headerName: "Tên tour",
-    width: 650,
+    headerName: "Tên khách sạn",
+    width: 350,
   },
   {
-    field: "days",
+    field: "phoneNumber",
     type: "string",
-    headerName: "Số ngày",
+    headerName: "Số điện thoại",
+    width: 150,
+  },
+  {
+    field: "province",
+    type: "string",
+    headerName: "Địa chỉ",
     width: 150,
   },
   {
@@ -35,13 +42,13 @@ const columns = [
   },
 ];
 
-const ToursList = () => {
+const Hotels = () => {
   const dispatch = useDispatch();
   const { loading, tours } = useSelector((state) => state.tour);
   const transformedData =
     tours && Array.isArray(tours)
       ? tours.map((item, index) => ({
-          id: item.tourId ? item.tourId.slice(-2) : index,
+          id: item.tourId.slice(-2),
           img: item.avatar,
           title: item.tourTitle,
           days: item.numberOfDay,
@@ -52,23 +59,22 @@ const ToursList = () => {
   useEffect(() => {
     dispatch(getAllTours()).unwrap();
   }, []);
-  console.log(tours);
 
   return (
     <div className="products">
       <div className="info">
-        <h1>Tours</h1>
-        <a href="/tours-list/add-new">Thêm tour mới</a>
+        <h1>Khách Sạn</h1>
+        <a href="/hotels/add-new">Thêm khách sạn mới</a>
       </div>
       {/* TEST THE API */}
 
       {loading ? (
         <Loading isTable />
       ) : (
-        <DataTable slug="tours-list" columns={columns} rows={transformedData} />
+        <DataTable slug="hotels" columns={columns} rows={transformedData} />
       )}
     </div>
   );
 };
 
-export default ToursList;
+export default Hotels;

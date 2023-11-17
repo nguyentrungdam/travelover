@@ -45,6 +45,17 @@ export const updateTour = createAsyncThunk(
     }
   }
 );
+export const searchTour = createAsyncThunk(
+  "tours/search",
+  async (tour, { rejectWithValue }) => {
+    try {
+      const response = await toursApi.searchTour(tour);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const tourSlice = createSlice({
   name: "tour",
   initialState: {
@@ -64,8 +75,19 @@ export const tourSlice = createSlice({
     },
     [createTour.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.tour = action.payload.data.data;
+    },
+    [searchTour.pending]: (state) => {
+      state.loading = true;
+    },
+    [searchTour.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [searchTour.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.tours = action.payload.data.data;
+      console.log(state.tours);
     },
     [updateTour.pending]: (state) => {
       state.loading = true;
@@ -76,7 +98,6 @@ export const tourSlice = createSlice({
     },
     [updateTour.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.tour = action.payload.data.data;
     },
     [getAllTours.pending]: (state) => {
@@ -88,7 +109,6 @@ export const tourSlice = createSlice({
     },
     [getAllTours.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.tours = action.payload.data.data;
     },
     [getTourDetail.pending]: (state) => {
@@ -100,7 +120,6 @@ export const tourSlice = createSlice({
     },
     [getTourDetail.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.tour = action.payload.data.data;
     },
   },

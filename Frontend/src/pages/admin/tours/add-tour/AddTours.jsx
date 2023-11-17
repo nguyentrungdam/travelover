@@ -5,6 +5,14 @@ import { useDispatch } from "react-redux";
 import { createTour } from "../../../../slices/tourSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
+/* Ngày 1 - TP. HỒ CHÍ MINH - THÁC DAMBRI - ĐÀ LẠT Số bữa ăn: 3 bữa (Ăn sáng, trưa, tối)
+Quý khách tập trung tại Vietravel (190 Pasteur, phường Võ Thị Sáu, Quận 3, TP.HCM), xe đưa đoàn khởi hành đi Đà Lạt. Trên đường đoàn dừng chân tham quan và ăn trưa tại Bảo Lộc:
+Ngày 2 - ĐÀ LẠT – ĐỒI CHÈ CẦU ĐẤT – HẦM VANG ĐÀ LẠT – THĂM VƯỜN DÂU TÂY Số bữa ăn: 3 bữa (Ăn sáng, trưa, tối)
+Đà Lạt chào đón quý khách với không khí se lạnh thoang thoảng mùi sương sớm mai, sau khi dùng bữa sáng, xe đưa đoàn tham quan
+Ngày 3 - ĐÀ LẠT – MONGO LAND Số bữa ăn: 2 bữa (Ăn sáng, trưa, tự túc ăn tối)
+Sau khi dùng bữa sáng tại khách sạn, xe đưa đoàn tham quan: Mongo Land: mang vẻ đẹp hoàn toàn mới lạ - một "tiểu Mông Cổ thu nhỏ" trong lòng Đà Lạt được thiết kế như một nông trại với những chiếc lều đủ màu sắc. Tất cả đều được bài trí độc đáo, bắt mắt theo phong cách Mông Cổ đặc trưng. Đến đây, ngoài việc tận hưởng bầu không khí trong lành và chiêm ngưỡng vẻ đẹp của thiên nhiên hùng vĩ, Quý khách sẽ được trải nghiêm
+Ngày 4 - ĐÀ LẠT – SAMTEN HILLS ĐÀ LẠT - TP. HỒ CHÍ MINH Số bữa ăn: 2 bữa (Ăn sáng, trưa)
+Quý khách dùng bữa sáng, làm thủ tục trả phòng. Sau đó xe và HDV đưa khách đi tham quan */
 const AddTours = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
@@ -13,10 +21,7 @@ const AddTours = () => {
     numberOfDay: 0,
     moreLocation: "",
     tourDescription: "",
-    day: 0,
-    description: "",
-    imageUrl: "",
-    price: 0,
+    tourDetail: "",
     startDate: "",
     endDate: "",
     suitablePerson: "",
@@ -67,6 +72,9 @@ const AddTours = () => {
     formDataObject.append("video", formData.video);
     formDataObject.append("numberOfDay", formData.numberOfDay);
     formDataObject.append("tourDescription", formData.tourDescription);
+    formDataObject.append("tourDetail", formData.tourDetail);
+    formDataObject.append("suitablePerson", formData.suitablePerson);
+    formDataObject.append("termAndCondition", formData.termAndCondition);
 
     // Thêm địa chỉ
     formDataObject.append("address[province]", selectedLocation.province);
@@ -75,15 +83,6 @@ const AddTours = () => {
     formDataObject.append("address[moreLocation]", formData.moreLocation);
     formDataObject.append("reasonableTime[startDate]", formData.startDate);
     formDataObject.append("reasonableTime[endDate]", formData.endDate);
-
-    // Thêm tourDetail (dựa trên tourDetail[0] trong form)
-    formDataObject.append("tourDetail[0][day]", formData.day);
-    formDataObject.append("tourDetail[0][description]", formData.description);
-    formDataObject.append("tourDetail[0][imageUrl]", formData.imageUrl);
-    formDataObject.append("tourDetail[0][price]", formData.price);
-
-    formDataObject.append("suitablePerson", formData.suitablePerson);
-    formDataObject.append("termAndCondition", formData.termAndCondition);
 
     // Gửi formDataObject lên API hoặc xử lý dữ liệu tại đây
     for (const [name, value] of formDataObject.entries()) {
@@ -222,17 +221,17 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  <div className="col-md-8 border-top">
+                  <div className="col-md-12 border-top">
                     <label className="pt-1 mb-1">Mô tả chi tiết tour</label>
                     <textarea
-                      name="description"
+                      name="tourDetail"
                       className="form-control"
                       onChange={handleChange}
                       placeholder="Nhập mô tả"
                       rows="4"
                     />
                   </div>
-                  <div className="col-md-4 border-top">
+                  {/* <div className="col-md-4 border-top">
                     <label className="pt-1 small mb-1">Số ngày</label>
                     <input
                       name="day"
@@ -249,17 +248,21 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                       placeholder="Điền giá tiền"
                       onChange={handleChange}
                     />
-                  </div>
+                  </div> */}
                 </div>
                 <div className="row gx-3 mb-3">
-                  <label className="small mb-1">Chính sách và điều khoản</label>
-                  <textarea
-                    name="termAndCondition"
-                    className="form-control"
-                    onChange={handleChange}
-                    placeholder="Nhập chính sách và điều khoản"
-                    rows="3"
-                  />
+                  <div className="col-md-12 ">
+                    <label className="small mb-1">
+                      Chính sách và điều khoản
+                    </label>
+                    <textarea
+                      name="termAndCondition"
+                      className="form-control"
+                      onChange={handleChange}
+                      placeholder="Nhập chính sách và điều khoản"
+                      rows="3"
+                    />
+                  </div>
                 </div>
                 <button
                   className="btn btn-primary"

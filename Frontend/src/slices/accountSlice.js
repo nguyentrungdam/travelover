@@ -126,8 +126,6 @@ export const accountSlice = createSlice({
     [signup.fulfilled]: (state, action) => {
       state.loading = false;
       state.account = action.payload.data;
-      state.isAuthenticated = true;
-      localStorage.setItem("token", action.payload.data.data.accessToken);
     },
     [getAccountProfile.pending]: (state) => {
       state.loading = true;

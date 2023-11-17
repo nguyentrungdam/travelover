@@ -1,7 +1,8 @@
 .search__bar {
   padding: 0.5rem 1rem;
   border-radius: 50px;
-  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  box-shadow: 0 0 8px rgba(17, 12, 46, 0.15), 0 0 8px rgba(17, 12, 46, 0.15),
+    0 0 8px rgba(17, 12, 46, 0.15), 0 0 8px rgba(17, 12, 46, 0.15);
   width: max-content;
 }
 
@@ -85,7 +86,7 @@
   padding: 10px 0px;
   border-radius: 5px;
   bottom: -25px;
-  width: 1024px;
+  width: 845px;
 }
 
 .headerIcon {
@@ -98,10 +99,22 @@
   gap: 10px;
   position: relative;
 }
+.headerSearchItem1 {
+  padding-right: 2.4rem;
+}
 
 .headerSearch-location {
   position: relative;
   padding-left: 10px;
+}
+.headerSearch-location h5,
+.headerSearch-date h5 {
+  color: #6c6b6b;
+}
+.headerSearch-date {
+  position: relative;
+  padding-left: 10px;
+  width: 110px;
 }
 
 .headerSearchInput {
@@ -111,6 +124,7 @@
   padding: 0;
 }
 .headerSearchText {
+  font-weight: 600;
   cursor: pointer;
   font-size: 1.1rem;
   color: var(--heading-color);
@@ -131,16 +145,17 @@
 .options {
   z-index: 2;
   position: absolute;
-  top: 74px;
+  top: 70px;
+  left: -36px;
   background-color: white;
   color: gray;
   border-radius: 5px;
-  -webkit-box-shadow: 5px 5px 10px -5px rgba(0, 0, 0, 0.4);
-  box-shadow: 5px 5px 10px -5px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 5px -2px rgba(0, 0, 0, 0.4),
+    -2px -2px 5px -2px rgba(0, 0, 0, 0.4);
 }
 
 .optionItem {
-  width: 200px;
+  width: 170px;
   display: flex;
   justify-content: space-between;
   margin: 10px;
@@ -171,4 +186,24 @@
   width: 8px;
   height: 18px;
   font-size: 15px;
+}
+.datepicker {
+  cursor: pointer;
+  border: none;
+}
+.datepicker {
+  width: 100%;
+  font-weight: bold;
+}
+.datepicker:focus,
+.select-search:focus {
+  border-color: var(--secondary--color); /* Màu sắc khi focus */
+  outline: none; /* Loại bỏ đường viền mặc định */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Hiệu ứng bóng khi focus */
+}
+.select-search {
+  font-weight: bold;
+  border: none;
+  appearance: none;
+  cursor: pointer;
 }

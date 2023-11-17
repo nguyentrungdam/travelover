@@ -41,7 +41,7 @@
   top: 0;
   left: 0;
   box-shadow: 3px 8px 8px -3px #ddd;
-  z-index: 999;
+  z-index: 900;
 }
 .btn {
   transition: transform 0.3s;

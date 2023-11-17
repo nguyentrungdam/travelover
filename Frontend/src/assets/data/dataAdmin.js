@@ -35,15 +35,15 @@ export const menu = [
       },
       {
         id: 3,
-        title: "Orders",
-        url: "/orders",
-        icon: "/order.svg",
+        title: "Khách sạn",
+        url: "/hotels",
+        icon: "/hotel.svg",
       },
       {
         id: 4,
-        title: "Posts",
-        url: "/posts",
-        icon: "/post.svg",
+        title: "Orders",
+        url: "/orders",
+        icon: "/order.svg",
       },
     ],
   },
@@ -717,3 +717,97 @@ export const singleProduct = {
     },
   ],
 };
+export const servicesData = [
+  { label: "Thời gian", value: "4 ngày 3 đêm" },
+  { label: "Phương tiện di chuyển", value: "Xe du lịch" },
+  {
+    label: "Điểm tham quan",
+    value:
+      "siem reap, Phnom Penh, Angkor wat, Angkor Thom, Chua Vang, Chua Bac, Hoang Cung",
+  },
+  { label: "Ẩm thực", value: "Theo thực đơn, Buffet sáng" },
+  { label: "Khách sạn", value: "Khách sạn 4 sao" },
+  { label: "Thời gian lý tưởng", value: "Quanh Năm" },
+  {
+    label: "Đối tượng thích hợp",
+    value: "Gia đình nhiều thế hệ, Người lớn tuổi, Thanh niên, Cặp đôi",
+  },
+  { label: "Ưu đãi", value: "Đã ưu đãi trực tiếp vào giá tour" },
+];
+export const tripDays = [
+  {
+    day: 1,
+    date: "09/11/2023",
+    location: "TP. HỒ CHÍ MINH – XA MÁT/ MỘC BÀI - SIEM REAP (Ăn ba bữa)",
+    description:
+      "Xe và hướng dẫn viên Vietravel đón Quý khách tại 190 Pasteur, Q.3, TP.HCM, khởi hành đến cửa khẩu Xa Mát hoặc Mộc Bài. Ăn sáng trên đường. Đến cửa khẩu, Quý khách làm thủ tục qua cửa khẩu. Xe và hướng dẫn viên địa phương đón đoàn và đưa đi dùng bữa trưa tại nhà hàng địa phương. Sau đó, Quý khách tiếp tục lên đường đi Siem Reap. Đến nơi, Quý khách về nhận phòng tại khách sạn. Ăn tối và tự do nghỉ ngơi. Quý khách tự do khám phá Siem Reap về đêm..",
+  },
+  {
+    day: 2,
+    date: "10/11/2023",
+    location: "SIEM REAP (Ăn ba bữa)",
+    description:
+      "Ăn sáng tại khách sạn. Quý khách tham quan Cổng nam Angkor Thom và Ta Prohm, đây là những cung điện lớn nhất với các mặt Phật được tạc trên đá cùng những phù điêu tuyệt đẹp, xe đưa Quý khách ngang qua đền Bayon, Baphuon và Quảng trường đấu voi. Tiếp theo, Quý khách tham quan đền Angkor Wat - Một trong những kỳ quan của thế giới. Sau bữa trưa, Quý khách sẽ trở về khách sạn nghỉ ngơi. Trước khi dùng ăn tối quý khách sẽ tham quan đồi Bakheng ngắm nhìn đất nước Chùa Tháp xinh đẹp và huyền bí. Quý khách dùng bữa tối. Sau đó, Quý khách trở về khách sạn nghỉ ngơi.",
+  },
+  {
+    day: 3,
+    date: "11/11/2023",
+    location: "SIEM REAP - PHNOM PENH (Ăn ba bữa)",
+    description:
+      "Ăn sáng tại khách sạn. Quý khách lên đường đến Phnom Penh - Thủ đô của Vương quốc Campuchia. Trên đường ghé tham quan cầu Kompong Kdei được xây dựng từ thế kỷ thứ XII với cấu trúc bằng đá ong độc đáo…Đoàn tham quan Chợ côn trùng (Skuon Market). Quý khách dùng bữa trưa tại nhà hàng địa phương ở Phnom Penh và nhận phòng tại khách sạn. Buổi chiều, Quý khách đi tham quan Wat Phnom - Một ngôi chùa rất nổi tiếng tại thành phố Phnom Penh. Tiếp tục đoàn tham quan Chùa Vàng, Chùa Bạc và Hoàng Cung. Sau đó đoàn dừng tham quan Quảng trường sông bốn mặt Đài độc Lập, Tượng Đài quân tình nguyện Việt Nam. Sau bữa tối, Quý khách tham quan và tự do thử vận may tại Casino nổi tiếng của Campuchia. Nghỉ đêm tại khách sạn.",
+  },
+  {
+    day: 4,
+    date: "12/11/2023",
+    location:
+      "PHNOM PENH – XA MÁT/ MỘC BÀI - TP.HỒ CHÍ MINH (Ăn sáng, ăn trưa)",
+    description:
+      "Ăn sáng tại khách sạn. Quý khách tự do mua sắm tại Central Market. Sau đó khởi hành về cửa khẩu Xa Mát hoặc Mộc Bài. Ăn trưa tại địa phương. Đến cửa khẩu, sau khi làm thủ tục nhập cảnh Việt Nam, xe Vietravel đưa Quý khách về lại 190 Pasteur, Q.3, TP.HCM. Kết thúc chuyến tham quan.",
+  },
+];
+
+export const photos = [
+  {
+    src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261707778.jpg?k=56ba0babbcbbfeb3d3e911728831dcbc390ed2cb16c51d88159f82bf751d04c6&o=&hp=1",
+  },
+  {
+    src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261707367.jpg?k=cbacfdeb8404af56a1a94812575d96f6b80f6740fd491d02c6fc3912a16d8757&o=&hp=1",
+  },
+  {
+    src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261708745.jpg?k=1aae4678d645c63e0d90cdae8127b15f1e3232d4739bdf387a6578dc3b14bdfd&o=&hp=1",
+  },
+  {
+    src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261707776.jpg?k=054bb3e27c9e58d3bb1110349eb5e6e24dacd53fbb0316b9e2519b2bf3c520ae&o=&hp=1",
+  },
+  {
+    src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261708693.jpg?k=ea210b4fa329fe302eab55dd9818c0571afba2abd2225ca3a36457f9afa74e94&o=&hp=1",
+  },
+  {
+    src: "https://cf.bstatic.com/xdata/images/hotel/max1280x900/261707389.jpg?k=52156673f9eb6d5d99d3eed9386491a0465ce6f3b995f005ac71abc192dd5827&o=&hp=1",
+  },
+];
+
+export const destinations = [
+  {
+    title: "Hạ Long",
+    imageUrl:
+      "https://media.travel.com.vn/destination/dg_200827_HA LONG_322052888.jpg",
+    link: "/du-lich-ha-long.aspx",
+  },
+  {
+    title: "Đà Nẵng",
+    imageUrl:
+      "https://media.travel.com.vn/destination/dg_230628_cau-rong-ve-dem.webp",
+    link: "/du-lich-da-nang.aspx",
+  },
+  {
+    title: "Đà Lạt",
+    imageUrl: "https://media.travel.com.vn/destination/dg_230628_da-lat.webp",
+    link: "/du-lich-da-lat.aspx",
+  },
+  {
+    title: "Phú Quốc",
+    imageUrl: "https://media.travel.com.vn/destination/dg_230628_phu-quoc.webp",
+    link: "/du-lich-phu-quoc.aspx",
+  },
+];
