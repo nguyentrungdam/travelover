@@ -30,12 +30,12 @@ public class Order extends BaseEntity{
 	private LocalDate startDate; // not null
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate endDate; // not null
-	private List<OrderDetail> orderDetail;
+	private OrderDetail orderDetail;
 	private CustomerInformation customerInformation; // not null
 	private int numberOfChildren; // not null
 	private int numberOfAdult; // not null
 	private String note;
-	private int price; // not null
+//	private int price; // not null
 	private List<Discount> discount;
 	private int totalPrice; // not null
 	private String paymentStatus; 

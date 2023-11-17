@@ -19,6 +19,7 @@ public class TourCreate {
 	private int numberOfDay; // not null
 	private Address address; // not null
 	private String tourDescription;
+	private int price;
 	private String tourDetail; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;

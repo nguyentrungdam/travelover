@@ -12,4 +12,10 @@ public class Room {
 	private int capacity;
 	private int price;
 	private boolean status;
+	
+	public boolean getStatus() {
+		return this.status;
+	}
 }
+
+

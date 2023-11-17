@@ -64,7 +64,7 @@ public class TourService implements ITourService{
 		return tourDetailList;
 	}
 
-    public String getCollectionName() {
+    private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Tour.class);
         return collectionName;
     }
@@ -269,7 +269,7 @@ public class TourService implements ITourService{
 		List<Tour> tourList = new ArrayList<>();
 		List<Tour> tourListClone = new ArrayList<>();
 		List<TourSearchRes> tourSearchResList = new ArrayList<>(); 
-		TourSearchRes tourSearchRes = new TourSearchRes();
+		
 		if(tourSearch.getKeyword() != null) {
 			tourList = search(tourSearch.getKeyword());
 		} else {
@@ -341,6 +341,7 @@ public class TourService implements ITourService{
 		// search with number of people
 		
 		for(Tour itemTour : tourList) {
+			TourSearchRes tourSearchRes = new TourSearchRes();
 			tourSearchRes.setTour(itemTour);
 			
 			if(tourSearch.getStartDate() != null && tourSearch.getNumberOfPeople() > 0) {
@@ -381,7 +382,11 @@ public class TourService implements ITourService{
 				}
 			}
 			
+			System.out.println("tourId before = " + tourSearchRes.getTour().getTourId());
 			tourSearchResList.add(tourSearchRes);
+			for (TourSearchRes itemTourSearchRes : tourSearchResList) {
+				System.out.println("tourId after = " + itemTourSearchRes.getTour().getTourId());
+			}
 		}
 
 		return tourSearchResList;

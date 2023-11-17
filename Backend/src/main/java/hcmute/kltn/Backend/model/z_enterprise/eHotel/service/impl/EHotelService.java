@@ -41,7 +41,7 @@ public class EHotelService implements IEHotelService{
 	@Autowired
     private MongoTemplate mongoTemplate;
 
-    public String getCollectionName() {
+    private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(EHotel.class);
         return collectionName;
     }

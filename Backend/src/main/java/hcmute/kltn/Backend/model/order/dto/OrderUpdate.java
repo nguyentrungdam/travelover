@@ -22,11 +22,17 @@ public class OrderUpdate {
 	private LocalDate startDate; // not null
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate endDate; // not null
-	private List<OrderDetail> orderDetail;
+	private String tourId;
+	private String hotelId;
+	private List<String> roomIdList;
+	private String vehivleId;
+	private List<String> carIdList;
+	private String guiderId;
+	private List<String> personIdList;
 	private CustomerInformation customerInformation; // not null
 	private int numberOfChildren; // not null
 	private int numberOfAdult; // not null
 	private String note;
 	private String paymentStatus; 
-	private String orderStatus; 
+	private int orderStatus; 
 }

@@ -291,4 +291,23 @@ public class HotelService implements IHotelService{
 		return roomList;
 	}
 
+	@Override
+	public Room getRoomDetail(String hotelId, String roomId) {
+		Room room = new Room();
+		
+		hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel eHotel = new hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel();		
+		eHotel = iEHotelService.getDetailEHotel(hotelId);
+		for (hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room itemRoomEnterprise : eHotel.getRoom()) {
+			if (itemRoomEnterprise.getRoomId().equals(roomId)) {
+				room.setRoomId(itemRoomEnterprise.getRoomId());
+				room.setCapacity(itemRoomEnterprise.getCapacity());
+				room.setPrice(itemRoomEnterprise.getPrice());
+				room.setStatus(itemRoomEnterprise.getStatus());
+				
+				break;
+			}
+		}
+		return room;
+	}
+
 }

@@ -15,5 +15,6 @@ public interface IHotelService {
 	public Hotel getDetailHotel(String hotelId);
 	public List<Hotel> getAllHotel();
 	public List<Hotel> searchHotel(HotelSearch hotelSearch);
+	public Room getRoomDetail(String hotelId, String roomId);
 	public List<Room> searchRoom(RoomSearch roomSearch);
 }

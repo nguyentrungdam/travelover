@@ -53,7 +53,7 @@ public class AccountService implements IAccountService{
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    public String getCollectionName() {
+    private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Account.class);
         return collectionName;
     }

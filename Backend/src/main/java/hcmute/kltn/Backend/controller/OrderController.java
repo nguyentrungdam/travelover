@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
+import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
 import hcmute.kltn.Backend.model.order.dto.entity.Order;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
@@ -53,22 +54,46 @@ public class OrderController {
 		});
 	}
 	
-	private final String updateOrderDescription = "Các field bắt buộc phải nhập:\n\n"
-			+ "- 'startDate': ''\n"
-			+ "- 'endDate': ''\n"
-			+ "- 'customerInformation': ''\n"
-			+ "- 'numberOfChildren': ''\n"
-			+ "- 'numberOfAdult': ''\n";
-	@RequestMapping(value = "/update", method = RequestMethod.PUT)
-	@Operation(summary = "Update order - STAFF", description = updateOrderDescription)
-	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
-	ResponseEntity<ResponseObject> updateOrder(
-			@RequestBody OrderUpdate orderUpdate) {
-		Order order = iOrderService.updateOrder(orderUpdate);
+//	private final String updateOrderDescription = "Các field bắt buộc phải nhập:\n\n"
+//			+ "- 'startDate': ''\n"
+//			+ "- 'endDate': ''\n"
+//			+ "- 'customerInformation': ''\n"
+//			+ "- 'numberOfChildren': ''\n"
+//			+ "- 'numberOfAdult': ''\n";
+//	@RequestMapping(value = "/update", method = RequestMethod.PUT)
+//	@Operation(summary = "Update order - STAFF", description = updateOrderDescription)
+//	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
+//	ResponseEntity<ResponseObject> updateOrder(
+//			@RequestBody OrderUpdate orderUpdate) {
+//		Order order = iOrderService.updateOrder(orderUpdate);
+//		
+//		return iResponseObjectService.success(new ResponseObject() {
+//			{
+//				setMessage("Update order successfully");
+//				setData(order);
+//			}
+//		});
+//	}
+	
+	private final String updateOrderStatus = "Các field bắt buộc phải nhập:\n\n"
+			+ "- 'orderId': ''\n"
+			+ "- 'status': ''\n\n"
+			+ "status Nhập số tương ứng như sau:\n\n"
+			+ "- 0 : canceled\n"
+			+ "- 1 : pending\n"
+			+ "- 2 : confirmed\n"
+			+ "- 3 : underway\n"
+			+ "- 4 : finished\n";
+	@RequestMapping(value = "/status/update", method = RequestMethod.PUT)
+	@Operation(summary = "Update order status - ADMIN / STAFF", description = updateOrderStatus)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> updateOrderStatus(
+			@RequestBody OrderStatusUpdate orderStatusUpdate) {
+		Order order = iOrderService.updateOrderStatus(orderStatusUpdate);
 		
 		return iResponseObjectService.success(new ResponseObject() {
 			{
-				setMessage("Update order successfully");
+				setMessage("Update order status successfully");
 				setData(order);
 			}
 		});

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderDetail {
 	private String tourId;
-	private List<VOTourDetail> tourDetail;
+	private VOTourDetail tourDetail;
 	private String hotelId;
 	private List<HotelDetail> hotelDetail;
 	private String vehicleId;

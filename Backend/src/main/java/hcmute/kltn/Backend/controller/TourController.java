@@ -110,8 +110,8 @@ public class TourController {
 	}
 	
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	@Operation(summary = "Search tour - ADMIN / STAFF")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	@Operation(summary = "Search tour")
+//	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> searchTour(@ModelAttribute TourSearch tourSearch) {
 		List<TourSearchRes> tourList = iTourService.searchTour(tourSearch);
 		
