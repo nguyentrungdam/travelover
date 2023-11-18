@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### folder image
+src/main/resources/static/images
