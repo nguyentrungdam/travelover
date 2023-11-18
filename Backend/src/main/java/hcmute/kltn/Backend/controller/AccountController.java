@@ -23,6 +23,7 @@ import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.account.service.impl.AccountDetailsService;
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,10 +47,9 @@ public class AccountController {
 	ResponseEntity<ResponseObject> login(@RequestBody AuthRequest request) {
 		AuthResponse response = iAccountService.login(request);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Login successfully");
-				setCountData(1);
 				setData(response);
 			}
 		});
@@ -60,7 +60,7 @@ public class AccountController {
 	ResponseEntity<ResponseObject> register(@RequestBody RegisterRequest registerRequest) {
 		Account account =  iAccountService.register(registerRequest);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Account successfully");
 				setData(account);
@@ -85,7 +85,7 @@ public class AccountController {
 			AccountUpdateProfile updateAccountRequest) {
 		Account account = iAccountService.updateProfile(fileAvatar, updateAccountRequest);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Update Account successfully");
 				setData(account);
@@ -99,7 +99,7 @@ public class AccountController {
 	ResponseEntity<ResponseObject> getProfile() {
 		Account account = iAccountService.getProfile();
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Query Account successfully");
 				setData(account);
@@ -112,7 +112,7 @@ public class AccountController {
 //	ResponseEntity<ResponseObject> deleteAccount(@PathVariable String id) {
 //		boolean delete = iUserService.delete(id);
 //		
-//		return iResponseObjectService.success(new ResponseObject() {
+//		return iResponseObjectService.success(new Response() {
 //			{
 //				setMessage("Delete Account successfully");
 //			}});
@@ -124,10 +124,9 @@ public class AccountController {
 	ResponseEntity<ResponseObject> getAllAccounts() {
 		List<Account> accountList = iAccountService.getAllAccount();
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all Accounts");
-				setCountData(accountList.size());
 				setData(accountList);
 			}
 		});
@@ -139,10 +138,9 @@ public class AccountController {
 	ResponseEntity<ResponseObject> getProfile(@RequestParam String keyword) {
 		List<Account> accountList = iAccountService.searchAccount(keyword);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search Account successfully");
-				setCountData(accountList.size());
 				setData(accountList);
 			}
 		});

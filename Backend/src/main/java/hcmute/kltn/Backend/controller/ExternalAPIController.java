@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.base.externalAPI.service.IExternalAPIService;
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.util.HashMapUtil;
@@ -57,7 +58,7 @@ public class ExternalAPIController {
 		HashMap<Object, Object> map = HashMapUtil.stringToHashMap(jsonObject.toString());
 		System.out.println("map = " + map);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage(jsonObject.getString("message"));
 				setData(map);

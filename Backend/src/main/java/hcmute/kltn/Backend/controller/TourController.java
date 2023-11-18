@@ -3,7 +3,6 @@ package hcmute.kltn.Backend.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -13,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.Pagination;
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
@@ -25,7 +26,6 @@ import hcmute.kltn.Backend.model.tour.service.ITourService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 
 @RestController
 @RequestMapping(path = "/api/v1/tours")
@@ -50,7 +50,7 @@ public class TourController {
 			@RequestBody TourCreate tourCreate) {
 		Tour tour = iTourService.createTour(tourCreate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Tour successfully");
 				setData(tour);
@@ -73,7 +73,7 @@ public class TourController {
 			@RequestBody TourUpdate tourUpdate) {
 		Tour tour = iTourService.updateTour(tourUpdate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Update tour successfulle");
 				setData(tour);
@@ -86,7 +86,7 @@ public class TourController {
 	ResponseEntity<ResponseObject> getDetail(@RequestParam String tourId) {
 		Tour tour = iTourService.getDetailTour(tourId);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get detail tour successfully");
 				setData(tour);
@@ -94,31 +94,66 @@ public class TourController {
 		});
 	}
 	
+	private final String getAllTourDesc = "Các field bắt buộc phải nhập:\n"
+			+ "- 'pageSize': ''\n"
+			+ "- 'pageNumber': ''\n\n"
+			+ "pageSize: Số lượng item có trong 1 trang\n\n"
+			+ "pageNumber: Trang hiện tại\n\n"
+			+ "Các trường hợp sử dụng\n"
+			+ "- Không phân trang: pageSize = 0, pageNumber = 0\n"
+			+ "- - pageSize = 0\n"
+			+ "- - pageNumber = 0\n"
+			+ "- Có phân trang: \n"
+			+ "- - pageSize > 0\n"
+			+ "- - pageNumber > 0\n"
+			+ "- Lấy trang cuối cùng: \n"
+			+ "- - pageSize > 0\n"
+			+ "- - pageNumber = -1\n";
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	@Operation(summary = "Get all tour - ADMIN / STAFF")
+	@Operation(summary = "Get all tour - ADMIN / STAFF", description = getAllTourDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
-	ResponseEntity<ResponseObject> getAllTour() {
+	ResponseEntity<ResponseObject> getAllTour(
+			@ModelAttribute Pagination Pagination) {
 		List<Tour> list = iTourService.getAllTour();
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all tour successfully");
-				setCountData(list.size());
+				setPageSize(Pagination.getPageSize());
+				setPageNumber(Pagination.getPageNumber());
 				setData(list);
 			}
 		});
 	}
 	
+	private final String searchTourDesc = "Các field bắt buộc phải nhập (áp dụng cho Pagination):\n"
+			+ "- 'pageSize': ''\n"
+			+ "- 'pageNumber': ''\n\n"
+			+ "pageSize: Số lượng item có trong 1 trang\n\n"
+			+ "pageNumber: Trang hiện tại\n\n"
+			+ "Các trường hợp sử dụng\n"
+			+ "- Không phân trang: pageSize = 0, pageNumber = 0\n"
+			+ "- - pageSize = 0\n"
+			+ "- - pageNumber = 0\n"
+			+ "- Có phân trang: \n"
+			+ "- - pageSize > 0\n"
+			+ "- - pageNumber > 0\n"
+			+ "- Lấy trang cuối cùng: \n"
+			+ "- - pageSize > 0\n"
+			+ "- - pageNumber = -1\n";
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	@Operation(summary = "Search tour")
+	@Operation(summary = "Search tour", description = searchTourDesc)
 //	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
-	ResponseEntity<ResponseObject> searchTour(@ModelAttribute TourSearch tourSearch) {
+	ResponseEntity<ResponseObject> searchTour(
+			@ModelAttribute TourSearch tourSearch,
+			@ModelAttribute Pagination Pagination) {
 		List<TourSearchRes> tourList = iTourService.searchTour(tourSearch);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search tour successfully");
-				setCountData(tourList.size());
+				setPageSize(Pagination.getPageSize());
+				setPageNumber(Pagination.getPageNumber());
 				setData(tourList);
 			}
 		});

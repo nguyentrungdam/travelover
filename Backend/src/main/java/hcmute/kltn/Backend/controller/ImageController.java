@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.model.base.image.dto.Image;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
@@ -44,7 +45,7 @@ public class ImageController {
 			@RequestParam(required = false) MultipartFile fileThumbnail) {
 		Image image = iImageService.create(fileThumbnail);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Image successfully");
 				setData(image);
@@ -74,7 +75,7 @@ public class ImageController {
 //			TourDTO tourDTO) {
 //		Tour tour = iTourService.updateTour(fileThumbnail, tourDTO);
 //		
-//		return iResponseObjectService.success(new ResponseObject() {
+//		return iResponseObjectService.success(new Response() {
 //			{
 //				setMessage("Update tour successfulle");
 //				setData(tour);
@@ -87,7 +88,7 @@ public class ImageController {
 //	ResponseEntity<ResponseObject> getDetail(@PathVariable String tourId) {
 //		Tour tour = iTourService.getDetail(tourId);
 //		
-//		return iResponseObjectService.success(new ResponseObject() {
+//		return iResponseObjectService.success(new Response() {
 //			{
 //				setMessage("Get detail tour successfully");
 //				setData(tour);
@@ -100,10 +101,9 @@ public class ImageController {
 //	ResponseEntity<ResponseObject> getAllTour() {
 //		List<Tour> list = iTourService.getAll();
 //		
-//		return iResponseObjectService.success(new ResponseObject() {
+//		return iResponseObjectService.success(new Response() {
 //			{
 //				setMessage("Get all tour successfully");
-//				setCountData(list.size());
 //				setData(list);
 //			}
 //		});

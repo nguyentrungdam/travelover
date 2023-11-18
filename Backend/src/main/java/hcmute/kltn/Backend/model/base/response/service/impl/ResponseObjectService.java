@@ -1,47 +1,96 @@
 package hcmute.kltn.Backend.model.base.response.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 
 @Service
 public class ResponseObjectService implements IResponseObjectService{
 	@Override
-	public ResponseEntity<ResponseObject> success(ResponseObject responseObject) {
-		ResponseObject responseObjectNew = new ResponseObject();
-		responseObjectNew.setStatus("ok");
-		responseObjectNew.setMessage(responseObject.getMessage() != null ? responseObject.getMessage() : "ok");
-		responseObjectNew.setTotalPages(responseObject.getTotalPages() != 0 ? responseObject.getTotalPages() : 1);
-		responseObjectNew.setCurrentpage(responseObject.getCurrentpage() != 0 ? responseObject.getCurrentpage() : 1);
-		if(responseObject.getData() != null) {
-			if(responseObject.getData() instanceof List<?>) {
-				List<?> objectList = (List<?>) responseObject.getData();
-				responseObjectNew.setCountData(objectList.size());
+	public ResponseEntity<ResponseObject> success(Response response) {
+		ResponseObject responseObject = new ResponseObject();
+		responseObject.setStatus("ok");
+		responseObject.setMessage(response.getMessage() != null ? response.getMessage() : "ok");
+		responseObject.setTotalPages(1);
+		responseObject.setCurrentPage(1);
+		if(response.getData() != null) {
+			if(response.getData() instanceof List<?>) {
+				List<?> dataList = (List<?>) response.getData();
+				responseObject.setCountData(dataList.size());
 			} else {
-				responseObjectNew.setCountData(1);
+				responseObject.setCountData(1);
 			}
 		} else {
-			responseObjectNew.setCountData(0);
+			responseObject.setCountData(0);
 		}
-		responseObjectNew.setData(responseObject.getData() != null ? responseObject.getData() : "");
+		responseObject.setData(response.getData());
 		
-		return ResponseEntity.status(HttpStatus.OK).body(responseObjectNew);
+		// pagination
+		List<?> objectList = new ArrayList<>();
+		if (response.getPageSize() > 0 && response.getData() instanceof List<?>) {
+			List<?> dataList = (List<?>) response.getData();
+			int totalPage = Integer.valueOf(dataList.size() / response.getPageSize());
+			if ((dataList.size() % response.getPageSize()) > 0) {
+				totalPage++;
+			}
+			
+			int fromIndex = 0;
+			int toIndex = 0;
+			if (response.getPageNumber() > 0) {
+				if (response.getPageNumber() > totalPage) {
+					responseObject.setTotalPages(totalPage);
+					responseObject.setCurrentPage(response.getPageNumber());
+					responseObject.setCountData(0);
+					responseObject.setData(null);
+				} else {
+					fromIndex = response.getPageSize() * (response.getPageNumber() - 1);
+					toIndex = fromIndex + response.getPageSize();
+					if (toIndex >= dataList.size()) {
+						toIndex = dataList.size();
+					}	
+					
+					objectList = dataList.subList(fromIndex, toIndex);
+
+					responseObject.setTotalPages(totalPage);
+					responseObject.setCurrentPage(response.getPageNumber());
+					responseObject.setCountData(objectList.size());
+					responseObject.setData(objectList);
+				}
+				
+				
+			} else if (response.getPageNumber() == -1) {
+				fromIndex = response.getPageSize() * (totalPage - 1);
+				toIndex = fromIndex + response.getPageSize();
+				if (toIndex >= dataList.size()) {
+					toIndex = dataList.size();
+				}	
+				
+				objectList = dataList.subList(fromIndex, toIndex);
+
+				responseObject.setTotalPages(totalPage);
+				responseObject.setCurrentPage(totalPage);
+				responseObject.setCountData(objectList.size());
+				responseObject.setData(objectList);
+			} 
+			
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).body(responseObject);
 	}
 
 	@Override
-	public ResponseEntity<ResponseObject> failed(ResponseObject responseObject) {
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseObject(
-			"failed",
-			responseObject.getMessage() != null ? responseObject.getMessage() : "failed",
-			responseObject.getTotalPages() != 0 ? responseObject.getTotalPages() : 1,
-			responseObject.getCurrentpage() != 0 ? responseObject.getCurrentpage() : 1,
-			responseObject.getCountData() != 0 ? responseObject.getCountData() : 0,
-			responseObject.getData() != null ? responseObject.getData() : ""
-		));
+	public ResponseEntity<ResponseObject> failed(Response response) {
+		ResponseObject responseObject = new ResponseObject();
+		responseObject.setStatus("failed");
+		responseObject.setMessage(response.getMessage() != null ? response.getMessage() : "failed");
+		
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
 	}
 }

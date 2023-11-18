@@ -382,11 +382,7 @@ public class TourService implements ITourService{
 				}
 			}
 			
-			System.out.println("tourId before = " + tourSearchRes.getTour().getTourId());
 			tourSearchResList.add(tourSearchRes);
-			for (TourSearchRes itemTourSearchRes : tourSearchResList) {
-				System.out.println("tourId after = " + itemTourSearchRes.getTour().getTourId());
-			}
 		}
 
 		return tourSearchResList;

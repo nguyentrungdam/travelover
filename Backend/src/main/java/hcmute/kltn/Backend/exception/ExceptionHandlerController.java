@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 
@@ -22,10 +23,9 @@ public class ExceptionHandlerController {
 	@ExceptionHandler(CustomException.class)
     public ResponseEntity<ResponseObject> handleCustomException(CustomException ex) {
 		System.out.println(ex.getMessage());
-    	return iResponseObjectService.failed(new ResponseObject() {
+    	return iResponseObjectService.failed(new Response() {
 			{
 				setMessage(ex.getMessage());
-				setCountData(0);
 			}
 		});
     }
@@ -47,10 +47,9 @@ public class ExceptionHandlerController {
         final String message = error;
         
         System.out.println(error);
-        return iResponseObjectService.failed(new ResponseObject() {
+        return iResponseObjectService.failed(new Response() {
 			{
 				setMessage(message);
-				setCountData(0);
 			}
 		});
     }
@@ -59,10 +58,9 @@ public class ExceptionHandlerController {
     public ResponseEntity<ResponseObject> handleOtherException(Exception ex) {
     	ex.printStackTrace();
 
-    	return iResponseObjectService.failed(new ResponseObject() {
+    	return iResponseObjectService.failed(new Response() {
 			{
 				setMessage(ex.getMessage());
-				setCountData(0);
 			}
 		});
     }

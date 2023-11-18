@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelCreate;
@@ -44,7 +45,7 @@ public class HotelController {
 	ResponseEntity<ResponseObject> createHotel(@RequestBody HotelCreate hotelCreate) {
 		Hotel hotel = iHotelService.createHotel(hotelCreate);
 		
-		return iResObjService.success(new ResponseObject() {
+		return iResObjService.success(new Response() {
 			{
 				setMessage("Create hotel successfully");
 				setData(hotel);
@@ -62,7 +63,7 @@ public class HotelController {
 	ResponseEntity<ResponseObject> updateHotel(@RequestBody HotelUpdate hotelUpdate) {
 		Hotel hotel = iHotelService.updateHotel(hotelUpdate);
 		
-		return iResObjService.success(new ResponseObject() {
+		return iResObjService.success(new Response() {
 			{
 				setMessage("Update hotel successfully");
 				setData(hotel);
@@ -76,7 +77,7 @@ public class HotelController {
 	ResponseEntity<ResponseObject> getDetailHotel(@RequestParam String hotelId) {
 		Hotel hotel = iHotelService.getDetailHotel(hotelId);
 		
-		return iResObjService.success(new ResponseObject() {
+		return iResObjService.success(new Response() {
 			{
 				setMessage("Get hotel detail successfully");
 				setData(hotel);
@@ -90,7 +91,7 @@ public class HotelController {
 	ResponseEntity<ResponseObject> getAllHotel() {
 		List<Hotel> hotelList = iHotelService.getAllHotel();
 		
-		return iResObjService.success(new ResponseObject() {
+		return iResObjService.success(new Response() {
 			{
 				setMessage("Get all hotel successfully");
 				setData(hotelList);
@@ -104,7 +105,7 @@ public class HotelController {
 	ResponseEntity<ResponseObject> searchHotel(@ModelAttribute HotelSearch hotelSearch) {
 		List<Hotel> hotelList = iHotelService.searchHotel(hotelSearch);
 		
-		return iResObjService.success(new ResponseObject() {
+		return iResObjService.success(new Response() {
 			{
 				setMessage("Search hotel successfully");
 				setData(hotelList);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
@@ -46,7 +47,7 @@ public class OrderController {
 			@RequestBody OrderCreate orderCreate) {
 		Order order = iOrderService.createOrder(orderCreate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create order successfully");
 				setData(order);
@@ -67,7 +68,7 @@ public class OrderController {
 //			@RequestBody OrderUpdate orderUpdate) {
 //		Order order = iOrderService.updateOrder(orderUpdate);
 //		
-//		return iResponseObjectService.success(new ResponseObject() {
+//		return iResponseObjectService.success(new Response() {
 //			{
 //				setMessage("Update order successfully");
 //				setData(order);
@@ -91,7 +92,7 @@ public class OrderController {
 			@RequestBody OrderStatusUpdate orderStatusUpdate) {
 		Order order = iOrderService.updateOrderStatus(orderStatusUpdate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Update order status successfully");
 				setData(order);
@@ -106,7 +107,7 @@ public class OrderController {
 			@RequestParam String orderId) {
 		Order order = iOrderService.getDetailOrder(orderId);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get detail order successfully");
 				setData(order);
@@ -120,10 +121,9 @@ public class OrderController {
 	ResponseEntity<ResponseObject> getAllOrder() {
 		List<Order> orderList = iOrderService.getAllOrder();
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all order successfully");
-				setCountData(orderList.size());
 				setData(orderList);
 			}
 		});
@@ -136,7 +136,7 @@ public class OrderController {
 			@RequestParam String keyword) {
 		List<Order> orderList = iOrderService.searchOrder(keyword);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search order successfully");
 				setData(orderList);

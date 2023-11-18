@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseObject {
-	private String status;
+public class Response {
     private String message;
-    private int totalPages;
-    private int currentPage;
-    private int countData;
+    private int pageSize;
+    private int pageNumber;
     private Object data;
 }

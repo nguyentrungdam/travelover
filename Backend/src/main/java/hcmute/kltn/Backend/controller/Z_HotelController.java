@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
@@ -51,7 +52,7 @@ public class Z_HotelController {
 		
 		EHotel eHotel = iEHotelService.createEHotel(eHotelCreate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Enterprise Hotel successfully");
 				setData(eHotel);
@@ -73,7 +74,7 @@ public class Z_HotelController {
 		
 		EHotel eHotel = iEHotelService.updateEHotel(eHotelUpdate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Update Enterprise Hotel successfully");
 				setData(eHotel);
@@ -91,7 +92,7 @@ public class Z_HotelController {
 		
 		EHotel eHotel = iEHotelService.getDetailEHotel(eHotelId);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get Enterprise Hotel detail successfully");
 				setData(eHotel);
@@ -106,7 +107,7 @@ public class Z_HotelController {
 		
 		List<EHotel> eHotelList = iEHotelService.getAllEHotel();
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get All Enterprise Hotel successfully");
 				setData(eHotelList);
@@ -120,7 +121,7 @@ public class Z_HotelController {
 	ResponseEntity<ResponseObject> searchEHotel(@RequestParam String keyword) {
 		List<EHotel> eHotelList = iEHotelService.searchEHotel(keyword);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search enterprise hotel successfully");
 				setData(eHotelList);
@@ -136,7 +137,7 @@ public class Z_HotelController {
 		
 		List<Room> roomList = iEHotelService.searchRoom(roomSearch);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search room successfully");
 				setData(roomList);
@@ -152,7 +153,7 @@ public class Z_HotelController {
 		
 		Order order = iEHotelService.createOrder(eHotelOrderCreate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Order Enterprise Hotel successfully");
 				setData(order);
@@ -168,7 +169,7 @@ public class Z_HotelController {
 		
 		Order order = iEHotelService.updateOrder(eHotelOrderUpdate);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Order Enterprise Hotel successfully");
 				setData(order);
@@ -184,7 +185,7 @@ public class Z_HotelController {
 		
 		Order order = iEHotelService.getOneOrder(eHotelId, orderId);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get one Order successfully");
 				setData(order);
@@ -200,7 +201,7 @@ public class Z_HotelController {
 		
 		List<Order> order = iEHotelService.getAllOrder(eHotelId);
 		
-		return iResponseObjectService.success(new ResponseObject() {
+		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all Order successfully");
 				setData(order);

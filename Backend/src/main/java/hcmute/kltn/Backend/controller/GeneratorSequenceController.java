@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceCreate;
@@ -38,7 +39,7 @@ public class GeneratorSequenceController {
     ResponseEntity<ResponseObject> createGenSeq(@RequestBody GeneratorSequenceCreate generatorSequenceCreate) {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.createGenSeq(generatorSequenceCreate);
         
-        return iResponseObjectService.success(new ResponseObject() {
+        return iResponseObjectService.success(new Response() {
 					{
 						setMessage("Create Generator Sequence successfully");
 						setData(generatorSequence);
@@ -53,7 +54,7 @@ public class GeneratorSequenceController {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.updateGenSeq(generatorSequenceDTO);
     	
     	return iResponseObjectService
-				.success(new ResponseObject() {
+				.success(new Response() {
 					{
 						setMessage("Update Generator Sequence successfully");
 						setData(generatorSequence);
@@ -67,7 +68,7 @@ public class GeneratorSequenceController {
     ResponseEntity<ResponseObject> getDetailGenSeq(@RequestParam String id) {
     	GeneratorSequence generatorSequence = iGeneratorSequenceService.getDetailGenSeq(id);
     	
-    	return iResponseObjectService.success(new ResponseObject() {
+    	return iResponseObjectService.success(new Response() {
 					{
 						setMessage("Get detail Generator Sequence successfully");
 						setData(generatorSequence);
@@ -81,10 +82,9 @@ public class GeneratorSequenceController {
     ResponseEntity<ResponseObject> getAllGenSeq() {
         List<GeneratorSequence> generatorSequenceList = iGeneratorSequenceService.getAllGenSeq();
         
-        return iResponseObjectService.success(new ResponseObject() {
+        return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all Generator Sequence");
-				setCountData(generatorSequenceList.size());
 				setData(generatorSequenceList);
 			}
 		});
@@ -97,7 +97,7 @@ public class GeneratorSequenceController {
 //    ResponseEntity<ResponseObject> deleteProduct(@PathVariable long id) {
 //    	boolean delete = iGeneratorSequenceService.delete(id);
 //    	
-//    	return iResponseObjectService.success(new ResponseObject() {
+//    	return iResponseObjectService.success(new Response() {
 //					{
 //						setMessage("Delete Generator Sequence successfully");
 //					}
