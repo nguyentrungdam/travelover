@@ -33,6 +33,7 @@ import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.dto.Image;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
@@ -364,6 +365,14 @@ public class AccountService implements IAccountService{
 		account = accountRepository.save(account);
 		
 		return true;
+	}
+
+	@Override
+	public Account updateAccount(AccountDTO accountDTO) {
+		Account account = new Account();
+		account = update(accountDTO);
+		
+		return account;
 	}
 
 }

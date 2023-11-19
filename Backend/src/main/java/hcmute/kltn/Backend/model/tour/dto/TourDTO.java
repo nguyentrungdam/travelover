@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class TourDTO {
 	private String tourId;
 	private String tourTitle; // not null, unique
-	private String thumbnailUrl; // not null
+	private String thumbnailUrl; 
 	private List<Image> image;
 	private String video;
 	private int numberOfDay; // not null

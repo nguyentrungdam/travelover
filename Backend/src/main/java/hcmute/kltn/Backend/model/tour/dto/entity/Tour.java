@@ -27,7 +27,7 @@ public class Tour extends BaseEntity{
 	@Id
 	private String tourId;
 	private String tourTitle; // not null, unique
-	private String thumbnailUrl; // not null
+	private String thumbnailUrl; 
 	private List<Image> image;
 	private String video;
 	private int numberOfDay; // not null

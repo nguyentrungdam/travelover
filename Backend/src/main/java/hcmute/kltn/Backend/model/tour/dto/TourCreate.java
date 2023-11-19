@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TourCreate {
 	private String tourTitle; // not null, unique
+	private String thumbnailUrl;
 	private String video;
 	private int numberOfDay; // not null
 	private Address address; // not null

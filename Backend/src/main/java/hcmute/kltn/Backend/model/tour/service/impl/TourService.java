@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
@@ -45,6 +46,8 @@ public class TourService implements ITourService{
     private MongoTemplate mongoTemplate;
 	@Autowired
 	private IHotelService iHotelService;
+	@Autowired
+	private IImageService iImageService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -141,6 +144,21 @@ public class TourService implements ITourService{
 		
 		// get tour from database
 		Tour tour = tourRepository.findById(tourDTO.getTourId()).get();
+		
+		// check image update
+		if ((tour.getThumbnailUrl() != null 
+				&& !tour.getThumbnailUrl().equals(""))
+				&& !tour.getThumbnailUrl().equals(tourDTO.getThumbnailUrl())) {
+			String[] urlSplit = tour.getThumbnailUrl().split("/");
+			String[] fileName = urlSplit[urlSplit.length - 1].split("\\.");
+			String imageId = fileName[0];
+			
+			boolean checkDelete = false;
+			checkDelete = iImageService.deleteImage(imageId);
+			if (checkDelete == false) {
+				throw new CustomException("An error occurred during the processing of the old image");
+			}
+		}
 
 		// Mapping
 		modelMapper.map(tourDTO, tour);

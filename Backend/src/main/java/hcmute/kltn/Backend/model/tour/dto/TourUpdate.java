@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class TourUpdate {
 	private String tourId; // not null
 	private String tourTitle; // not null, unique
+	private String thumbnailUrl;
 	private String video;
 	private int numberOfDay; // not null
 	private Address address; // not null

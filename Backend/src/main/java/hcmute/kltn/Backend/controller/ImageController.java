@@ -1,5 +1,8 @@
 package hcmute.kltn.Backend.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,13 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.model.base.image.dto.Image;
+import hcmute.kltn.Backend.model.base.image.dto.ImageCreate;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
-import hcmute.kltn.Backend.model.tour.dto.TourDTO;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
-import hcmute.kltn.Backend.model.tour.service.ITourService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,19 +39,46 @@ public class ImageController {
 	@Autowired
 	private IResponseObjectService iResponseObjectService;
 	
-	private final String createTourDescription = "Các field bắt buộc phải nhập:\n\n";
+	private final String createImageDesc = "Tải file có type = image, size <= 2MB";
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@Operation(summary = "Create image - ADMIN", description = createTourDescription)
-	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
-	@ModelAttribute
-	ResponseEntity<ResponseObject> createTour(
-			@RequestParam(required = false) MultipartFile fileThumbnail) {
-		Image image = iImageService.create(fileThumbnail);
+	@Operation(summary = "Create image - LOGIN", description = createImageDesc)
+	@PreAuthorize("isAuthenticated()")
+	ResponseEntity<ResponseObject> createImage(
+			@ModelAttribute MultipartFile file) {
+		Image image = iImageService.createImage(file);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Image successfully");
 				setData(image);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/detail", method = RequestMethod.GET)
+	@Operation(summary = "Get image detail - LOGIN")
+	@PreAuthorize("isAuthenticated()")
+	ResponseEntity<ResponseObject> getDetail(@RequestParam String imageId) {
+		Image image = iImageService.getImageDetail(imageId);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get image detail successfully");
+				setData(image);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+	@Operation(summary = "Delete image - LOGIN")
+	@PreAuthorize("isAuthenticated()")
+	ResponseEntity<ResponseObject> deleteImage(
+			@RequestParam String imageId) {
+		boolean checkDelete = iImageService.deleteImage(imageId);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Delete image successfully");
 			}
 		});
 	}
@@ -83,18 +113,7 @@ public class ImageController {
 //		});
 //	}
 //	
-//	@RequestMapping(value = "/detail/{tourId}", method = RequestMethod.GET)
-//	@Operation(summary = "Get tour detail")
-//	ResponseEntity<ResponseObject> getDetail(@PathVariable String tourId) {
-//		Tour tour = iTourService.getDetail(tourId);
-//		
-//		return iResponseObjectService.success(new Response() {
-//			{
-//				setMessage("Get detail tour successfully");
-//				setData(tour);
-//			}
-//		});
-//	}
+
 //	
 //	@RequestMapping(value = "/list", method = RequestMethod.GET)
 //	@Operation(summary = "Get all tour")
@@ -107,5 +126,22 @@ public class ImageController {
 //				setData(list);
 //			}
 //		});
+//	}
+	
+//	@RequestMapping(value = "/test", method = RequestMethod.GET)
+//	@Operation(summary = "Get byte image")
+//	public byte[] test(
+//			@RequestParam String fileName) {
+//		String path = System.getProperty("user.dir") + "/" + "src/main/resources/static/images" +"/" + fileName;
+//		Path pathNew = Paths.get(path);
+//		
+//		byte[] imageByte = null;
+//		try {
+//			imageByte = Files.readAllBytes(pathNew);
+//		} catch (Exception e) {
+//			System.out.println("Read byte image fail");
+//		}
+//		
+//		return imageByte;
 //	}
 }

@@ -19,5 +19,6 @@ public interface IAccountService {
 	public List<Account> getAllAccount();
 	public List<Account> searchAccount(String keyword);
 	public Account getDetailAccount(String accountId);
+	public Account updateAccount(AccountDTO accountDTO);
 	public boolean initData(AccountDTO accountDTO);
 }
