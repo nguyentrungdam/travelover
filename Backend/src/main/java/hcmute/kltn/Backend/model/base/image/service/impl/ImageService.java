@@ -165,7 +165,7 @@ public class ImageService implements IImageService{
         saveImage(file, path);
         
         image.setImageId(imageId);
-        String url = "localhost:" + portServer + "/images/" +fileNameNew;
+        String url = "http://localhost:" + portServer + "/images/" +fileNameNew;
         image.setUrl(url);
 
         return image;
