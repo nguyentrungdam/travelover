@@ -33,5 +33,5 @@ build/
 .vscode/
 
 ### Image folder
-src/main/resources/static/images/
+src/main/resources/static/images/*
 !src/main/resources/static/images/README.md
