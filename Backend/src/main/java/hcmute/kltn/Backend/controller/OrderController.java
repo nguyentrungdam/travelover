@@ -36,7 +36,6 @@ public class OrderController {
 	
 	private final String createOrderDescription = "Các field bắt buộc phải nhập:\n\n"
 			+ "- 'startDate': ''\n"
-			+ "- 'endDate': ''\n"
 			+ "- 'customerInformation': ''\n"
 			+ "- 'numberOfChildren': ''\n"
 			+ "- 'numberOfAdult': ''\n";

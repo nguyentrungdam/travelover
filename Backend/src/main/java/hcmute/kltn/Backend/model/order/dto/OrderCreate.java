@@ -17,8 +17,6 @@ import lombok.NoArgsConstructor;
 public class OrderCreate {
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate startDate; // not null
-	@DateTimeFormat(pattern="yyyy-MM-dd")
-	private LocalDate endDate; // not null
 	private String tourId;
 	private String hotelId;
 	private List<String> roomIdList;

@@ -19,20 +19,24 @@ public class ResponseObjectService implements IResponseObjectService{
 		responseObject.setStatus("ok");
 		responseObject.setMessage(response.getMessage() != null ? response.getMessage() : "ok");
 		responseObject.setTotalPages(1);
+		responseObject.setTotalData(1);
 		responseObject.setCurrentPage(1);
 		if(response.getData() != null) {
 			if(response.getData() instanceof List<?>) {
 				List<?> dataList = (List<?>) response.getData();
+				responseObject.setTotalData(dataList.size());
 				responseObject.setCountData(dataList.size());
 			} else {
+				responseObject.setTotalData(1);
 				responseObject.setCountData(1);
 			}
 		} else {
+			responseObject.setTotalData(0);
 			responseObject.setCountData(0);
 		}
 		responseObject.setData(response.getData());
 		
-		// pagination
+		// pagination with list
 		List<?> objectList = new ArrayList<>();
 		if (response.getPageSize() > 0 && response.getData() instanceof List<?>) {
 			List<?> dataList = (List<?>) response.getData();
@@ -43,7 +47,11 @@ public class ResponseObjectService implements IResponseObjectService{
 			
 			int fromIndex = 0;
 			int toIndex = 0;
+			
+			responseObject.setTotalData(dataList.size());
+			
 			if (response.getPageNumber() > 0) {
+				// pagination
 				if (response.getPageNumber() > totalPage) {
 					responseObject.setTotalPages(totalPage);
 					responseObject.setCurrentPage(response.getPageNumber());
@@ -66,6 +74,7 @@ public class ResponseObjectService implements IResponseObjectService{
 				
 				
 			} else if (response.getPageNumber() == -1) {
+				// get last page
 				fromIndex = response.getPageSize() * (totalPage - 1);
 				toIndex = fromIndex + response.getPageSize();
 				if (toIndex >= dataList.size()) {

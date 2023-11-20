@@ -76,10 +76,10 @@ public class OrderService implements IOrderService{
 		if(orderDTO.getStartDate() == null || orderDTO.getStartDate().isEqual(dateNow) || orderDTO.getStartDate().isBefore(dateNow)) {
 			throw new CustomException("The start date must greater than the current date");
 		}
-		if(orderDTO.getEndDate() == null || orderDTO.getEndDate().isEqual(dateNow) 
-				|| orderDTO.getEndDate().isBefore(dateNow) || orderDTO.getEndDate().isBefore(orderDTO.getStartDate())) {
-			throw new CustomException("The end date must greater or equal than the start date");
-		}
+//		if(orderDTO.getEndDate() == null || orderDTO.getEndDate().isEqual(dateNow) 
+//				|| orderDTO.getEndDate().isBefore(dateNow) || orderDTO.getEndDate().isBefore(orderDTO.getStartDate())) {
+//			throw new CustomException("The end date must greater or equal than the start date");
+//		}
 		if(orderDTO.getCustomerInformation() == null) {
 			throw new CustomException("Customer Information is not null");
 		}
@@ -221,6 +221,8 @@ public class OrderService implements IOrderService{
 		OrderDTO orderDTO = new OrderDTO();
 		modelMapper.map(orderCreate, orderDTO);
 		
+		
+		
 		// init order detail
 		OrderDetail orderDetail = new OrderDetail();
 		
@@ -238,7 +240,11 @@ public class OrderService implements IOrderService{
 		
 		// update total price
 		totalPrice += vOTourDetail.getPrice();
-
+		
+		// update endDate
+		LocalDate endDate = orderDTO.getStartDate().plusDays((long) (tour.getNumberOfDay() - 1));
+		orderDTO.setEndDate(endDate);
+		
 		// get hotel information
 		List<HotelDetail> hotelDetailList = new ArrayList<>();
 		orderDetail.setHotelId(orderCreate.getHotelId());

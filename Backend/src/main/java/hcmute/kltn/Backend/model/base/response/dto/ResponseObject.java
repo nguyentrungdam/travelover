@@ -12,6 +12,7 @@ public class ResponseObject {
     private String message;
     private int totalPages;
     private int currentPage;
+    private int totalData;
     private int countData;
     private Object data;
 }
