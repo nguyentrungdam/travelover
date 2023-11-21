@@ -32,6 +32,7 @@ import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.dto.Image;
+import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
@@ -53,6 +54,8 @@ public class AccountService implements IAccountService{
 	private IAccountDetailService iAccountDetailService;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+	private IImageService iImageService;
 
     private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Account.class);
@@ -102,10 +105,8 @@ public class AccountService implements IAccountService{
 
 		// Set default value
 		String accountId = iGeneratorSequenceService.genId(getCollectionName());
-		String password = new BCryptPasswordEncoder().encode(account.getPassword());
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		account.setAccountId(accountId);
-		account.setPassword(password);
 		account.setRole("CUSTOMER");
 		account.setStatus(true);			
 		account.setCreatedBy(accountId);
@@ -143,13 +144,25 @@ public class AccountService implements IAccountService{
 		// get account from db
 		Account account = accountRepository.findById(accountDTO.getAccountId()).get();
 		
+		// check image and delete old image
+		if ((account.getAvatar() != null 
+				&& !account.getAvatar().equals(""))
+				&& !account.getAvatar().equals(accountDTO.getAvatar())) {
+			boolean checkDelete = false;
+			checkDelete = iImageService.deleteImageByUrl(account.getAvatar());
+			if (checkDelete == false) {
+				throw new CustomException("An error occurred during the processing of the old image");
+			}
+		}
+		
 		// Mapping
 		modelMapper.map(accountDTO, account);
 		
+//		// check password
+//		String passwordDTO = new BCryptPasswordEncoder().encode(accountDTO.getPassword());
+		
 		// Set default value
 		String currentAccountId = iAccountDetailService.getCurrentAccount().getAccountId();
-		String password = new BCryptPasswordEncoder().encode(account.getPassword());
-		account.setPassword(password);
 		account.setLastModifiedBy(currentAccountId);
 		account.setLastModifiedAt(LocalDateUtil.getDateNow());
 
@@ -249,40 +262,30 @@ public class AccountService implements IAccountService{
 		AccountDTO accountDTO = new AccountDTO();
 		modelMapper.map(registerRequest, accountDTO);
 		
-		return create(accountDTO);
+		String password = new BCryptPasswordEncoder().encode(accountDTO.getPassword());
+		accountDTO.setPassword(password);
+		
+		Account account = new Account();
+		account = create(accountDTO);
+		
+		return account;
 	}
 
 	@Override
-	public Account updateProfile(MultipartFile file, AccountUpdateProfile accountUpdateProfile) {
+	public Account updateProfile(AccountUpdateProfile accountUpdateProfile) {
 		// Get Id Account 
 		Account account = iAccountDetailService.getCurrentAccount();
 		
-		// Check field foreign key
-		if (accountUpdateProfile.getAvatar() != null 
-				&& accountUpdateProfile.getAvatar() != "") {
-			throw new CustomException("Invalid foreign key");
-		}
 
 		// Mapping
 		AccountDTO accountDTO = new AccountDTO();
 		modelMapper.map(account, accountDTO);
 		modelMapper.map(accountUpdateProfile, accountDTO);
 		
-		// Check image
-//		if (file != null) {
-//			if (accountDTO.getAvatar() == null || accountDTO.getAvatar() == "") {
-//				Image image = iImageService.createImage(tableName, file);
-//				accountDTO.setAvatar(image.getImageId());
-//			} else {
-//				Image image = iImageService.getDetail(accountDTO.getAvatar());
-//				ImageDTO imageDTO = new ImageDTO();
-//				modelMapper.map(image, imageDTO);
-//				
-//				iImageService.updateImage(imageDTO, file);
-//			}	
-//		}
+		Account accountNew = new Account();
+		accountNew = update(accountDTO);
 		
-		return update(accountDTO);
+		return accountNew;
 	}
 	
 	@Override

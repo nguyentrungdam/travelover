@@ -68,22 +68,12 @@ public class AccountController {
 		});
 	}
 	
-	private final String updateAccountDescription = "Update theo toàn bộ thông tin được nhập từ updateAccountRequest\n\n"
-			+ "Chỉ cần tạo 1 form-data bao gồm cả file và các field nằm trong updateAccountRequest\n\n"
-			+ "Ví dụ:\n\n"
-			+ "- 'file': file hình ảnh\n"
-			+ "- 'fistName': text\n"
-			+ "- 'lastName': text\n"
-			+ "- ...\n\n"
-			+ "Để xóa hình ảnh avatar có sẵn thì xóa luôn field avatar";
-	@RequestMapping(value = "/profile/update", method = RequestMethod.PUT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@Operation(summary = "Update Account - LOGIN", description = updateAccountDescription)
+	@RequestMapping(value = "/profile/update", method = RequestMethod.PUT)
+	@Operation(summary = "Update Account - LOGIN")
 	@PreAuthorize("isAuthenticated()")
-	@ModelAttribute
 	ResponseEntity<ResponseObject> updateProfile(
-			@RequestParam(required = false) MultipartFile fileAvatar,
-			AccountUpdateProfile updateAccountRequest) {
-		Account account = iAccountService.updateProfile(fileAvatar, updateAccountRequest);
+			@RequestBody AccountUpdateProfile updateAccountRequest) {
+		Account account = iAccountService.updateProfile(updateAccountRequest);
 		
 		return iResponseObjectService.success(new Response() {
 			{

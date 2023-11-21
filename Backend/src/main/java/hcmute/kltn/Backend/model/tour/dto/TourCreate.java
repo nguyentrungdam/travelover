@@ -1,5 +1,7 @@
 package hcmute.kltn.Backend.model.tour.dto;
 
+import java.util.List;
+
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class TourCreate {
 	private String tourTitle; // not null, unique
 	private String thumbnailUrl;
+	private List<String> image;
 	private String video;
 	private int numberOfDay; // not null
 	private Address address; // not null

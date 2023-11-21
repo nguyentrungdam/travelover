@@ -114,6 +114,9 @@ public class TourService implements ITourService{
 		Tour tour = new Tour();
 		modelMapper.map(tourDTO, tour);
 		
+		// mapping image
+		tour.setImage(tourDTO.getImage());
+		
 		// set tour detail list
 		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 
@@ -145,23 +148,43 @@ public class TourService implements ITourService{
 		// get tour from database
 		Tour tour = tourRepository.findById(tourDTO.getTourId()).get();
 		
-		// check image update
+		// check thumbnail image and delete
 		if ((tour.getThumbnailUrl() != null 
 				&& !tour.getThumbnailUrl().equals(""))
 				&& !tour.getThumbnailUrl().equals(tourDTO.getThumbnailUrl())) {
-			String[] urlSplit = tour.getThumbnailUrl().split("/");
-			String[] fileName = urlSplit[urlSplit.length - 1].split("\\.");
-			String imageId = fileName[0];
-			
-			boolean checkDelete = false;
-			checkDelete = iImageService.deleteImage(imageId);
+			boolean checkDelete = iImageService.deleteImageByUrl(tour.getThumbnailUrl());
 			if (checkDelete == false) {
 				throw new CustomException("An error occurred during the processing of the old image");
+			}
+		}
+		
+		// check image update
+		boolean checkExists = false;
+		if (tour.getImage() != null) {
+			for (String itemString : tour.getImage()) {
+				checkExists = false;
+				for (String itemStringDTO : tourDTO.getImage()) {
+					if (itemString.equals(itemStringDTO)) {
+						checkExists = true;
+						break;
+					}
+				}
+				
+				if (checkExists == false) {
+					boolean checkDelete = false;
+					checkDelete = iImageService.deleteImageByUrl(itemString);
+					if (checkDelete == false) {
+						throw new CustomException("An error occurred during the processing of the old image");
+					}
+				}
 			}
 		}
 
 		// Mapping
 		modelMapper.map(tourDTO, tour);
+		
+		// mapping image
+		tour.setImage(tourDTO.getImage());
 		
 		// set tour detail list
 		tour.setTourDetailList(deteilToList(tour.getTourDetail()));

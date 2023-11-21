@@ -40,7 +40,8 @@ public class SecurityConfig {
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.authorizeRequests()
-//				.antMatchers("/api/v1/users/list").hasAuthority("ROLE_ADMIN")
+//				.antMatchers("/swagger-ui/**", "/api/v1/**").permitAll()
+//				.antMatchers("/**").hasAuthority("ROLE_SUPER_ADMIN")
 				.anyRequest().permitAll();
 //		http.csrf().ignoringAntMatchers("/api/v1/accounts/update");
 

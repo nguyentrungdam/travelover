@@ -17,6 +17,7 @@ public class TourUpdate {
 	private String tourId; // not null
 	private String tourTitle; // not null, unique
 	private String thumbnailUrl;
+	private List<String> image;
 	private String video;
 	private int numberOfDay; // not null
 	private Address address; // not null

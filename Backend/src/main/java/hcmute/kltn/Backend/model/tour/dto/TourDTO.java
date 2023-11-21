@@ -20,7 +20,7 @@ public class TourDTO {
 	private String tourId;
 	private String tourTitle; // not null, unique
 	private String thumbnailUrl; 
-	private List<Image> image;
+	private List<String> image;
 	private String video;
 	private int numberOfDay; // not null
 	private Address address; // not null

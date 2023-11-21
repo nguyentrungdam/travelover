@@ -13,7 +13,7 @@ import hcmute.kltn.Backend.model.account.dto.entity.Account;
 
 public interface IAccountService {
 	public Account register(RegisterRequest registerRequest);
-	public Account updateProfile(MultipartFile file, AccountUpdateProfile accountUpdateProfile);
+	public Account updateProfile(AccountUpdateProfile accountUpdateProfile);
 	public Account getProfile();
 	public AuthResponse login(AuthRequest request);
 	public List<Account> getAllAccount();

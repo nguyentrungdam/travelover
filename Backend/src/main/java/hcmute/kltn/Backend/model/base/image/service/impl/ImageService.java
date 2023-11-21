@@ -40,8 +40,8 @@ public class ImageService implements IImageService{
 	private ModelMapper modelMapper;
 	@Autowired
     private MongoTemplate mongoTemplate;
-	@Autowired
-    private IAccountService iAccountService;
+//	@Autowired
+//    private IAccountService iAccountService;
 	
 	@Value("${file.image.upload-dir}")
     private String uploadDir;
@@ -83,7 +83,10 @@ public class ImageService implements IImageService{
             BufferedImage bufferedImage = ImageIO.read(inputStream);
 
             // Get image writers
-            Iterator<ImageWriter> imageWriters = ImageIO.getImageWritersByFormatName("jpg"); // Input your Format Name here
+            String fileName = image.getOriginalFilename();
+        	String[] fileNameSplit = fileName.split("\\.");
+        	String fileNameExtension = fileNameSplit[fileNameSplit.length - 1];
+            Iterator<ImageWriter> imageWriters = ImageIO.getImageWritersByFormatName(fileNameExtension); // Input your Format Name here
 
             if (!imageWriters.hasNext())
                 throw new IllegalStateException("Writers Not Found!!");
@@ -180,7 +183,7 @@ public class ImageService implements IImageService{
 		File imageFile = getImageFile(imageId);
 		
 		Image image = new Image();
-		String url = "localhost:" + portServer + "/images/" + imageFile.getName();
+		String url = "http://localhost:" + portServer + "/images/" + imageFile.getName();
 		image.setImageId(imageId);
 		image.setUrl(url);
 		
@@ -207,6 +210,14 @@ public class ImageService implements IImageService{
 		return checkDelete;
 	}
 	
+	private String getIdByUrl(String imageUrl) {
+		String[] urlSplit = imageUrl.split("/");
+		String[] fileName = urlSplit[urlSplit.length - 1].split("\\.");
+		String imageId = fileName[0];
+		
+		return imageId;
+	}
+	
 	@Override
 	public Image createImage(MultipartFile file) {
 		Image image = new Image();
@@ -227,6 +238,16 @@ public class ImageService implements IImageService{
 	public boolean deleteImage(String imageId) {
 		boolean checkDelete = delete(imageId);
 		
+		return checkDelete;
+	}
+
+	@Override
+	public boolean deleteImageByUrl(String imageUrl) {
+		String imageId = getIdByUrl(imageUrl);
+		
+		boolean checkDelete = false;
+		checkDelete = deleteImage(imageId);
+
 		return checkDelete;
 	}
 }
