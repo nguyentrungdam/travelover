@@ -13,6 +13,7 @@ import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.order.dto.extend.CustomerInformation;
 import hcmute.kltn.Backend.model.order.dto.extend.Discount;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
+import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,6 +39,6 @@ public class Order extends BaseEntity{
 //	private int price; // not null
 	private List<Discount> discount;
 	private int totalPrice; // not null
-	private String paymentStatus; 
+	private List<Payment> payment; 
 	private String orderStatus; 
 }

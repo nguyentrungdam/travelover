@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderStatusUpdate {
 	private String orderId;
-	private int status;
+	private String status;
 }

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import hcmute.kltn.Backend.model.order.dto.extend.CustomerInformation;
 import hcmute.kltn.Backend.model.order.dto.extend.Discount;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
+import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,6 @@ public class OrderDTO {
 //	private int price; // not null
 	private List<Discount> discount;
 	private int totalPrice; // not null
-	private String paymentStatus; 
-	private int orderStatus;  
+	private List<Payment> payment; 
+	private String orderStatus;  
 }

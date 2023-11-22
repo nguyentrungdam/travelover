@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import hcmute.kltn.Backend.model.order.dto.extend.CustomerInformation;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
+import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,6 @@ public class OrderUpdate {
 	private int numberOfChildren; // not null
 	private int numberOfAdult; // not null
 	private String note;
-	private String paymentStatus; 
-	private int orderStatus; 
+	private List<Payment> payment; 
+	private String orderStatus; 
 }

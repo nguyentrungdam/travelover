@@ -45,8 +45,8 @@ public class ImageService implements IImageService{
 	
 	@Value("${file.image.upload-dir}")
     private String uploadDir;
-	@Value("${server.port}")
-    private String portServer;
+	@Value("${backend.dev.domain}")
+    private String backendDomain;
 
     private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Image.class);
@@ -168,7 +168,7 @@ public class ImageService implements IImageService{
         saveImage(file, path);
         
         image.setImageId(imageId);
-        String url = "http://localhost:" + portServer + "/images/" +fileNameNew;
+        String url = backendDomain + "/images/" +fileNameNew;
         image.setUrl(url);
 
         return image;
@@ -183,7 +183,7 @@ public class ImageService implements IImageService{
 		File imageFile = getImageFile(imageId);
 		
 		Image image = new Image();
-		String url = "http://localhost:" + portServer + "/images/" + imageFile.getName();
+		String url = backendDomain + "/images/" + imageFile.getName();
 		image.setImageId(imageId);
 		image.setUrl(url);
 		

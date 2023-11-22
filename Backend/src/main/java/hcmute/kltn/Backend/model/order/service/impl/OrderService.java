@@ -22,11 +22,13 @@ import hcmute.kltn.Backend.model.hotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
+import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
 import hcmute.kltn.Backend.model.order.dto.entity.Order;
 import hcmute.kltn.Backend.model.order.dto.extend.HotelDetail;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
+import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import hcmute.kltn.Backend.model.order.dto.extend.VOTourDetail;
 import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
@@ -52,7 +54,9 @@ public class OrderService implements IOrderService{
 	@Autowired
 	private ITourService iTourService;
 	
-	private String getOrderStatus(int index) {
+	private String getOrderStatus(String orderStatus) {
+		int index = Integer.valueOf(orderStatus);
+		
 		List<String> orderStatusList = new ArrayList<>();
 		for (EOrderStatus value : EOrderStatus.values()) {
 			orderStatusList.add(String.valueOf(value));
@@ -112,7 +116,7 @@ public class OrderService implements IOrderService{
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		order.setOrderId(orderId);
-		order.setOrderStatus(getOrderStatus(1));
+		order.setOrderStatus(getOrderStatus("1"));
 		order.setStatus(true);
 		order.setCreatedBy(accountId);
 		order.setCreatedAt(dateNow);
@@ -329,6 +333,43 @@ public class OrderService implements IOrderService{
 
 		// update order
 		order = update(orderDTO);
+		
+		return order;
+	}
+
+	@Override
+	public Order updateOrderPayment(OrderPaymentUpdate orderPaymentUpdate) {
+		// get order from database
+		Order order = new Order();
+		order = getDetail(orderPaymentUpdate.getOrderId());
+		
+		// get payment
+		if (order.getPayment() != null) {
+			List<Payment> paymentList = new ArrayList<>(order.getPayment());
+			
+			// update payment
+			Payment payment = new Payment();
+			payment.setMethod(orderPaymentUpdate.getMethod());
+			payment.setTransactionCode(orderPaymentUpdate.getTransactionCode());
+			payment.setAmount(orderPaymentUpdate.getAmount());
+			payment.setDate(orderPaymentUpdate.getDate());
+			paymentList.add(payment);
+			order.setPayment(paymentList);
+		} else {
+			List<Payment> paymentList = new ArrayList<>();
+			
+			// update payment
+			Payment payment = new Payment();
+			payment.setMethod(orderPaymentUpdate.getMethod());
+			payment.setTransactionCode(orderPaymentUpdate.getTransactionCode());
+			payment.setAmount(orderPaymentUpdate.getAmount());
+			payment.setDate(orderPaymentUpdate.getDate());
+			paymentList.add(payment);
+			order.setPayment(paymentList);
+		}
+		
+		// update order
+		order = orderRepository.save(order);
 		
 		return order;
 	}
