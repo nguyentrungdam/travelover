@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import "./AddTours.css";
 import LocationSelect from "./LocationSelect";
 import { useDispatch } from "react-redux";
@@ -9,11 +9,14 @@ import { axiosMultipart } from "../../../../apis/axios";
 
 const AddTours = () => {
   const fileInputRef = useRef();
+  const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
+  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     tourTitle: "",
     thumbnailUrl: "",
     profilePicture: "",
+    profileThumbnail: "",
     numberOfDay: 0,
     moreLocation: "",
     tourDescription: "",
@@ -23,45 +26,46 @@ const AddTours = () => {
     endDate: "",
     suitablePerson: "",
     termAndCondition: "",
+    image: ["", "", "", "", "", ""],
   });
   const [selectedLocation, setSelectedLocation] = useState({
     province: "",
     district: "",
     commune: "",
   });
-  const handleSelectImage = (e) => {
+  const handleSelectImage = (e, index) => {
+    console.log(index);
     const selectedFile = e.target.files[0];
-    console.log(selectedFile);
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+    const formDataClone = { ...formData };
+    const imageFormData = new FormData();
+    imageFormData.append("file", selectedFile);
+    const imageUrl = URL.createObjectURL(selectedFile);
     axiosMultipart
-      .post("/images/create", formData)
+      .post("/images/create", imageFormData)
       .then((response) => {
-        const imageUrl = response.data.data.url;
-        // Cập nhật state của formData với giá trị thumbnailUrl từ API
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          thumbnailUrl: imageUrl,
-        }));
+        if (index === -1) {
+          formDataClone.thumbnailUrl = response.data.data.url;
+          formDataClone.profileThumbnail = imageUrl;
+        } else {
+          formDataClone.image[index] = response.data.data.url;
+          formDataClone.profilePicture = imageUrl;
+        }
+        setFormData(formDataClone);
       })
       .catch((error) => {
         console.error("Lỗi khi gọi API:", error);
       });
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          profilePicture: reader.result,
-        }));
-      } else return;
-    };
-    reader.readAsDataURL(e.target.files[0]);
   };
-  console.log(formData.thumbnailUrl);
+
   function handleUploadButtonClick() {
     fileInputRef.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
   }
+  const handleUploadButtonClick6 = (index) => () => {
+    if (fileInputRefs.current[index] && fileInputRefs.current[index].current) {
+      fileInputRefs.current[index].current.click();
+    }
+  };
+
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
@@ -95,6 +99,9 @@ const AddTours = () => {
     // Thêm các trường dữ liệu vào formDataObject
     formDataObject.append("tourTitle", formData.tourTitle);
     formDataObject.append("thumbnailUrl", formData.thumbnailUrl);
+    formData.image.forEach((image, index) => {
+      formDataObject.append(`image[${index}]`, image);
+    });
     formDataObject.append("numberOfDay", formData.numberOfDay);
     formDataObject.append("tourDescription", formData.tourDescription);
     formDataObject.append("tourDetail", formData.tourDetail);
@@ -139,6 +146,19 @@ const AddTours = () => {
         pauseOnHover: true,
         autoClose: 1000,
       });
+    }
+  };
+  const openModal = () => {
+    setShowModal(true);
+    document.body.classList.add("modal-open");
+  };
+  const closeModal = () => {
+    setShowModal(false);
+    document.body.classList.remove("modal-open");
+  };
+  const handleOverlayClick = (e) => {
+    if (e.target.classList.contains("modal-overlay2")) {
+      closeModal();
     }
   };
 
@@ -284,20 +304,21 @@ const AddTours = () => {
             </div>
           </div>
         </div>
+
         <div className="col-xl-4 px-xl-0">
           <div className="card mb-4 mb-xl-0">
-            <div className="card-header">Image</div>
+            <div className="card-header">Thumbnail</div>
             <div className="card-body text-center">
               <img
                 className="img-account-profile  mb-2"
-                src={formData.profilePicture || "/noavatar.png"}
+                src={formData.profileThumbnail || "/noavatar.png"}
                 alt=""
               />{" "}
               <input
                 className="chooseFile"
                 type="file"
                 accept=".jpg,.png"
-                onChange={handleSelectImage}
+                onChange={(e) => handleSelectImage(e, -1)}
                 style={{ display: "none" }}
                 ref={fileInputRef}
               />
@@ -309,12 +330,69 @@ const AddTours = () => {
                 type="button"
                 onClick={handleUploadButtonClick}
               >
-                Upload Image
+                Upload Thumbnail
+              </button>
+            </div>
+          </div>
+          <div className="card mb-4 mb-xl-0 mt-3">
+            <div className="card-header">Image list</div>
+            <div className="card-body text-center">
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={openModal}
+              >
+                Upload Image List
               </button>
             </div>
           </div>
         </div>
       </div>
+      {showModal && (
+        <div className="modal-overlay2" onClick={handleOverlayClick}>
+          <div className="modal2 col-xl-6">
+            <div className="d-flex wrap-modal-addtour">
+              <span className="card-header">Image list</span>
+              <button className="close-btn2" onClick={closeModal}>
+                X
+              </button>
+            </div>
+            <div className="  d-flex image-list">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div key={index} className="mb-2 d-flex flex-column mx-2">
+                  <img
+                    className="img-account-profile"
+                    src={
+                      formData.image[index]
+                        ? formData.image[index]
+                        : "/noavatar.png"
+                    }
+                    alt=""
+                  />
+                  <input
+                    className="chooseFile"
+                    type="file"
+                    accept=".jpg, .png"
+                    onChange={(e) => handleSelectImage(e, index)}
+                    style={{ display: "none" }}
+                    ref={fileInputRefs.current[index]}
+                  />
+                  <div className="small font-italic text-muted my-2">
+                    JPG or PNG must not exceed 2 MB
+                  </div>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleUploadButtonClick6(index)}
+                  >
+                    Upload Image
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </>
   );

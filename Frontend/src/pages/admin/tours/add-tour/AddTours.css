@@ -33,3 +33,61 @@
 .selectSearch {
   font-size: 1.1rem;
 }
+.image-list {
+  background: #fff;
+  padding: 10px 5px;
+  color: black;
+  border-radius: 6px;
+  text-align: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.image-list > div {
+  box-sizing: border-box;
+  width: calc(
+    33.3333% - 16px
+  ); /* Đặt độ rộng của mỗi ô (1/3) và trừ đi khoảng cách giữa chúng */
+  margin: 10px 0 16px 0; /* Đặt khoảng cách giữa các hàng */
+}
+.img-account-profile {
+  max-width: 100%; /* Ảnh sẽ không vượt quá kích thước của ô */
+  height: auto; /* Duy trì tỷ lệ khung hình khi thay đổi kích thước */
+}
+.modal-overlay2 {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal2 {
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  display: block;
+  color: black;
+}
+.wrap-modal-addtour {
+  position: relative;
+  margin-left: 12px;
+}
+.close-btn2 {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  width: 30px;
+  border: 1px solid #5b5b5b;
+}
+.close-btn2:hover {
+  background: rgb(244, 47, 47) !important;
+}
+body.modal-open {
+  overflow: hidden;
+}
