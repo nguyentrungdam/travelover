@@ -59,6 +59,7 @@ export const searchTour = createAsyncThunk(
 export const tourSlice = createSlice({
   name: "tour",
   initialState: {
+    totalData: 0,
     tours: [],
     tour: {},
     loading: false,
@@ -87,7 +88,8 @@ export const tourSlice = createSlice({
     [searchTour.fulfilled]: (state, action) => {
       state.loading = false;
       state.tours = action.payload.data.data;
-      console.log(state.tours);
+      state.totalData = action.payload.data.totalData;
+      console.log(state.totalData);
     },
     [updateTour.pending]: (state) => {
       state.loading = true;

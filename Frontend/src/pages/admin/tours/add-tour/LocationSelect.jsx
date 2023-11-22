@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./AddTours.css";
-const LocationSelect = ({ onSelectLocation, pickProvince, searchProvince }) => {
+const LocationSelect = ({
+  onSelectLocation,
+  pickProvince,
+  searchProvince,
+  english,
+}) => {
   const [cities, setCities] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -102,7 +107,9 @@ const LocationSelect = ({ onSelectLocation, pickProvince, searchProvince }) => {
             onChange={(e) => handleSetCity(e.target.value)}
             value={selectedCity}
           >
-            <option value="">Chọn tỉnh/thành phố</option>
+            <option value="">
+              {english ? "Select province/city" : "Chọn tỉnh/thành phố"}
+            </option>
             {sortByName(cities).map((city) => (
               <option key={city?.code} value={city.name}>
                 {city.name}
@@ -115,7 +122,9 @@ const LocationSelect = ({ onSelectLocation, pickProvince, searchProvince }) => {
             value={selectedDistrict}
             className="mx-2"
           >
-            <option value="">Chọn quận/huyện</option>
+            <option value="">
+              {english ? "Select district" : "Chọn quận/huyện"}
+            </option>
             {sortByName(districts).map((district) => (
               <option key={district.code} value={district.name}>
                 {district.name}
@@ -128,7 +137,9 @@ const LocationSelect = ({ onSelectLocation, pickProvince, searchProvince }) => {
             onChange={(e) => setSelectedWard(e.target.value)}
             value={selectedWard}
           >
-            <option value="">Chọn phường/xã</option>
+            <option value="">
+              {english ? "Select ward/commune" : "Chọn phường/xã"}
+            </option>
             {sortByName(wards).map((ward) => (
               <option key={ward.code} value={ward.name}>
                 {ward.name}

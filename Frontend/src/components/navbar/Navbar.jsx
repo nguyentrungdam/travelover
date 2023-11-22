@@ -43,7 +43,7 @@ const Navbar = () => {
                     <span className="SubA">Tài Khoản</span>
                   </Link> */}
                   <span className="SubA seperate" onClick={handleLogout}>
-                    Đăng Xuất
+                    Logout
                   </span>
                 </div>
               </div>

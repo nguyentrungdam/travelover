@@ -9,7 +9,7 @@ const columns = [
   { field: "id", headerName: "ID", width: 40, type: "string" },
   {
     field: "img",
-    headerName: "Ảnh",
+    headerName: "Image",
     width: 70,
     renderCell: (params) => {
       return <img src={params.row.img || "/noavatar.png"} alt="" />;
@@ -18,13 +18,13 @@ const columns = [
   {
     field: "title",
     type: "string",
-    headerName: "Tên tour",
-    width: 650,
+    headerName: "Tour Title",
+    width: 600,
   },
   {
     field: "days",
     type: "string",
-    headerName: "Số ngày",
+    headerName: "Days",
     width: 150,
   },
   {
@@ -42,7 +42,7 @@ const ToursList = () => {
     tours && Array.isArray(tours)
       ? tours.map((item, index) => ({
           id: item.tourId ? item.tourId.slice(-2) : index,
-          img: item.avatar,
+          img: item?.thumbnailUrl,
           title: item.tourTitle,
           days: item.numberOfDay,
           createdAt: item.createdAt,
@@ -58,7 +58,8 @@ const ToursList = () => {
     <div className="products">
       <div className="info">
         <h1>Tours</h1>
-        <a href="/tours-list/add-new">Thêm tour mới</a>
+
+        <a href="/tours-list/add-new">Add New Tour</a>
       </div>
       {/* TEST THE API */}
 

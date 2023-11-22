@@ -7,7 +7,10 @@ import Footer from "../../../components/Footer/Footer";
 import ScrollToTop from "../../../shared/ScrollToTop";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
-import { formatCurrencyWithoutD } from "../../../utils/validate";
+import {
+  formatCurrencyWithoutD,
+  validateOriginalDate,
+} from "../../../utils/validate";
 import { useDispatch, useSelector } from "react-redux";
 import { searchTour } from "../../../slices/tourSlice";
 import { vi } from "date-fns/locale";
@@ -23,8 +26,8 @@ const List = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, tours } = useSelector((state) => state.tour);
-
+  const { loading, tours, totalData } = useSelector((state) => state.tour);
+  const [countData, setCountData] = useState(0);
   const [province, setProvince] = useState(
     location.state.selectedLocation
       ? location.state.selectedLocation.province
@@ -40,31 +43,37 @@ const List = () => {
   const [isChecked1, setIsChecked1] = useState(false);
   const [isChecked2, setIsChecked2] = useState(false);
   // Phân trang
-  // const [currentPage, setCurrentPage] = useState(0);
-  // const itemsPerPage = 12; // Số mục trên mỗi trang
-  // const pageCount = Math.ceil(tours.length / itemsPerPage);
-  // // Lấy mục của trang hiện tại
-  // const currentItems = tours.slice(
-  //   currentPage * itemsPerPage,
-  //   (currentPage + 1) * itemsPerPage
-  // );
-  //  // Hàm xử lý khi chuyển trang
-  //  const handlePageClick = (data) => {
-  //   const selectedPage = data.selected;
-  //   setCurrentPage(selectedPage);
-  // };
+  const [nextPage, setNextPage] = useState(1);
+  const [pageCount, setPageCount] = useState(0);
+  const [itemOffset, setItemOffset] = useState(0);
+  const itemsPerPage = 9; // Số mục trên mỗi trang
+  useEffect(() => {
+    setPageCount(Math.ceil(totalData / itemsPerPage));
+  }, [totalData, itemOffset]);
+  // Hàm xử lý khi chuyển trang
+  const handlePageClick = async (event) => {
+    const newOffset = (event.selected * itemsPerPage) % tours.length;
+    setItemOffset(newOffset);
+    setNextPage(event.selected + 1);
+    window.scrollTo(0, 0);
+  };
   console.log(tours);
 
   useEffect(() => {
     setProvince(location.state.selectedLocation.province);
-    dispatch(
+    const res = dispatch(
       searchTour({
+        keyword: "",
         province,
         startDate,
         numberOfDay,
         numberOfPeople,
+        pageSize: 9,
+        pageNumber: 1,
       })
     ).unwrap();
+    console.log(res);
+    setCountData(res.data?.totalData);
     const handleScroll = () => {
       if (window.scrollY > 200) {
         setHeaderVisible(false);
@@ -83,17 +92,20 @@ const List = () => {
     const fetchData = async () => {
       const res = await dispatch(
         searchTour({
+          keyword: "",
           province,
           startDate,
           numberOfDay,
           numberOfPeople,
+          pageSize: itemsPerPage,
+          pageNumber: nextPage,
         })
       ).unwrap();
-      console.log(res);
+      setCountData(res.data?.totalData);
     };
     fetchData();
-  }, [dispatch, province, startDate, numberOfDay, numberOfPeople]);
-  console.log(province, startDate, numberOfDay, numberOfPeople);
+  }, [dispatch, province, startDate, numberOfDay, numberOfPeople, nextPage]);
+  console.log(province, startDate, numberOfDay, numberOfPeople, nextPage);
   const handleSelectLocation = (location) => {
     setProvince(location.province);
   };
@@ -183,7 +195,7 @@ const List = () => {
                     </select>
                   </div>
 
-                  <div className="tour-search-result__filter__block mb-2 d-flex">
+                  <div className="tour-search-result__filter__block mb-2 d-flex gap-1">
                     <h5 className="s-title me-2">Số người: </h5>
                     <button
                       disabled={numberOfPeople <= 1}
@@ -192,7 +204,7 @@ const List = () => {
                     >
                       -
                     </button>
-                    <span className="optionCounterNumber mx-2 fz17 fw-bold">
+                    <span className="optionCounterNumber mx-3 fz17 fw-bold">
                       {numberOfPeople}
                     </span>
                     <button
@@ -266,8 +278,13 @@ const List = () => {
                   <div className="d-none d-lg-block">
                     <div className="order-by">
                       <div className="order-by-title">
-                        Chúng tôi tìm thấy <strong>{tours.length}</strong> tours
-                        cho Quý khách.
+                        Chúng tôi tìm thấy{" "}
+                        <strong>
+                          {totalData > 9
+                            ? totalData
+                            : tours?.length || countData}
+                        </strong>{" "}
+                        tours cho Quý khách.
                       </div>
                       <div className="order-by-left">
                         <div className="order-wrap">
@@ -289,7 +306,7 @@ const List = () => {
                 </div>
 
                 <div className="row row-cols-1 row-cols-md-3 g-4">
-                  {tours.map((item, index) => (
+                  {tours?.map((item, index) => (
                     <div
                       className="col promotion-search-result__result__item"
                       key={index}
@@ -297,20 +314,15 @@ const List = () => {
                       <div className="card tour-item">
                         <div className="position-relative">
                           <div className="tour-item__image">
-                            <a
-                              href="/tourNDSGN869-021-191123XE-V-F/sieu-sale-🔥-|-vung-tau-sac-mau-bien-xanh-|-kich-cau-du-lich-.aspx?LM=0"
-                              title="Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du lịch "
-                            >
-                              <img
-                                src="https://media.travel.com.vn/destination/tf_230614013334_101846_BAI BIEN THUY VAN (minh hoa).jpg"
-                                id="imgaddtour_0ae974d0-6bf1-489c-9949-1d74ce7d887b"
-                                className="card-img-top img-fluid"
-                                alt="Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du lịch "
-                                width="309"
-                                height="220"
-                                loading="lazy"
-                              />
-                            </a>
+                            <img
+                              src={item.tour.thumbnailUrl}
+                              id="imgaddtour_0ae974d0-6bf1-489c-9949-1d74ce7d887b"
+                              className="card-img-top img-fluid"
+                              alt={item.tour.tourTitle}
+                              width="309"
+                              height="220"
+                              loading="lazy"
+                            />
 
                             <div className="tour-item__image-inner__bottom">
                               <span className="tour-item__image-inner__bottom__category">
@@ -326,15 +338,17 @@ const List = () => {
                         </div>
                         <div className="card-body p-3">
                           <p className="tour-item__date mb-1">
-                            19/11/2023 - Trong ngày - Giờ đi: 05:30
+                            Thời gian thích hợp:{" "}
+                            {validateOriginalDate(
+                              item.tour.reasonableTime.startDate
+                            )}{" "}
+                            đến{" "}
+                            {validateOriginalDate(
+                              item.tour.reasonableTime.endDate
+                            )}
                           </p>
                           <h3 className="card-text tour-item__title mb-1">
-                            <a
-                              href="/tourNDSGN869-021-191123XE-V-F/sieu-sale-🔥-|-vung-tau-sac-mau-bien-xanh-|-kich-cau-du-lich-.aspx?LM=0"
-                              title="Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du lịch "
-                            >
-                              {item.tour.tourTitle}
-                            </a>
+                            {item.tour.tourTitle}
                           </h3>
                           <div className="tour-item__code">
                             <div>Đối tượng thích hợp:</div>
@@ -354,7 +368,7 @@ const List = () => {
                               <div className="tour-item__price--old"></div>
                               <div className="tour-item__price--current fix-leftalign">
                                 <span className="tour-item__price--current__number pe-2 mb-0">
-                                  299,000₫
+                                  {formatCurrencyWithoutD(item.tour.price)}₫
                                 </span>
                               </div>
                               <div className="tour-item__price--current">
@@ -383,7 +397,30 @@ const List = () => {
                     </div>
                   ))}
                 </div>
-                {tours.length === 0 ? (
+
+                {totalData < 10 ? (
+                  " "
+                ) : (
+                  <div className="contain-pagination">
+                    <ReactPaginate
+                      breakLabel="..."
+                      nextLabel=">"
+                      onPageChange={handlePageClick}
+                      pageRangeDisplayed={5}
+                      pageCount={pageCount}
+                      previousLabel="<"
+                      renderOnZeroPageCount={null}
+                      className="pagination"
+                      pageLinkClassName={pageCount === 1 ? `a active` : "a"}
+                      activeLinkClassName="active"
+                      pageClassName="li"
+                      previousClassName="li"
+                      nextClassName=" li"
+                      forcePage={nextPage - 1}
+                    />
+                  </div>
+                )}
+                {countData === 0 ? (
                   <div className="d-flex justify-content-center flex-column align-items-center pt-5">
                     <img src="/sorry.png" alt="sorry" className="sorry-img" />
                     <h5 className="sorry-text">

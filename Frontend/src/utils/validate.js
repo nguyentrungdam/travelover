@@ -39,9 +39,17 @@ export function formatCurrencyWithoutD(amount) {
     style: "currency",
     currency: "VND",
   });
-
   const formattedAmount = formatter.format(amount);
-
   // Bỏ chữ "đ" ở cuối
   return formattedAmount.replace(/\s?₫$/, "");
+}
+export function FormatLine({ text }) {
+  // Tách chuỗi thành mảng các dòng
+  const lines = text?.split("\n");
+  // Render mỗi dòng trong mảng bằng thẻ <p>
+  return lines?.map((line, index) => (
+    <p className="mb-1" key={index}>
+      {line}
+    </p>
+  ));
 }

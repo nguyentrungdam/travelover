@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 const axiosMultipart = axios.create({
   baseURL: api,
   headers: {
-    "Content-Type": "multipart/form-data",
+    // "Content-Type": "multipart/form-data",
     "Access-Control-Allow-Credentials": true,
   },
   credentials: "include",

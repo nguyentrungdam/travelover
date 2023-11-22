@@ -1,58 +1,87 @@
-import React, { useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import "./AddTours.css";
 import LocationSelect from "./LocationSelect";
 import { useDispatch } from "react-redux";
 import { createTour } from "../../../../slices/tourSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-/* Ngày 1 - TP. HỒ CHÍ MINH - THÁC DAMBRI - ĐÀ LẠT Số bữa ăn: 3 bữa (Ăn sáng, trưa, tối)
-Quý khách tập trung tại Vietravel (190 Pasteur, phường Võ Thị Sáu, Quận 3, TP.HCM), xe đưa đoàn khởi hành đi Đà Lạt. Trên đường đoàn dừng chân tham quan và ăn trưa tại Bảo Lộc:
-Ngày 2 - ĐÀ LẠT – ĐỒI CHÈ CẦU ĐẤT – HẦM VANG ĐÀ LẠT – THĂM VƯỜN DÂU TÂY Số bữa ăn: 3 bữa (Ăn sáng, trưa, tối)
-Đà Lạt chào đón quý khách với không khí se lạnh thoang thoảng mùi sương sớm mai, sau khi dùng bữa sáng, xe đưa đoàn tham quan
-Ngày 3 - ĐÀ LẠT – MONGO LAND Số bữa ăn: 2 bữa (Ăn sáng, trưa, tự túc ăn tối)
-Sau khi dùng bữa sáng tại khách sạn, xe đưa đoàn tham quan: Mongo Land: mang vẻ đẹp hoàn toàn mới lạ - một "tiểu Mông Cổ thu nhỏ" trong lòng Đà Lạt được thiết kế như một nông trại với những chiếc lều đủ màu sắc. Tất cả đều được bài trí độc đáo, bắt mắt theo phong cách Mông Cổ đặc trưng. Đến đây, ngoài việc tận hưởng bầu không khí trong lành và chiêm ngưỡng vẻ đẹp của thiên nhiên hùng vĩ, Quý khách sẽ được trải nghiêm
-Ngày 4 - ĐÀ LẠT – SAMTEN HILLS ĐÀ LẠT - TP. HỒ CHÍ MINH Số bữa ăn: 2 bữa (Ăn sáng, trưa)
-Quý khách dùng bữa sáng, làm thủ tục trả phòng. Sau đó xe và HDV đưa khách đi tham quan */
+import { axiosMultipart } from "../../../../apis/axios";
+
 const AddTours = () => {
+  const fileInputRef = useRef();
+  const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
+  const [showModal, setShowModal] = useState(false);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     tourTitle: "",
-    video: "",
+    thumbnailUrl: "",
+    profilePicture: "",
+    profileThumbnail: "",
     numberOfDay: 0,
     moreLocation: "",
     tourDescription: "",
     tourDetail: "",
     startDate: "",
+    price: 0,
     endDate: "",
     suitablePerson: "",
     termAndCondition: "",
+    image: ["", "", "", "", "", ""],
   });
   const [selectedLocation, setSelectedLocation] = useState({
     province: "",
     district: "",
     commune: "",
   });
+  const handleSelectImage = (e, index) => {
+    console.log(index);
+    const selectedFile = e.target.files[0];
+    const formDataClone = { ...formData };
+    const imageFormData = new FormData();
+    imageFormData.append("file", selectedFile);
+    const imageUrl = URL.createObjectURL(selectedFile);
+    axiosMultipart
+      .post("/images/create", imageFormData)
+      .then((response) => {
+        if (index === -1) {
+          formDataClone.thumbnailUrl = response.data.data.url;
+          formDataClone.profileThumbnail = imageUrl;
+        } else {
+          formDataClone.image[index] = response.data.data.url;
+          formDataClone.profilePicture = imageUrl;
+        }
+        setFormData(formDataClone);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi gọi API:", error);
+      });
+  };
+
+  function handleUploadButtonClick() {
+    fileInputRef.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
+  }
+  const handleUploadButtonClick6 = (index) => () => {
+    if (fileInputRefs.current[index] && fileInputRefs.current[index].current) {
+      fileInputRefs.current[index].current.click();
+    }
+  };
 
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Kiểm tra tên trường của giá trị đang được thay đổi
     if (name === "startDate" || name === "endDate") {
-      // Tách ngày và tháng từ giá trị nhập liệu
-      const [day, month] = value.split("-");
-      // Lấy ngày hiện tại
-      const today = new Date();
-      // Tạo ngày mới với năm hiện tại, tháng (lấy tháng - 1 vì tháng bắt đầu từ 0), và ngày từ giá trị nhập liệu
-      const newDate = new Date(today.getFullYear(), month - 1, day);
-      // Định dạng ngày thành "YYYY-MM-DD"
-      const formattedDate = newDate.toISOString().split("T")[0];
-      // Cập nhật giá trị trong formData tương ứng
-      setFormData({
-        ...formData,
-        [name]: formattedDate,
-      });
+      if (value.length === 5) {
+        const [day, month] = value.split("-");
+        const today = new Date();
+        const newDate = new Date(today.getFullYear(), month - 1, day);
+        const formattedDate = newDate.toISOString().split("T")[0];
+        setFormData({
+          ...formData,
+          [name]: formattedDate,
+        });
+      }
     } else {
       setFormData({
         ...formData,
@@ -69,12 +98,16 @@ const AddTours = () => {
 
     // Thêm các trường dữ liệu vào formDataObject
     formDataObject.append("tourTitle", formData.tourTitle);
-    formDataObject.append("video", formData.video);
+    formDataObject.append("thumbnailUrl", formData.thumbnailUrl);
+    formData.image.forEach((image, index) => {
+      formDataObject.append(`image[${index}]`, image);
+    });
     formDataObject.append("numberOfDay", formData.numberOfDay);
     formDataObject.append("tourDescription", formData.tourDescription);
     formDataObject.append("tourDetail", formData.tourDetail);
     formDataObject.append("suitablePerson", formData.suitablePerson);
     formDataObject.append("termAndCondition", formData.termAndCondition);
+    formDataObject.append("price", formData.price);
 
     // Thêm địa chỉ
     formDataObject.append("address[province]", selectedLocation.province);
@@ -115,151 +148,147 @@ const AddTours = () => {
       });
     }
   };
-  //========= sample data =================================
-  /* 
-Phương tiện di chuyển: Xe du lịch
-Ưu đãi: Đã bao gồm ưu đãi trong giá tour
-Khách sạn: Khách sạn 3 sao
+  const openModal = () => {
+    setShowModal(true);
+    document.body.classList.add("modal-open");
+  };
+  const closeModal = () => {
+    setShowModal(false);
+    document.body.classList.remove("modal-open");
+  };
+  const handleOverlayClick = (e) => {
+    if (e.target.classList.contains("modal-overlay2")) {
+      closeModal();
+    }
+  };
 
-Ngày 1 - TP. HỒ CHÍ MINH – ĐÀ LẠT Số bữa ăn: 3 bữa (Ăn sáng, trưa, chiều)
-Ngày 2 - ĐÀ LẠT - THÀNH PHỐ NGÀN HOA Số bữa ăn: 3 bữa (Ăn sáng, trưa, chiều)
-Ngày 3 - ĐÀ LẠT - NHA TRANG Số bữa ăn: 3 bữa (Ăn sáng, trưa, chiều)
-Ngày 4 - NHA TRANG - HÒN LAO - VINWONDERS NHA TRANG Số bữa ăn: 2 bữa (Ăn sáng, trưa, tự túc ăn chiều)
-Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
-
-- Khi đăng ký đặt cọc 50% số tiền tour
-- Thanh toán hết trước ngày khởi hành 5 ngày (tour ngày thường), trước ngày khởi hành 10 ngày (tour lễ tết)
-*/
   return (
     <>
       <div className="info">
-        <h1>Thêm Tour Mới</h1>
-        <a href="/tours-list">Quay lại</a>
+        <h1>Add New Tour</h1>
+        <a href="/tours-list">Back</a>
       </div>
       <div className="row row-1">
         <div className="col-xl-8">
           <div className="card mb-4">
-            <div className="card-header">Thông tin tour</div>
+            <div className="card-header">Tour Infomation</div>
             <div className="card-body">
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-8">
-                    <label className="small mb-1">Tên tour</label>
+                    <label className="small mb-1">Tour title</label>
                     <input
                       name="tourTitle"
                       className="form-control"
                       type="text"
-                      placeholder="Điền tên tour"
+                      placeholder="Name of the tour..."
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-4">
-                    <label className="small mb-1">Số ngày</label>
+                    <label className="small mb-1">Days</label>
                     <input
                       name="numberOfDay"
                       className="form-control"
                       type="text"
-                      placeholder="Điền số ngày"
+                      placeholder="Number of days..."
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  <label className="small mb-1">Địa chỉ</label>
-                  <LocationSelect onSelectLocation={handleSelectLocation} />
+                  <label className="small mb-1">Address</label>
+                  <LocationSelect
+                    onSelectLocation={handleSelectLocation}
+                    english
+                  />
 
                   <div className="mt-2">
                     <input
                       name="moreLocation"
                       className="form-control"
                       type="text"
-                      placeholder="Nhập địa chỉ (số nhà, tên đường)"
+                      placeholder="Enter house number, street name,..."
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-8">
-                    <label className="small mb-1">Mô tả</label>
+                    <label className="small mb-1">Description</label>
                     <textarea
                       name="tourDescription"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Nhập mô tả"
+                      placeholder="Enter description"
                       rows="4"
                     />
                   </div>
                   <div className="col-md-4">
-                    <label className="small mb-1">Đối tượng phù hợp</label>
+                    <label className="small mb-1">Suitable Person</label>
                     <input
                       name="suitablePerson"
                       className="form-control"
                       type="text"
-                      placeholder="Mọi người"
+                      placeholder="Enter a suitable person..."
+                      onChange={handleChange}
+                    />
+                    <label className="small ">Price</label>
+                    <input
+                      name="price"
+                      className="form-control"
+                      type="text"
+                      placeholder="Enter price..."
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3 ">
                   <div className="col-md-6 d-flex  align-items-center">
-                    <label className="small mb-1">Mùa thích hợp từ ngày</label>
+                    <label className="small mb-1">
+                      Suitable season from date
+                    </label>
                     <input
+                      maxLength={5}
                       name="startDate"
                       className="form-control w-50 ms-2"
-                      placeholder="Vd: 15-05"
+                      placeholder="Ex: 15-05"
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-6 d-flex  align-items-center ">
-                    <label className="small mb-1">đến ngày</label>
+                    <label className="small mb-1">to</label>
                     <input
+                      maxLength={5}
                       name="endDate"
                       className="form-control w-50 ms-2"
-                      placeholder="Vd: 15-07"
+                      placeholder="Ex: 15-07"
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 border-top">
-                    <label className="pt-1 mb-1">Mô tả chi tiết tour</label>
+                    <label className="pt-1 mb-1">
+                      Detailed tour description
+                    </label>
                     <textarea
                       name="tourDetail"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Nhập mô tả"
+                      placeholder="Enter tour description by day..."
                       rows="4"
                     />
                   </div>
-                  {/* <div className="col-md-4 border-top">
-                    <label className="pt-1 small mb-1">Số ngày</label>
-                    <input
-                      name="day"
-                      className="form-control mb-2"
-                      type="text"
-                      placeholder="Điền số ngày"
-                      onChange={handleChange}
-                    />{" "}
-                    <label className="small ">Giá tiền</label>
-                    <input
-                      name="price"
-                      className="form-control"
-                      type="text"
-                      placeholder="Điền giá tiền"
-                      onChange={handleChange}
-                    />
-                  </div> */}
                 </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 ">
-                    <label className="small mb-1">
-                      Chính sách và điều khoản
-                    </label>
+                    <label className="small mb-1">Policies and terms</label>
                     <textarea
                       name="termAndCondition"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Nhập chính sách và điều khoản"
+                      placeholder="Enter term and policies"
                       rows="3"
                     />
                   </div>
@@ -269,71 +298,101 @@ Ngày 5 - NHA TRANG – TP.HCM Số bữa ăn: 2 bữa (Ăn sáng, trưa)
                   type="button"
                   onClick={handleSubmit}
                 >
-                  Tạo tour
+                  Create Tour
                 </button>
               </form>
             </div>
           </div>
         </div>
+
         <div className="col-xl-4 px-xl-0">
           <div className="card mb-4 mb-xl-0">
-            <div className="card-header">Video</div>
+            <div className="card-header">Thumbnail</div>
             <div className="card-body text-center">
               <img
-                className="img-account-profile rounded-circle mb-2"
-                src={"/noavatar.png"}
+                className="img-account-profile  mb-2"
+                src={formData.profileThumbnail || "/noavatar.png"}
                 alt=""
               />{" "}
               <input
                 className="chooseFile"
                 type="file"
                 accept=".jpg,.png"
-                // onChange={handleSelectImage}
+                onChange={(e) => handleSelectImage(e, -1)}
                 style={{ display: "none" }}
-                // ref={fileInputRef}
+                ref={fileInputRef}
               />
               <div className="small font-italic text-muted mb-4">
-                JPG hoặc PNG không quá 5 MB
+                JPG or PNG must not exceed 2 MB
               </div>
               <button
                 className="btn btn-primary"
                 type="button"
-                // onClick={handleUploadButtonClick}
+                onClick={handleUploadButtonClick}
               >
-                Tải lên video
+                Upload Thumbnail
               </button>
             </div>
           </div>
-          <div className="card mb-4 mb-xl-0 mt-xl-2">
-            <div className="card-header">Ảnh</div>
+          <div className="card mb-4 mb-xl-0 mt-3">
+            <div className="card-header">Image list</div>
             <div className="card-body text-center">
-              <img
-                className="img-account-profile rounded-circle mb-2"
-                src={"/noavatar.png"}
-                alt=""
-              />{" "}
-              <input
-                className="chooseFile"
-                type="file"
-                accept=".jpg,.png"
-                // onChange={handleSelectImage}
-                style={{ display: "none" }}
-                // ref={fileInputRef}
-              />
-              <div className="small font-italic text-muted mb-4">
-                JPG hoặc PNG không quá 5 MB
-              </div>
               <button
                 className="btn btn-primary"
                 type="button"
-                // onClick={handleUploadButtonClick}
+                onClick={openModal}
               >
-                Tải lên ảnh
+                Upload Image List
               </button>
             </div>
           </div>
         </div>
       </div>
+      {showModal && (
+        <div className="modal-overlay2" onClick={handleOverlayClick}>
+          <div className="modal2 col-xl-6">
+            <div className="d-flex wrap-modal-addtour">
+              <span className="card-header">Image list</span>
+              <button className="close-btn2" onClick={closeModal}>
+                X
+              </button>
+            </div>
+            <div className="  d-flex image-list">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div key={index} className="mb-2 d-flex flex-column mx-2">
+                  <img
+                    className="img-account-profile"
+                    src={
+                      formData.image[index]
+                        ? formData.image[index]
+                        : "/noavatar.png"
+                    }
+                    alt=""
+                  />
+                  <input
+                    className="chooseFile"
+                    type="file"
+                    accept=".jpg, .png"
+                    onChange={(e) => handleSelectImage(e, index)}
+                    style={{ display: "none" }}
+                    ref={fileInputRefs.current[index]}
+                  />
+                  <div className="small font-italic text-muted my-2">
+                    JPG or PNG must not exceed 2 MB
+                  </div>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleUploadButtonClick6(index)}
+                  >
+                    Upload Image
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </>
   );

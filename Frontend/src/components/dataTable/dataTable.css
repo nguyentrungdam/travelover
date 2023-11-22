@@ -8,7 +8,6 @@
 .dataTable .dataGrid img {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
   object-fit: cover;
 }
 .dataTable .dataGrid .action {
@@ -27,4 +26,16 @@
 }
 .css-kzyyzb-MuiDataGrid-root .MuiDataGrid-columnHeader {
   padding: 0 !important;
+}
+.css-kzyyzb-MuiDataGrid-root {
+  font-family: Quicksand, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+}
+.css-pdct74-MuiTablePagination-selectLabel,
+.css-levciy-MuiTablePagination-displayedRows {
+  font-family: Quicksand, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 1rem !important;
+  margin-bottom: 0px !important;
 }

@@ -14,6 +14,11 @@ import ScrollToTop from "../../../shared/ScrollToTop";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { searchTour } from "../../../slices/tourSlice";
+import {
+  FormatLine,
+  formatCurrencyWithoutD,
+  validateOriginalDate,
+} from "../../../utils/validate";
 
 const TourDetail = () => {
   const location = useLocation();
@@ -27,7 +32,7 @@ const TourDetail = () => {
   const province = state ? state.province : "";
   const startDate = state ? state.startDate : "";
   const numberOfDay = state ? state.numberOfDay : "";
-  const numberOfPeople = state ? state.numberOfPeople : "";
+  const numberOfPeople = state ? state.numberOfPeople : 1;
   console.log(tourId, province, startDate, numberOfDay, numberOfPeople);
   const [activeDay, setActiveDay] = useState(null);
   useEffect(() => {
@@ -39,6 +44,8 @@ const TourDetail = () => {
         startDate,
         numberOfDay,
         numberOfPeople,
+        pageSize: 1,
+        pageNumber: 1,
       })
     ).unwrap();
   }, []);
@@ -67,7 +74,12 @@ const TourDetail = () => {
 
     setSlideNumber(newSlideNumber);
   };
-
+  const totalPriceRoom = tours[0]?.hotel.room.reduce((acc, room) => {
+    if (room.status) {
+      return acc + room.price;
+    }
+    return acc;
+  }, 0);
   return (
     <div>
       <ScrollToTop />
@@ -97,10 +109,16 @@ const TourDetail = () => {
         )}
         <div className="hotelWrapper container">
           <div className="d-flex justify-content-between align-items-center">
-            <h1 className="hotelTitle">{tours[0]?.tour?.tourTitle}</h1>
-            <div className="d-flex gap-2  align-items-center">
+            <h1 className="hotelTitle col-md-6">{tours[0]?.tour?.tourTitle}</h1>
+            <div className="col-md-6 d-flex gap-2  align-items-center justify-content-end">
               <p className="mb-0">
-                <span className="price-total ">1.000.000đ </span>/khách
+                <span className="price-total ">
+                  {formatCurrencyWithoutD(
+                    tours[0]?.tour?.price + totalPriceRoom
+                  )}
+                  ₫{" "}
+                </span>
+                /khách
               </p>
               <button className="bookNow" onClick={() => handleOrder()}>
                 Đặt Ngay
@@ -109,14 +127,8 @@ const TourDetail = () => {
           </div>
           <div className="hotelAddress">
             <FontAwesomeIcon icon={faLocationDot} />
-            <span>Elton St 125 New york</span>
+            <span className="fz-14">{tours[0]?.tour?.address.province}</span>
           </div>
-          <span className="hotelDistance">
-            Excellent location – 500m from center
-          </span>
-          <span className="hotelPriceHighlight">
-            Book a stay over $114 at this property and get a free airport taxi
-          </span>
           <div className="hotelImages">
             {photos.map((photo, i) => (
               <div className="hotelImgWrapper" key={i}>
@@ -131,29 +143,39 @@ const TourDetail = () => {
           </div>
           <div className="hotelDetails">
             <div className="hotelDetailsTexts col-md-7">
-              <h1 className="hotelTitle">Stay in the heart of City</h1>
-              <p className="hotelDesc">
-                Located a 5-minute walk from St. Florian's Gate in Krakow, Tower
-                Street Apartments has accommodations with air conditioning and
-                free WiFi. The units come with hardwood floors and feature a
-                fully equipped kitchenette with a microwave, a flat-screen TV,
-                and a private bathroom with shower and a hairdryer. A fridge is
-                also offered, as well as an electric tea pot and a coffee
-                machine. Popular points of interest near the apartment include
-                Cloth Hall, Main Market Square and Town Hall Tower. The nearest
-                airport is John Paul II International Kraków–Balice, 16.1 km
-                from Tower Street Apartments, and the property offers a paid
-                airport shuttle service.
-              </p>
+              <p className="hotelDesc">{tours[0]?.tour?.tourDescription}</p>
               <div className="group-services">
-                {servicesData.map((service, index) => (
-                  <div className="item" key={index}>
-                    <img src="/noavatar.png" className="icon-img" alt="" />
-                    <label>{service.label}</label>
-                    <p>{service.value}</p>
-                  </div>
-                ))}
+                <div className="item">
+                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <label>Thời gian</label>
+                  <p>{tours[0]?.tour?.numberOfDay} ngày</p>
+                </div>
+                <div className="item">
+                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <label>Đối tượng phù hợp</label>
+                  <p>{tours[0]?.tour?.suitablePerson} </p>
+                </div>
+                <div className="item">
+                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <label>Mùa thích hợp</label>
+                  <p>
+                    {validateOriginalDate(
+                      tours[0]?.tour?.reasonableTime.startDate
+                    )}{" "}
+                    đến{" "}
+                    {validateOriginalDate(
+                      tours[0]?.tour?.reasonableTime.endDate
+                    )}
+                  </p>
+                </div>
+                <div className="item">
+                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <label>Khách sạn</label>
+                  <p>{tours[0]?.hotel?.hotelName} </p>
+                </div>
               </div>
+              <h5>Chính sách và điều khoản</h5>
+              <FormatLine text={tours[0]?.tour?.termAndCondition} />
             </div>
             <div className="hotelDetailsPrice col-md-5">
               <h2>Chi tiết giá tour</h2>
@@ -165,24 +187,29 @@ const TourDetail = () => {
                       <th className="l2">Giá </th>
                     </tr>
                     <tr>
-                      <td>Người lớn (Từ 12 tuổi trở lên)</td>
-                      <td className="t-price">4,990,000 đ</td>
+                      <td>Giá tour</td>
+                      <td className="t-price">
+                        {formatCurrencyWithoutD(tours[0]?.tour?.price)}₫
+                      </td>
                     </tr>
-                    <tr>
-                      <td>Trẻ em (Từ 5 - 11 tuổi)</td>
-                      <td className="t-price">3,742,500 đ</td>
-                    </tr>
-                    <tr>
-                      <td>Trẻ nhỏ (Từ 2 - 4 tuổi)</td>
-                      <td className="t-price">2,300,000 đ</td>
-                    </tr>
-                    <tr>
-                      <td>Em bé ( Dưới 2 tuổi )</td>
-                      <td className="t-price">230,000 đ</td>
-                    </tr>
+                    <td>Khách sạn:</td>
+                    {tours[0]?.hotel?.room.map((room, i) => (
+                      <tr>
+                        <td className="ps-4 p-0">Phòng {i + 1}</td>
+                        <td className="t-price p-0">
+                          {formatCurrencyWithoutD(room.price)}₫
+                        </td>
+                      </tr>
+                    ))}
+
                     <tr className="total1">
                       <td>Tổng cộng</td>
-                      <td className="t-price">320 đ</td>
+                      <td className="t-price">
+                        {formatCurrencyWithoutD(
+                          tours[0]?.tour?.price + totalPriceRoom
+                        )}
+                        ₫
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -209,22 +236,22 @@ const TourDetail = () => {
               <div className="row">
                 <div className="col-md-4 col-12 left">
                   <div className="go-tour">
-                    {tripDays.map((day, index) => (
-                      <div key={index} className={`day day-0${day.day}`}>
+                    {tours[0]?.tour?.tourDetailList.map((day, index) => (
+                      <div key={index} className={`day day-0${index + 1}`}>
                         <div className="wrapper">
                           <span className="date-left">Ngày</span>
                           <a
-                            href={`#day-0${day.day}`}
+                            href={`#day-0${index + 1}`}
                             className={`date-center  ${
-                              activeDay === day.day ? "active1" : ""
+                              activeDay === index + 1 ? "active1" : ""
                             }`}
-                            onClick={() => setActiveDay(day.day)}
+                            onClick={() => setActiveDay(index + 1)}
                           >
-                            {day.day}
+                            {index + 1}
                           </a>
                           <span className="date-right">
-                            <span className="date-hotel">{day.date}</span>
-                            <span className="location">{day.location}</span>
+                            {/* <span className="date-hotel">{day.date}</span> */}
+                            <span className="location">{day.title}</span>
                           </span>
                         </div>
                       </div>
@@ -232,11 +259,9 @@ const TourDetail = () => {
                   </div>
                 </div>
                 <div className="col-md-8 col-12 right timeline-section">
-                  {tripDays.map((day, index) => (
+                  {tours[0]?.tour?.tourDetailList.map((day, index) => (
                     <div key={index}>
-                      <h3 id={`day-0${day.day}`}>
-                        Ngày {day.day} - {day.location}
-                      </h3>
+                      <h3 id={`day-0${index + 1}`}>{day.title}</h3>
                       <div className="excerpt">
                         <span className="line"></span>
                         <div style={{ textAlign: "justify" }}>

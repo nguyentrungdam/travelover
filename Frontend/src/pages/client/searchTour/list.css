@@ -192,7 +192,7 @@ strong {
 .tour-item__image {
   position: relative;
   overflow: hidden;
-  padding-top: 66.14285714%;
+  padding-top: 57.14285714%;
   border-radius: 10px 10px 0 0;
 }
 .tour-item__image a {
@@ -258,6 +258,7 @@ strong {
 }
 .tour-item__code {
   margin-bottom: 10px;
+  height: 72px;
 }
 .font-weight-bold {
   font-weight: bold;
@@ -336,4 +337,38 @@ strong {
 .sorry-text {
   color: var(--secondary-color);
   font-weight: bold;
+}
+/*! phân trang */
+.contain-pagination {
+  padding: 0;
+  margin-top: 50px;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.a {
+  width: 40px;
+  height: 40px;
+  padding: 8px 14px;
+}
+.active {
+  color: #ff01bd;
+}
+.li {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  background-color: #f5f5f5;
+  text-align: center;
+  border-radius: 50%;
+}
+.li:hover {
+  background-color: pink;
 }
