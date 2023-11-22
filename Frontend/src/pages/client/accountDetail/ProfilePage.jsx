@@ -4,7 +4,9 @@ import {
   getAccountProfile,
   updateUserInfo,
 } from "../../../slices/accountSlice";
-
+import { axiosMultipart } from "../../../apis/axios";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const ProfilePage = () => {
   const fileInputRef = useRef();
   const dispatch = useDispatch();
@@ -15,8 +17,8 @@ const ProfilePage = () => {
     lastName: "",
     address: "",
     phoneNumber: "",
-    avatar: null,
-    profilePictureToChange: null,
+    avatar: "",
+    profilePicture: "",
   });
 
   useEffect(() => {
@@ -34,40 +36,60 @@ const ProfilePage = () => {
   }, [account]);
   const handleSelectImage = (e) => {
     const selectedFile = e.target.files[0];
-    const imageUrl = URL.createObjectURL(selectedFile); // Tạo URL từ tệp ảnh
-
-    setUserInfo({
-      ...userInfo,
-      avatar: imageUrl, // Lưu địa chỉ URL của ảnh
-      profilePictureToChange: selectedFile,
-    });
+    console.log(selectedFile);
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    axiosMultipart
+      .post("/images/create", formData)
+      .then((response) => {
+        const imageUrl = response.data.data.url;
+        // Cập nhật state của formData với giá trị thumbnailUrl từ API
+        setUserInfo((prevFormData) => ({
+          ...prevFormData,
+          avatar: imageUrl,
+        }));
+      })
+      .catch((error) => {
+        console.error("Lỗi khi gọi API:", error);
+      });
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setUserInfo((prevFormData) => ({
+          ...prevFormData,
+          profilePicture: reader.result,
+        }));
+      } else return;
+    };
+    reader.readAsDataURL(e.target.files[0]);
   };
   function handleUploadButtonClick() {
     fileInputRef.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
   }
   const handleSave = async (e) => {
     e.preventDefault();
-    const form = new FormData();
-    form.append("firstName", userInfo.firstName);
-    form.append("lastName", userInfo.lastName);
-    form.append("address", userInfo.address);
-    form.append("phoneNumber", userInfo.phoneNumber);
-    if (userInfo.profilePictureToChange) {
-      form.append("avatar", userInfo.profilePictureToChange);
+
+    console.log(userInfo);
+    try {
+      const res = await dispatch(
+        updateUserInfo({
+          address: userInfo.address,
+          phoneNumber: userInfo.phoneNumber,
+          avatar: userInfo.avatar,
+          firstName: userInfo.firstName,
+          lastName: userInfo.lastName,
+        })
+      ).unwrap();
+      console.log(res);
+      if (res.data.status === "ok") {
+        notify(1);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      }
+    } catch (err) {
+      notify(2);
     }
-    console.log(userInfo.avatar);
-    console.log(userInfo.profilePictureToChange);
-    // try {
-    //   const res = await dispatch(updateUserInfo(form)).unwrap();
-    //   console.log(res);
-    //   if (res.data.status === "ok") {
-    //     alert("OK");
-    //     window.location.reload();
-    //   }
-    // } catch (err) {
-    //   alert(err.message);
-    //   // alert("Vui lòng kiểm tra lại các thông tin cho chính xác!");
-    // }
   };
   const handleChangeFirstName = (e) => {
     setUserInfo({ ...userInfo, firstName: e.target.value });
@@ -81,6 +103,21 @@ const ProfilePage = () => {
   const handleChangePhone = (e) => {
     setUserInfo({ ...userInfo, phoneNumber: e.target.value });
   };
+  const notify = (prop) => {
+    if (prop === 1) {
+      toast.success("Cập nhật thành công ! 👌", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+        pauseOnHover: true,
+      });
+    } else {
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+        position: toast.POSITION.TOP_RIGHT,
+        pauseOnHover: true,
+        autoClose: 1000,
+      });
+    }
+  };
   return (
     <div>
       <div className="row">
@@ -91,7 +128,9 @@ const ProfilePage = () => {
               <img
                 className="img-account-profile rounded-circle mb-2"
                 src={
-                  userInfo.avatar || account?.data?.avatar || "/noavatar.png"
+                  userInfo.profilePicture ||
+                  account?.data?.avatar ||
+                  "/noavatar.png"
                 }
                 alt=""
               />{" "}
@@ -228,6 +267,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

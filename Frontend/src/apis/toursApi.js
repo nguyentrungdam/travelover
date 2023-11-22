@@ -18,7 +18,7 @@ const toursApi = {
     return axios.get(url);
   },
   searchTour: (tour) => {
-    const url = `/tours/search?province=${tour.province}&startDate=${tour.startDate}&numberOfDay=${tour.numberOfDay}&numberOfPeople=${tour.numberOfPeople}`;
+    const url = `/tours/search?keyword=${tour.keyword}&province=${tour.province}&startDate=${tour.startDate}&numberOfDay=${tour.numberOfDay}&numberOfPeople=${tour.numberOfPeople}&pageSize=${tour.pageSize}&pageNumber=${tour.pageNumber}`;
     return axios.get(url);
   },
 };

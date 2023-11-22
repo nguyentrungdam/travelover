@@ -24,7 +24,7 @@ const DataTable = (props) => {
 
   const actionColumn = {
     field: "action",
-    headerName: "Hành động",
+    headerName: "Action",
     width: 200,
     renderCell: (params) => {
       return (

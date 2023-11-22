@@ -13,6 +13,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../../components/Loading/Loading";
 import { searchTour } from "../../../slices/tourSlice";
+import {
+  formatCurrencyWithoutD,
+  validateOriginalDate,
+} from "../../../utils/validate";
 
 const Tours = () => {
   const navigate = useNavigate();
@@ -24,18 +28,6 @@ const Tours = () => {
     numberOfDay: "",
     numberOfPeople: "",
   });
-
-  useEffect(() => {
-    dispatch(
-      searchTour({
-        province: "",
-        startDate: "",
-        numberOfDay: "",
-        numberOfPeople: 1,
-      })
-    );
-  }, []);
-  console.log(tours);
 
   const updateParentState = (newState) => {
     setParentState((prevState) => ({ ...prevState, ...newState }));
@@ -49,10 +41,13 @@ const Tours = () => {
   const handleViewDetail = (tourId) => {
     navigate(`/tours/tour-detail/${tourId}`, {
       state: {
+        keyword: tourId,
         province: parentState.selectedLocation.province,
         startDate: parentState.startDate,
         numberOfDay: parentState.numberOfDay,
-        numberOfPeople: parentState.numberOfDay,
+        numberOfPeople: parentState.numberOfPeople,
+        pageSize: 1,
+        pageNumber: 1,
       },
     });
   };
@@ -60,10 +55,13 @@ const Tours = () => {
     // Gọi API ở đây với searchParams
     const res1 = dispatch(
       searchTour({
+        keyword: "",
         province: searchParams.selectedLocation.province,
         startDate: searchParams.startDate,
         numberOfDay: searchParams.numberOfDay,
         numberOfPeople: searchParams.numberOfPeople,
+        pageSize: 0,
+        pageNumber: 0,
       })
     );
     console.log(res1);
@@ -95,8 +93,8 @@ const Tours = () => {
                 <div className="d-none d-lg-block">
                   <div className="order-by">
                     <div className="order-by-title">
-                      Chúng tôi tìm thấy <strong>{tours.length}</strong> tours
-                      cho Quý khách.
+                      Chúng tôi tìm thấy <strong>{tours?.length || 0}</strong>{" "}
+                      tours cho Quý khách.
                     </div>
                     <div className="order-by-left">
                       <div className="order-wrap">
@@ -126,20 +124,15 @@ const Tours = () => {
                     <div className="card tour-item">
                       <div className="position-relative">
                         <div className="tour-item__image">
-                          <a
-                            href="/tourNDSGN869-021-191123XE-V-F/sieu-sale-🔥-|-vung-tau-sac-mau-bien-xanh-|-kich-cau-du-lich-.aspx?LM=0"
-                            title="Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du lịch "
-                          >
-                            <img
-                              src="https://media.travel.com.vn/destination/tf_230614013334_101846_BAI BIEN THUY VAN (minh hoa).jpg"
-                              id="imgaddtour_0ae974d0-6bf1-489c-9949-1d74ce7d887b"
-                              className="card-img-top img-fluid"
-                              alt="Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du lịch "
-                              width="309"
-                              height="220"
-                              loading="lazy"
-                            />
-                          </a>
+                          <img
+                            src={item?.tour.thumbnailUrl}
+                            id="imgaddtour_0ae974d0-6bf1-489c-9949-1d74ce7d887b"
+                            className="card-img-top img-fluid"
+                            alt={item?.tour.tourTitle}
+                            width="309"
+                            height="220"
+                            loading="lazy"
+                          />
 
                           <div className="tour-item__image-inner__bottom">
                             <span className="tour-item__image-inner__bottom__category">
@@ -155,15 +148,17 @@ const Tours = () => {
                       </div>
                       <div className="card-body p-3">
                         <p className="tour-item__date mb-1">
-                          19/11/2023 - Trong ngày - Giờ đi: 05:30
+                          Thời gian thích hợp:{" "}
+                          {validateOriginalDate(
+                            item?.tour.reasonableTime.startDate
+                          )}{" "}
+                          đến{" "}
+                          {validateOriginalDate(
+                            item?.tour.reasonableTime.endDate
+                          )}
                         </p>
                         <h3 className="card-text tour-item__title mb-1">
-                          <a
-                            href="/tourNDSGN869-021-191123XE-V-F/sieu-sale-🔥-|-vung-tau-sac-mau-bien-xanh-|-kich-cau-du-lich-.aspx?LM=0"
-                            title="Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du lịch "
-                          >
-                            {item?.tour.tourTitle}
-                          </a>
+                          {item?.tour.tourTitle}
                         </h3>
                         <div className="tour-item__code">
                           <div>Đối tượng thích hợp:</div>
@@ -183,7 +178,7 @@ const Tours = () => {
                             <div className="tour-item__price--old"></div>
                             <div className="tour-item__price--current fix-leftalign">
                               <span className="tour-item__price--current__number pe-2 mb-0">
-                                299,000₫
+                                {formatCurrencyWithoutD(item?.tour.price)}₫
                               </span>
                             </div>
                             <div className="tour-item__price--current">
@@ -212,7 +207,7 @@ const Tours = () => {
                   </div>
                 ))}
               </div>
-              {tours?.length === 0 ? (
+              {tours?.length === 0 || !tours?.length ? (
                 <div className="d-flex justify-content-center flex-column align-items-center pt-5">
                   <img src="/sorry.png" alt="sorry" className="sorry-img" />
                   <h5 className="sorry-text">

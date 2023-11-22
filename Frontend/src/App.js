@@ -56,15 +56,17 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<AccountDetail />} />
-      {/* <Route path="/thank-you" element={<ThankYou />} /> */}
       <Route path="/tours/search-tour" element={<List />} />
       <Route path="/tours/tour-detail/:tourId" element={<TourDetail />} />
       <Route path="/tours/tour-booking" element={<TourBooking />} />
+      {/* <Route path="/thank-you" element={<ThankYou />} /> */}
 
       <Route path="/*" element={<Page404 />} />
       {/* admin route */}
       {/* "email": "admind@gmail.com",
-  "password": "123456@Aa" */}
+  "password": "123456@Aa"
+  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuYW1AZ21haWwuY29tIiwiaWF0IjoxNzAwMDI3OTI1LCJleHAiOjE3MDEyMzc1MjV9.PQm_UQhbn7eB5ApirkMav91RqlaBzFAHrAsX82w_cIiOK9Hriajg6sEFsKgJqRu8XXVEwy1SIRYfXn0lOKu6Xw
+   */}
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />

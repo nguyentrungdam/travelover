@@ -11,7 +11,7 @@ const columns = [
   { field: "id", headerName: "ID", width: 50 },
   {
     field: "img",
-    headerName: "Ảnh",
+    headerName: "Image",
     width: 100,
     renderCell: (params) => {
       return <img src={params.row.img || "/noavatar.png"} alt="" />;
@@ -20,13 +20,13 @@ const columns = [
   {
     field: "firstName",
     type: "string",
-    headerName: "Họ",
+    headerName: "First Name",
     width: 150,
   },
   {
     field: "lastName",
     type: "string",
-    headerName: "Tên",
+    headerName: "Last Name",
     width: 150,
   },
   {
@@ -38,12 +38,12 @@ const columns = [
   {
     field: "role",
     type: "string",
-    headerName: "Vai trò",
+    headerName: "Role",
     width: 150,
   },
   {
     field: "createdAt",
-    headerName: "Ngày tạo",
+    headerName: "Create At",
     width: 120,
     type: "string",
   },
