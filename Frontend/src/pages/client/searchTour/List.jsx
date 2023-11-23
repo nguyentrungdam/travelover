@@ -1,7 +1,7 @@
 import "./list.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
 import ScrollToTop from "../../../shared/ScrollToTop";
@@ -87,6 +87,7 @@ const List = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  const tomorrow = addDays(new Date(), 1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,7 +177,7 @@ const List = () => {
                       value={selectedDate}
                       locale={vi} // Thiết lập ngôn ngữ Tiếng Việt
                       dateFormat="dd-MM-yyyy" // Định dạng ngày tháng
-                      minDate={new Date()} // Chỉ cho phép chọn ngày từ hôm nay trở đi
+                      minDate={tomorrow} // Chỉ cho phép chọn ngày từ mai trở đi
                     />
                   </div>
                   <div className="tour-search-result__filter__block mb-2 d-flex align-items-center">

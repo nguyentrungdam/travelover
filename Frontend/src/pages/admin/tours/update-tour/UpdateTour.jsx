@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTourDetail, updateTour } from "../../../../slices/tourSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { validateOriginalDate } from "../../../../utils/validate";
 import { axiosMultipart } from "../../../../apis/axios";
 const UpdateTour = () => {
@@ -14,16 +14,14 @@ const UpdateTour = () => {
   const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
   const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
-  const calculateIdFull = (id) => {
-    const idFull = `TR${"0".repeat(12 - id.toString().length)}${id}`;
-    return idFull;
-  };
   const { loading, tour } = useSelector((state) => state.tour);
-
   useEffect(() => {
-    const idFull = calculateIdFull(id);
-    dispatch(getTourDetail(idFull)).unwrap();
+    dispatch(getTourDetail(id)).unwrap();
   }, []);
+  //lấy path
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.pathname);
+  console.log(location.pathname);
 
   const [selectedLocation, setSelectedLocation] = useState({
     province: "",
@@ -38,7 +36,7 @@ const UpdateTour = () => {
       fileInputRefs.current[index].current.click();
     }
   };
-  console.log(tour);
+  // console.log(tour);
   const handleSelectImage = (e, index) => {
     console.log(index);
     const selectedFile = e.target.files[0];
@@ -102,7 +100,7 @@ const UpdateTour = () => {
     e.preventDefault();
     const formDataUpdate = new FormData();
     // Thêm các trường dữ liệu vào formDataUpdate
-    formDataUpdate.append("tourId", calculateIdFull(id));
+    formDataUpdate.append("tourId", id);
     formDataUpdate.append("tourTitle", formData.tourTitle || tour.tourTitle);
     formDataUpdate.append(
       "thumbnailUrl",

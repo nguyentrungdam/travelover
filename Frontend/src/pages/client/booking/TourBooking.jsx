@@ -1,10 +1,101 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./TourBooking.css";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarMinus, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { searchTour } from "../../../slices/tourSlice";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { orderTour } from "../../../slices/orderSlice";
+import { axiosInstance } from "../../../apis/axios";
 const TourBooking = () => {
+  const { loading, tours } = useSelector((state) => state.tour);
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const { tourId } = useParams();
+  const { state } = location;
+  const province = state ? state.province : "";
+  const startDate = state ? state.startDate : "";
+  const numberOfDay = state ? state.numberOfDay : "";
+  const numberOfPeople = state ? state.numberOfPeople : 1;
+  const [customerInformation, setCustomerInformation] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+  });
+  const [note, setNote] = useState("");
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const res = dispatch(
+      searchTour({
+        keyword: tourId,
+        province,
+        startDate,
+        numberOfDay,
+        numberOfPeople,
+        pageSize: 1,
+        pageNumber: 1,
+      })
+    ).unwrap();
+  }, []);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "fullName" || name === "email" || name === "phoneNumber") {
+      setCustomerInformation((prevCustomerInformation) => {
+        return {
+          ...prevCustomerInformation,
+          [name]: value,
+        };
+      });
+    } else if (name === "note") {
+      setNote(value);
+    }
+  };
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await dispatch(
+        orderTour({
+          startDate: startDate,
+          tourId,
+          hotelId: tours[0]?.hotel?.hotelId,
+          roomIdList: tours[0]?.hotel?.room.map((room) => room.roomId),
+          vehivleId: "",
+          carIdList: [],
+          guiderId: "",
+          personIdList: [],
+          customerInformation,
+          numberOfChildren: 0,
+          numberOfAdult: numberOfPeople,
+          note,
+        })
+      ).unwrap();
+      console.log(res);
+      if (res.data.status === "ok") {
+        let orderVNPayData = {
+          amount: res.data.data.totalPrice,
+          orderType: "tour",
+          orderInfo: res.data.data.orderId,
+          returnUrl: "http://localhost:3000/thank-you",
+        };
+        console.log(orderVNPayData);
+        axiosInstance
+          .post("/payments/vnpay/create", orderVNPayData)
+          .then((response) => {
+            window.location.href = response.data.data;
+          })
+          .catch((error) => {
+            console.error("Lỗi khi gọi API:", error);
+          });
+      }
+    } catch (err) {
+      alert(err);
+    }
+  };
   return (
     <div>
       <Header />
@@ -77,9 +168,9 @@ const TourBooking = () => {
                     <input
                       className="form-control"
                       id="contact_name"
-                      name="Fullname"
+                      name="fullName"
                       type="text"
-                      value=""
+                      onChange={handleChange}
                     />
                   </div>
                   <div className="mail">
@@ -89,9 +180,9 @@ const TourBooking = () => {
                     <input
                       className="form-control"
                       id="email"
-                      name="Email"
+                      name="email"
                       type="text"
-                      value=""
+                      onChange={handleChange}
                     />
                   </div>
                   <div className="phone">
@@ -101,20 +192,9 @@ const TourBooking = () => {
                     <input
                       className="form-control"
                       id="mobilephone"
-                      name="Telephone"
-                      onkeypress="return funCheckInt(event)"
+                      name="phoneNumber"
                       type="text"
-                      value=""
-                    />
-                  </div>
-                  <div className="addess">
-                    <label>Địa chỉ</label>
-                    <input
-                      className="form-control"
-                      id="address"
-                      name="Address"
-                      type="text"
-                      value=""
+                      onChange={handleChange}
                     />
                   </div>
                 </form>
@@ -128,6 +208,7 @@ const TourBooking = () => {
                     className="form-control"
                     cols="20"
                     id="note"
+                    onChange={handleChange}
                     name="note"
                     placeholder="Vui lòng nhập nội dung lời nhắn bằng tiếng Anh hoặc tiếng Việt"
                     rows="5"
@@ -247,6 +328,7 @@ const TourBooking = () => {
                     <button
                       className="btn btn-primary btn-order"
                       id="btnConfirm"
+                      onClick={handlePayment}
                     >
                       Đặt ngay
                     </button>

@@ -12,14 +12,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import { vi } from "date-fns/locale";
 import LocationSelect from "../pages/admin/tours/add-tour/LocationSelect";
 
 const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
   const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const tomorrow = addDays(new Date(), 1);
+  const [selectedDate, setSelectedDate] = useState(tomorrow);
+  const [startDate, setStartDate] = useState(format(tomorrow, "yyyy-MM-dd"));
   const [numberOfDay, setNumberOfDay] = useState("1-3");
   const [openOptions, setOpenOptions] = useState(false);
   const optionsRef = useRef(null);
@@ -96,7 +97,7 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
                 onChange={handleDateChange}
                 locale={vi} // Thiết lập ngôn ngữ Tiếng Việt
                 dateFormat="dd-MM-yyyy" // Định dạng ngày tháng
-                minDate={new Date()} // Chỉ cho phép chọn ngày từ hôm nay trở đi
+                minDate={tomorrow} // Chỉ cho phép chọn ngày từ ngày mai trở đi
               />
             </div>
           </div>

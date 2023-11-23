@@ -1,9 +1,12 @@
 import React from "react";
 import { Container, Row, Col, Button } from "reactstrap";
-import { Link } from "react-router-dom";
-import "../styles/thank-you.css";
+import { Link, useLocation } from "react-router-dom";
+import "../../../styles/thank-you.css";
 
 const ThankYou = () => {
+  let params = new URLSearchParams(window.location.search);
+  let abc = params.get("paymentStatus");
+  console.log(abc);
   return (
     <section>
       <Container>

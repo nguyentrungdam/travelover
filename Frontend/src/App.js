@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAccountProfile } from "./slices/accountSlice";
-import ThankYou from "./pages/ThankYou";
 import Page404 from "./components/404/404";
 import Home from "./pages/client/home/Home";
 import Login from "./pages/client/account/Login";
@@ -22,6 +21,7 @@ import ToursList from "./pages/admin/tours/tours";
 import AddTours from "./pages/admin/tours/add-tour/AddTours";
 import UpdateTour from "./pages/admin/tours/update-tour/UpdateTour";
 import Hotels from "./pages/admin/hotels/Hotels";
+import ThankYou from "./pages/client/booking/ThankYou";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -58,8 +58,8 @@ function App() {
       <Route path="/account" element={<AccountDetail />} />
       <Route path="/tours/search-tour" element={<List />} />
       <Route path="/tours/tour-detail/:tourId" element={<TourDetail />} />
-      <Route path="/tours/tour-booking" element={<TourBooking />} />
-      {/* <Route path="/thank-you" element={<ThankYou />} /> */}
+      <Route path="/tours/tour-booking/:tourId" element={<TourBooking />} />
+      <Route path="/thank-you" element={<ThankYou />} />
 
       <Route path="/*" element={<Page404 />} />
       {/* admin route */}
