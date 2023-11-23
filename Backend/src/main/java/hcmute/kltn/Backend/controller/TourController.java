@@ -66,7 +66,7 @@ public class TourController {
 			+ "- 'address': ''\n"
 			+ "- 'TourDetail': ''\n"
 			+ "- 'reasonableTime': ''\n";
-	@RequestMapping(value = "/update/", method = RequestMethod.PUT)
+	@RequestMapping(value = "/update", method = RequestMethod.PUT)
 	@Operation(summary = "Update tour - ADMIN / STAFF", description = updateTourDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> updateTour(
