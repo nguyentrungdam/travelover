@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import "./UpdateTours.css";
 import LocationSelect from "../add-tour/LocationSelect";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,12 +11,15 @@ import { axiosMultipart } from "../../../../apis/axios";
 const UpdateTour = () => {
   const fileInputRef = useRef();
   const dispatch = useDispatch();
+  const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
+  const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
   const calculateIdFull = (id) => {
     const idFull = `TR${"0".repeat(12 - id.toString().length)}${id}`;
     return idFull;
   };
   const { loading, tour } = useSelector((state) => state.tour);
+
   useEffect(() => {
     const idFull = calculateIdFull(id);
     dispatch(getTourDetail(idFull)).unwrap();
@@ -30,34 +33,35 @@ const UpdateTour = () => {
   function handleUploadButtonClick() {
     fileInputRef.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
   }
-  const handleSelectImage = (e) => {
+  const handleUploadButtonClick6 = (index) => () => {
+    if (fileInputRefs.current[index] && fileInputRefs.current[index].current) {
+      fileInputRefs.current[index].current.click();
+    }
+  };
+  console.log(tour);
+  const handleSelectImage = (e, index) => {
+    console.log(index);
     const selectedFile = e.target.files[0];
-    console.log(selectedFile.name);
-    const formData = new FormData();
-    formData.append("file", selectedFile);
+    const formDataClone = { ...formData };
+    const imageFormData = new FormData();
+    imageFormData.append("file", selectedFile);
+    const imageUrl = URL.createObjectURL(selectedFile);
     axiosMultipart
-      .post("/images/create", formData)
+      .post("/images/create", imageFormData)
       .then((response) => {
-        const imageUrl = response.data.data.url;
-        // Cập nhật state của formData với giá trị thumbnailUrl từ API
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          thumbnailUrl: imageUrl,
-        }));
+        if (index === -1) {
+          formDataClone.thumbnailUrl = response.data.data.url;
+          formDataClone.profileThumbnail = imageUrl;
+        } else {
+          formDataClone.image[index] = response.data.data.url;
+          formDataClone.profilePicture = imageUrl;
+        }
+        setFormData(formDataClone);
       })
       .catch((error) => {
+        notify(2);
         console.error("Lỗi khi gọi API:", error);
       });
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          profilePicture: reader.result,
-        }));
-      } else return;
-    };
-    reader.readAsDataURL(e.target.files[0]);
   };
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
@@ -75,6 +79,7 @@ const UpdateTour = () => {
     endDate: "",
     suitablePerson: "",
     termAndCondition: "",
+    image: ["", "", "", "", "", ""],
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,7 +101,6 @@ const UpdateTour = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     const formDataUpdate = new FormData();
-
     // Thêm các trường dữ liệu vào formDataUpdate
     formDataUpdate.append("tourId", calculateIdFull(id));
     formDataUpdate.append("tourTitle", formData.tourTitle || tour.tourTitle);
@@ -104,6 +108,9 @@ const UpdateTour = () => {
       "thumbnailUrl",
       formData.thumbnailUrl || tour.thumbnailUrl
     );
+    formData.image.forEach((image, index) => {
+      formDataUpdate.append(`image[${index}]`, image || tour.image?.[index]);
+    });
     formDataUpdate.append(
       "numberOfDay",
       formData.numberOfDay || tour.numberOfDay
@@ -152,17 +159,17 @@ const UpdateTour = () => {
     for (const [name, value] of formDataUpdate.entries()) {
       console.log(name, ":", value);
     }
-    // try {
-    //   const res = await dispatch(updateTour(formDataUpdate)).unwrap();
-    //   console.log(res);
-    //   if (res.data.status === "ok") {
-    //     notify(1);
-    //     window.location.reload();
-    //   }
-    // } catch (err) {
-    //   // notify(2);
-    //   alert(err.message);
-    // }
+    try {
+      const res = await dispatch(updateTour(formDataUpdate)).unwrap();
+      console.log(res);
+      if (res.data.status === "ok") {
+        notify(1);
+        window.location.reload();
+      }
+    } catch (err) {
+      // notify(2);
+      alert(err.message);
+    }
   };
   const notify = (prop) => {
     if (prop === 1) {
@@ -177,6 +184,19 @@ const UpdateTour = () => {
         pauseOnHover: true,
         autoClose: 1000,
       });
+    }
+  };
+  const openModal = () => {
+    setShowModal(true);
+    document.body.classList.add("modal-open");
+  };
+  const closeModal = () => {
+    setShowModal(false);
+    document.body.classList.remove("modal-open");
+  };
+  const handleOverlayClick = (e) => {
+    if (e.target.classList.contains("modal-overlay2")) {
+      closeModal();
     }
   };
   return (
@@ -199,7 +219,6 @@ const UpdateTour = () => {
                       className="form-control"
                       type="text"
                       defaultValue={tour.tourTitle}
-                      // placeholder={tour.tourTitle}
                       onChange={handleChange}
                     />
                   </div>
@@ -222,7 +241,7 @@ const UpdateTour = () => {
                   />
                   <div className="mt-2">
                     <input
-                      placeholder={tour.address?.moreLocation}
+                      defaultValue={tour.address?.moreLocation}
                       name="moreLocation"
                       className="form-control"
                       type="text"
@@ -332,14 +351,14 @@ const UpdateTour = () => {
             <div className="card-body text-center">
               <img
                 className="img-account-profile  mb-2"
-                src={tour.thumbnailUrl}
+                src={tour?.thumbnailUrl || "/noavatar.png"}
                 alt=""
               />{" "}
               <input
                 className="chooseFile"
                 type="file"
                 accept=".jpg,.png"
-                onChange={handleSelectImage}
+                onChange={(e) => handleSelectImage(e, -1)}
                 style={{ display: "none" }}
                 ref={fileInputRef}
               />
@@ -355,8 +374,65 @@ const UpdateTour = () => {
               </button>
             </div>
           </div>
+          <div className="card mb-4 mb-xl-0 mt-3">
+            <div className="card-header">Image list</div>
+            <div className="card-body text-center">
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={openModal}
+              >
+                Upload Image List
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+      {showModal && (
+        <div className="modal-overlay2" onClick={handleOverlayClick}>
+          <div className="modal2 col-xl-6">
+            <div className="d-flex wrap-modal-addtour">
+              <span className="card-header">Image list</span>
+              <button className="close-btn2" onClick={closeModal}>
+                X
+              </button>
+            </div>
+            <div className="  d-flex image-list">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div key={index} className="mb-2 d-flex flex-column mx-2">
+                  <img
+                    className="img-account-profile"
+                    src={
+                      formData.image[index]
+                        ? formData.image[index]
+                        : tour.image?.[index] ?? "/noavatar.png"
+                    }
+                    alt=""
+                  />
+                  <input
+                    className="chooseFile"
+                    type="file"
+                    accept=".jpg, .png"
+                    onChange={(e) => handleSelectImage(e, index)}
+                    style={{ display: "none" }}
+                    ref={fileInputRefs.current[index]}
+                  />
+                  <div className="small font-italic text-muted my-2">
+                    JPG or PNG must not exceed 2 MB
+                  </div>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleUploadButtonClick6(index)}
+                  >
+                    Upload Image
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer />
     </>
   );
