@@ -141,7 +141,6 @@ public class ImageService implements IImageService{
     private File getImageFile(String fileName) {
     	File dir = new File(uploadDir);
 		File[] fileList = dir.listFiles();
-		String fileFullName = new String();
 
         for (File itemFile : fileList) {
         	if (itemFile.getName().startsWith(fileName)) {
@@ -210,6 +209,24 @@ public class ImageService implements IImageService{
 		return checkDelete;
 	}
 	
+	private void deleteNotCheck(String imageId) {
+		// get image file
+		File imageFile = new File("");
+		
+		File dir = new File(uploadDir);
+		File[] fileList = dir.listFiles();
+		String fileFullName = new String();
+
+        for (File itemFile : fileList) {
+        	if (itemFile.getName().startsWith(imageId)) {
+        		imageFile = itemFile;
+        	}
+        }
+
+		// delete image file
+		imageFile.delete();
+	}
+	
 	private String getIdByUrl(String imageUrl) {
 		String[] urlSplit = imageUrl.split("/");
 		String[] fileName = urlSplit[urlSplit.length - 1].split("\\.");
@@ -245,9 +262,8 @@ public class ImageService implements IImageService{
 	public boolean deleteImageByUrl(String imageUrl) {
 		String imageId = getIdByUrl(imageUrl);
 		
-		boolean checkDelete = false;
-		checkDelete = deleteImage(imageId);
+		deleteNotCheck(imageId);
 
-		return checkDelete;
+		return true;
 	}
 }
