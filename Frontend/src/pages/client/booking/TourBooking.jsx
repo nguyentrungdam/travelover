@@ -9,11 +9,23 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { orderTour } from "../../../slices/orderSlice";
 import { axiosInstance } from "../../../apis/axios";
+import { addDays, format } from "date-fns";
+import { vi } from "date-fns/locale";
+import {
+  formatCurrencyWithoutD,
+  validateEmail,
+  validateVietnameseName,
+  validateVietnamesePhoneNumber,
+} from "../../../utils/validate";
+
 const TourBooking = () => {
   const { loading, tours } = useSelector((state) => state.tour);
   const location = useLocation();
   const dispatch = useDispatch();
   const { tourId } = useParams();
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const { state } = location;
   const province = state ? state.province : "";
   const startDate = state ? state.startDate : "";
@@ -25,7 +37,6 @@ const TourBooking = () => {
     phoneNumber: "",
   });
   const [note, setNote] = useState("");
-
   useEffect(() => {
     window.scrollTo(0, 0);
     const res = dispatch(
@@ -40,9 +51,43 @@ const TourBooking = () => {
       })
     ).unwrap();
   }, []);
+  console.log(tours);
+  //validate date
+  const startDateString = new Date(startDate);
+  const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
+  const endDateString = new Date(endDate);
+  const formattedEndDate = format(endDateString, "iii, dd MMMM, yyyy", {
+    locale: vi,
+  });
+  const formattedStartDate = format(startDateString, "iii, dd MMMM, yyyy", {
+    locale: vi,
+  });
+  const totalPriceRoom = tours[0]?.hotel?.room.reduce((acc, room) => {
+    if (room.status) {
+      return acc + room.price;
+    }
+    return acc;
+  }, 0);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    if (name === "email") {
+      const isValidEmail = validateEmail(value);
+      setEmailError(isValidEmail ? "" : "Phải là một địa chỉ email hợp lệ!");
+    } else if (name === "fullName") {
+      const isValidName = validateVietnameseName(value);
+      setNameError(isValidName ? "" : "Tên không có kí tự đặc biệt!");
+    } else if (name === "phoneNumber") {
+      const isValidPhoneNumber = validateVietnamesePhoneNumber(value);
+      setPhoneError(
+        isValidPhoneNumber
+          ? ""
+          : "Số điện thoại chỉ bao gồm số và tối đa là 10!"
+      );
+    }
+
+    // Cập nhật giá trị của state chung
     if (name === "fullName" || name === "email" || name === "phoneNumber") {
       setCustomerInformation((prevCustomerInformation) => {
         return {
@@ -55,47 +100,58 @@ const TourBooking = () => {
     }
   };
 
+  console.log(tours);
   const handlePayment = async (e) => {
     e.preventDefault();
-    try {
-      const res = await dispatch(
-        orderTour({
-          startDate: startDate,
-          tourId,
-          hotelId: tours[0]?.hotel?.hotelId,
-          roomIdList: tours[0]?.hotel?.room.map((room) => room.roomId),
-          vehivleId: "",
-          carIdList: [],
-          guiderId: "",
-          personIdList: [],
-          customerInformation,
-          numberOfChildren: 0,
-          numberOfAdult: numberOfPeople,
-          note,
-        })
-      ).unwrap();
-      console.log(res);
-      if (res.data.status === "ok") {
-        let orderVNPayData = {
-          amount: res.data.data.totalPrice,
-          orderType: "tour",
-          orderInfo: res.data.data.orderId,
-          returnUrl: "http://localhost:3000/thank-you",
-        };
-        console.log(orderVNPayData);
-        axiosInstance
-          .post("/payments/vnpay/create", orderVNPayData)
-          .then((response) => {
-            window.location.href = response.data.data;
+    if (
+      !customerInformation.fullName ||
+      !customerInformation.email ||
+      !customerInformation.phoneNumber
+    ) {
+      alert("Vui lòng nhập đầy đủ các thông tin bắt buộc!");
+      return;
+    } else {
+      try {
+        const res = await dispatch(
+          orderTour({
+            startDate: startDate,
+            tourId,
+            hotelId: tours[0]?.hotel?.hotelId,
+            roomIdList: tours[0]?.hotel?.room.map((room) => room.roomId),
+            vehivleId: "",
+            carIdList: [],
+            guiderId: "",
+            personIdList: [],
+            customerInformation,
+            numberOfChildren: 0,
+            numberOfAdult: numberOfPeople,
+            note,
           })
-          .catch((error) => {
-            console.error("Lỗi khi gọi API:", error);
-          });
+        ).unwrap();
+        console.log(res);
+        if (res.data.status === "ok") {
+          let orderVNPayData = {
+            amount: res.data.data.totalPrice,
+            orderType: "tour",
+            orderInfo: res.data.data.orderId,
+            returnUrl: "http://localhost:3000/thank-you",
+          };
+          console.log(orderVNPayData);
+          axiosInstance
+            .post("/payments/vnpay/create", orderVNPayData)
+            .then((response) => {
+              window.location.href = response.data.data;
+            })
+            .catch((error) => {
+              console.error("Lỗi khi gọi API:", error);
+            });
+        }
+      } catch (err) {
+        alert(err);
       }
-    } catch (err) {
-      alert(err);
     }
   };
+
   return (
     <div>
       <Header />
@@ -104,13 +160,14 @@ const TourBooking = () => {
           <div className="row">
             <div className="col-12 top">
               <h2 className="h2-title">Tổng quan về chuyến đi</h2>
+
               <div className="product">
                 <div className="product-image">
                   <div className="image">
                     <img
-                      src="https://media.travel.com.vn/tour/tfd_230614015141_352277_TP VUNG TAU FLYCAM.jpg"
+                      src={tours[0]?.tour?.thumbnailUrl}
                       className="img-fluid"
-                      alt="image"
+                      alt={tours[0]?.tour?.tourTitle}
                     />
                   </div>
                 </div>
@@ -124,28 +181,15 @@ const TourBooking = () => {
                   </div>
 
                   <p className="title" id="title">
-                    Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du
-                    lịch{" "}
+                    {tours[0]?.tour?.tourTitle}
                   </p>
                   <div className="entry">
                     <div className="entry-inner">
                       <span>
-                        Mã Tour <b>NDSGN869-021-191123XE-V-F</b>
+                        Thời gian <b> {tours[0]?.tour?.numberOfDay} ngày</b>
                       </span>
                       <span>
-                        Khởi hành <b>19/11/2023</b>
-                      </span>
-                      <span>
-                        Thời gian <b>1 ngày</b>
-                      </span>
-                      <span>
-                        Nơi khởi hành <b>TP. Hồ Chí Minh</b>
-                      </span>
-                      <span>
-                        Số chỗ còn nhận <b>9</b>
-                      </span>
-                      <span>
-                        Dịch vụ tùy chọn <b>Xe suốt tuyến</b>
+                        Điểm đến <b>{tours[0]?.tour?.address?.province}</b>
                       </span>
                     </div>
                   </div>
@@ -161,41 +205,53 @@ const TourBooking = () => {
                   method="get"
                   id="form"
                 >
-                  <div className="name">
+                  <div className="name position-relative">
                     <label>
                       Họ và Tên <b>*</b>
                     </label>
                     <input
                       className="form-control"
+                      placeholder="Vd: Nguyễn Văn A"
                       id="contact_name"
                       name="fullName"
                       type="text"
                       onChange={handleChange}
-                    />
+                    />{" "}
+                    {nameError && (
+                      <span className="error-container1">{nameError}</span>
+                    )}
                   </div>
-                  <div className="mail">
+                  <div className="mail position-relative">
                     <label>
                       Email <b>*</b>
                     </label>
                     <input
+                      placeholder="Vd: nguyenvana@gmail.com"
                       className="form-control"
                       id="email"
                       name="email"
                       type="text"
                       onChange={handleChange}
-                    />
+                    />{" "}
+                    {emailError && (
+                      <span className="error-container1">{emailError}</span>
+                    )}
                   </div>
-                  <div className="phone">
+                  <div className="phone position-relative mt-2">
                     <label>
                       Số điện thoại <b>*</b>
                     </label>
                     <input
+                      placeholder="Vd: 0398765432"
                       className="form-control"
                       id="mobilephone"
                       name="phoneNumber"
                       type="text"
                       onChange={handleChange}
                     />
+                    {phoneError && (
+                      <span className="error-container1">{phoneError}</span>
+                    )}
                   </div>
                 </form>
               </div>
@@ -203,14 +259,14 @@ const TourBooking = () => {
               <div className="customer-save">
                 <h3>Quý khách có ghi chú lưu ý gì, hãy nói với chúng tôi !</h3>
                 <div className="customer-save-inner">
-                  <p>Ghi chú thêm</p>
+                  <p>Ghi chú thêm </p>
                   <textarea
                     className="form-control"
                     cols="20"
                     id="note"
                     onChange={handleChange}
                     name="note"
-                    placeholder="Vui lòng nhập nội dung lời nhắn bằng tiếng Anh hoặc tiếng Việt"
+                    placeholder="Vui lòng nhập nội dung lời nhắn"
                     rows="5"
                   ></textarea>
                 </div>
@@ -219,25 +275,20 @@ const TourBooking = () => {
             <div className="col-md-4 col-12 right">
               <div className="group-checkout">
                 <h3>Tóm tắt chuyến đi</h3>
-                <span>
-                  Dịch vụ tùy chọn <b>Xe suốt tuyến</b>
-                </span>
+
                 <p className="package-title">
-                  Tour trọn gói <span> (9 khách)</span>
+                  Tour trọn gói <span> ({numberOfPeople} khách)</span>
                 </p>
                 <div className="product">
                   <div className="product-image">
                     <img
-                      src="https://media.travel.com.vn/tour/tfd_230614015141_352277_TP VUNG TAU FLYCAM.jpg"
+                      src={tours[0]?.tour?.thumbnailUrl}
                       className="img-fluid"
-                      alt="image"
+                      alt={tours[0]?.tour?.tourTitle}
                     />
                   </div>
                   <div className="product-content">
-                    <p className="title">
-                      Siêu Sale 🔥 | Vũng Tàu - Sắc Màu Biển Xanh | Kích cầu du
-                      lịch{" "}
-                    </p>
+                    <p className="title">{tours[0]?.tour?.tourTitle}</p>
                   </div>
                 </div>
                 <div className="go-tour">
@@ -249,7 +300,7 @@ const TourBooking = () => {
 
                     <div className="start-content">
                       <h4>Bắt đầu chuyến đi</h4>
-                      <p className="time">CN, 19 Tháng 11, 2023</p>
+                      <p className="time">{formattedStartDate}</p>
                       <p className="from"></p>
                     </div>
                   </div>
@@ -261,7 +312,7 @@ const TourBooking = () => {
 
                     <div className="start-content">
                       <h4>Kết thúc chuyến đi</h4>
-                      <p className="time">CN, 19 Tháng 11, 2023</p>
+                      <p className="time">{formattedEndDate}</p>
                       <p className="from"></p>
                     </div>
                   </div>
@@ -276,22 +327,26 @@ const TourBooking = () => {
                             className="icon-checkout-users"
                             icon={faUsers}
                           />
-                          <span className="icon-checkout-users ms-1">1</span>
+                          <span className="icon-checkout-users ms-1">
+                            {numberOfPeople}
+                          </span>
                         </th>
                       </tr>
                       <tr>
-                        <td>Người lớn</td>
+                        <td>Giá tour</td>
                         <td className="t-price text-right" id="AdultPrice">
-                          1 x 299,000₫
+                          {formatCurrencyWithoutD(tours[0]?.tour?.price)}₫
                         </td>
                       </tr>
-
-                      <tr className="pt">
-                        <td>Phụ thu phòng riêng</td>
-                        <td className="t-price text-right" id="txtPhuThu">
-                          0₫
-                        </td>
-                      </tr>
+                      <td>Khách sạn:</td>
+                      {tours[0]?.hotel?.room.map((room, i) => (
+                        <tr>
+                          <td className="ps-4 p-0">Phòng {i + 1}</td>
+                          <td className="t-price p-0 text-right">
+                            {formatCurrencyWithoutD(room.price)}₫
+                          </td>
+                        </tr>
+                      ))}
 
                       <tr className="cuppon">
                         <td>Mã giảm giá </td>
@@ -304,7 +359,6 @@ const TourBooking = () => {
                               placeholder="Thêm mã"
                               required="required"
                               type="text"
-                              value=""
                             />
                             <input
                               type="button"
@@ -319,7 +373,10 @@ const TourBooking = () => {
                       <tr className="total">
                         <td>Tổng cộng</td>
                         <td className="t-price text-right" id="TotalPrice">
-                          299,000₫
+                          {formatCurrencyWithoutD(
+                            tours[0]?.tour?.price + totalPriceRoom
+                          )}
+                          ₫
                         </td>
                       </tr>
                     </tbody>

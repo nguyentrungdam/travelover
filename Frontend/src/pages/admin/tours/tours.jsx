@@ -6,7 +6,7 @@ import { getAllTours } from "../../../slices/tourSlice";
 import Loading from "../../../components/Loading/Loading";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 40, type: "string" },
+  { field: "stt", headerName: "ID", width: 40, type: "string" },
   {
     field: "img",
     headerName: "Image",
@@ -41,6 +41,7 @@ const ToursList = () => {
   const transformedData =
     tours && Array.isArray(tours)
       ? tours.map((item, index) => ({
+          stt: index + 1,
           id: item?.tourId,
           img: item?.thumbnailUrl,
           title: item.tourTitle,

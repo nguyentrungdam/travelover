@@ -143,6 +143,10 @@ const List = () => {
       },
     });
   };
+  // Hàm tính tổng tiền từ mảng các phòng
+  const calculateRoomTotalPrice = (rooms) => {
+    return rooms.reduce((total, room) => total + room.price, 0);
+  };
   return (
     <>
       {isHeaderVisible ? <Header /> : " "}
@@ -369,7 +373,11 @@ const List = () => {
                               <div className="tour-item__price--old"></div>
                               <div className="tour-item__price--current fix-leftalign">
                                 <span className="tour-item__price--current__number pe-2 mb-0">
-                                  {formatCurrencyWithoutD(item.tour.price)}₫
+                                  {formatCurrencyWithoutD(
+                                    item?.tour?.price +
+                                      calculateRoomTotalPrice(item?.hotel?.room)
+                                  )}
+                                  ₫
                                 </span>
                               </div>
                               <div className="tour-item__price--current">

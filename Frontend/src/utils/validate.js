@@ -18,7 +18,14 @@ export function validateName(name) {
   const nameRegex = REUNICODE;
   return nameRegex.test(name);
 }
-
+export const validateVietnameseName = (name) => {
+  const regex = /^[a-zA-Z\sÀ-ỹ]+$/;
+  return regex.test(name);
+};
+export const validateVietnamesePhoneNumber = (phoneNumber) => {
+  const regex = /^\d{1,10}$/;
+  return regex.test(phoneNumber);
+};
 export function validatePasswordMatch(password, confirmPassword) {
   return password === confirmPassword;
 }

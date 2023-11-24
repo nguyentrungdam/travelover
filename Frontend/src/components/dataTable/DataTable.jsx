@@ -5,18 +5,6 @@ import { Link } from "react-router-dom";
 const DataTable = (props) => {
   // TEST THE API
 
-  // const queryClient = useQueryClient();
-  // // const mutation = useMutation({
-  // //   mutationFn: (id: number) => {
-  // //     return fetch(`http://localhost:8800/api/${props.slug}/${id}`, {
-  // //       method: "delete",
-  // //     });
-  // //   },
-  // //   onSuccess: ()=>{
-  // //     queryClient.invalidateQueries([`all${props.slug}`]);
-  // //   }
-  // // });
-
   const handleDelete = (id) => {
     //delete the item
     // mutation.mutate(id)
@@ -29,9 +17,20 @@ const DataTable = (props) => {
     renderCell: (params) => {
       return (
         <div className="action">
-          <Link to={`/${props.slug}/${params.row.id}`}>
-            <img src="/view.svg" alt="" />
-          </Link>
+          {props.handleUpdateOrderStatus ? (
+            <div
+              className="update"
+              onClick={() =>
+                props.handleUpdateOrderStatus(params.row.id, params.row.status)
+              }
+            >
+              <img src="/view.svg" alt="" />
+            </div>
+          ) : (
+            <Link to={`/${props.slug}/${params.row.id}`}>
+              <img src="/view.svg" alt="" />
+            </Link>
+          )}
           <div className="delete" onClick={() => handleDelete(params.row.id)}>
             <img src="/delete.svg" alt="" />
           </div>

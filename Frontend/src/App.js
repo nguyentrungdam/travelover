@@ -22,6 +22,7 @@ import AddTours from "./pages/admin/tours/add-tour/AddTours";
 import UpdateTour from "./pages/admin/tours/update-tour/UpdateTour";
 import Hotels from "./pages/admin/hotels/Hotels";
 import ThankYou from "./pages/client/booking/ThankYou";
+import OrderList from "./pages/admin/orders/orders";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -60,13 +61,9 @@ function App() {
       <Route path="/tours/tour-detail/:tourId" element={<TourDetail />} />
       <Route path="/tours/tour-booking/:tourId" element={<TourBooking />} />
       <Route path="/thank-you" element={<ThankYou />} />
-
       <Route path="/*" element={<Page404 />} />
       {/* admin route */}
-      {/* "email": "admind@gmail.com",
-  "password": "123456@Aa"
-  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuYW1AZ21haWwuY29tIiwiaWF0IjoxNzAwMDI3OTI1LCJleHAiOjE3MDEyMzc1MjV9.PQm_UQhbn7eB5ApirkMav91RqlaBzFAHrAsX82w_cIiOK9Hriajg6sEFsKgJqRu8XXVEwy1SIRYfXn0lOKu6Xw
-   */}
+
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />
@@ -77,6 +74,7 @@ function App() {
         <Route path="hotels" element={<Hotels />} />
         {/* <Route path="hotels/:id" element={<UpdateTour />} />
         <Route path="hotels/add-new" element={<AddTours />} /> */}
+        <Route path="orders-list" element={<OrderList />} />
       </Route>
       {/* <Route path="users">
         <Route

@@ -67,7 +67,7 @@
 .hotelImg {
   border-radius: 5px;
   width: 100%;
-  height: 100%;
+  height: 306px;
   object-fit: cover;
   cursor: pointer;
 }
