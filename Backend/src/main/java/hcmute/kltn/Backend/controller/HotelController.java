@@ -16,10 +16,11 @@ import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelCreate;
+import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.HotelUpdate;
-import hcmute.kltn.Backend.model.hotel.dto.entity.Hotel;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,12 +44,12 @@ public class HotelController {
 	@Operation(summary = "Create hotel - ADMIN", description = createHotelDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> createHotel(@RequestBody HotelCreate hotelCreate) {
-		Hotel hotel = iHotelService.createHotel(hotelCreate);
+		HotelDTO hotelDTO = iHotelService.createHotel(hotelCreate);
 		
 		return iResObjService.success(new Response() {
 			{
 				setMessage("Create hotel successfully");
-				setData(hotel);
+				setData(hotelDTO);
 			}
 		});
 	}
@@ -61,12 +62,12 @@ public class HotelController {
 	@Operation(summary = "Update hotel - ADMIN", description = updateHotelDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> updateHotel(@RequestBody HotelUpdate hotelUpdate) {
-		Hotel hotel = iHotelService.updateHotel(hotelUpdate);
+		HotelDTO hotelDTO = iHotelService.updateHotel(hotelUpdate);
 		
 		return iResObjService.success(new Response() {
 			{
 				setMessage("Update hotel successfully");
-				setData(hotel);
+				setData(hotelDTO);
 			}
 		});
 	}
@@ -75,12 +76,12 @@ public class HotelController {
 	@Operation(summary = "Get hotel detail - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> getDetailHotel(@RequestParam String hotelId) {
-		Hotel hotel = iHotelService.getDetailHotel(hotelId);
+		HotelDTO hotelDTO = iHotelService.getDetailHotel(hotelId);
 		
 		return iResObjService.success(new Response() {
 			{
 				setMessage("Get hotel detail successfully");
-				setData(hotel);
+				setData(hotelDTO);
 			}
 		});
 	}
@@ -89,12 +90,12 @@ public class HotelController {
 	@Operation(summary = "Get all hotel - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> getAllHotel() {
-		List<Hotel> hotelList = iHotelService.getAllHotel();
+		List<HotelDTO> hotelDTOList = iHotelService.getAllHotel();
 		
 		return iResObjService.success(new Response() {
 			{
 				setMessage("Get all hotel successfully");
-				setData(hotelList);
+				setData(hotelDTOList);
 			}
 		});
 	}
@@ -103,12 +104,12 @@ public class HotelController {
 	@Operation(summary = "Search hotel - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
 	ResponseEntity<ResponseObject> searchHotel(@ModelAttribute HotelSearch hotelSearch) {
-		List<Hotel> hotelList = iHotelService.searchHotel(hotelSearch);
+		List<HotelDTO> hotelDTOList = iHotelService.searchHotel(hotelSearch);
 		
 		return iResObjService.success(new Response() {
 			{
 				setMessage("Search hotel successfully");
-				setData(hotelList);
+				setData(hotelDTOList);
 			}
 		});
 	}

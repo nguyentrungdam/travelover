@@ -48,28 +48,24 @@ public class HotelService implements IHotelService{
         return collectionName;
     }
 	
-	private void checkFieldCondition(HotelDTO hotelDTO) {
+	private void checkFieldCondition(Hotel hotel) {
 		// check null
-		if(hotelDTO.getHotelName() == null || hotelDTO.getHotelName().equals("")) {
+		if(hotel.getHotelName() == null || hotel.getHotelName().equals("")) {
 			throw new CustomException("Hotel Name is not null");
 		}
-		if(hotelDTO.getContact() == null) {
+		if(hotel.getContact() == null) {
 			throw new CustomException("Contact is not null");
 		}
-		if(hotelDTO.getAddress() == null) {
+		if(hotel.getAddress() == null) {
 			throw new CustomException("Address is not null");
 		}
 		
 		// check unique
 	}
-
-	private Hotel create(HotelDTO hotelDTO) {
+	
+	private Hotel create(Hotel hotel) {
 		// check field condition
-		checkFieldCondition(hotelDTO);
-		
-		// mapping
-		Hotel hotel = new Hotel();
-		modelMapper.map(hotelDTO, hotel);
+		checkFieldCondition(hotel);
 		
 		// set default value
 		String hotelId = iGeneratorSequenceService.genId(getCollectionName());
@@ -83,25 +79,45 @@ public class HotelService implements IHotelService{
 		hotel.setLastModifiedAt(dateNow);
 		
 		// create hotel
-		hotel = hotelRepository.save(hotel);
+		Hotel hotelNew = new Hotel();
+		hotelNew = hotelRepository.save(hotel);
 
-		return hotel;
+		return hotelNew;
 	}
 
-	private Hotel update(HotelDTO hotelDTO) {
+//	private Hotel create(HotelDTO hotelDTO) {
+//		// check field condition
+//		checkFieldCondition(hotelDTO);
+//		
+//		// mapping
+//		Hotel hotel = new Hotel();
+//		modelMapper.map(hotelDTO, hotel);
+//		
+//		// set default value
+//		String hotelId = iGeneratorSequenceService.genId(getCollectionName());
+//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+//		LocalDate dateNow = LocalDateUtil.getDateNow();
+//		hotel.setHotelId(hotelId);
+//		hotel.setStatus(true);
+//		hotel.setCreatedBy(accountId);
+//		hotel.setCreatedAt(dateNow);
+//		hotel.setLastModifiedBy(accountId);
+//		hotel.setLastModifiedAt(dateNow);
+//		
+//		// create hotel
+//		hotel = hotelRepository.save(hotel);
+//
+//		return hotel;
+//	}
+	
+	private Hotel update(Hotel hotel) {
 		// check exists
-		if(!hotelRepository.existsById(hotelDTO.getHotelId())) {
+		if(!hotelRepository.existsById(hotel.getHotelId())) {
 			throw new CustomException("Cannot find hotel");
 		}
 		
 		// check field condition
-		checkFieldCondition(hotelDTO);
-		
-		// get hotel from database
-		Hotel hotel = hotelRepository.findById(hotelDTO.getHotelId()).get();
-		
-		// mapping
-		modelMapper.map(hotelDTO, hotel);
+		checkFieldCondition(hotel);
 		
 		// set default value
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
@@ -110,10 +126,38 @@ public class HotelService implements IHotelService{
 		hotel.setLastModifiedAt(dateNow);
 		
 		// update hotel
-		hotel = hotelRepository.save(hotel);
+		Hotel hotelNew = new Hotel();
+		hotelNew = hotelRepository.save(hotel);
 
-		return hotel;
+		return hotelNew;
 	}
+
+//	private Hotel update(HotelDTO hotelDTO) {
+//		// check exists
+//		if(!hotelRepository.existsById(hotelDTO.getHotelId())) {
+//			throw new CustomException("Cannot find hotel");
+//		}
+//		
+//		// check field condition
+//		checkFieldCondition(hotelDTO);
+//		
+//		// get hotel from database
+//		Hotel hotel = hotelRepository.findById(hotelDTO.getHotelId()).get();
+//		
+//		// mapping
+//		modelMapper.map(hotelDTO, hotel);
+//		
+//		// set default value
+//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+//		LocalDate dateNow = LocalDateUtil.getDateNow();
+//		hotel.setLastModifiedBy(accountId);
+//		hotel.setLastModifiedAt(dateNow);
+//		
+//		// update hotel
+//		hotel = hotelRepository.save(hotel);
+//
+//		return hotel;
+//	}
 
 	private Hotel getDetail(String hotelId) {
 		// check exists
@@ -134,16 +178,11 @@ public class HotelService implements IHotelService{
 		return hotelList;
 	}
 
-	private boolean delete(String hotelId) {
+	private void delete(String hotelId) {
 		// check exists
-		if(!hotelRepository.existsById(hotelId)) {
-			throw new CustomException("Cannot find hotel");
+		if(hotelRepository.existsById(hotelId)) {
+			hotelRepository.deleteById(hotelId);
 		}
-		
-		// delete hotel
-		hotelRepository.deleteById(hotelId);
-
-		return true;
 	}
 	
 	private List<Hotel> search(String keyword) {
@@ -173,49 +212,66 @@ public class HotelService implements IHotelService{
 
 		return hotelList;
 	}
+	
+	private HotelDTO getHotelDTO(Hotel hotel) {
+		HotelDTO hotelDTONew = new HotelDTO();
+		modelMapper.map(hotel, hotelDTONew);
+		return hotelDTONew;
+	}
+	
+	private List<HotelDTO> getHotelDTOList(List<Hotel> hotelList) {
+		List<HotelDTO> hotelDTOList = new ArrayList<>();
+		for (Hotel itemHotel : hotelList) {
+			hotelDTOList.add(getHotelDTO(itemHotel));
+		}
+		return hotelDTOList;
+	}
 
 	@Override
-	public Hotel createHotel(HotelCreate hotelCreate) {
-		// mapping
-		HotelDTO hotelDTO = new HotelDTO();
-		modelMapper.map(hotelCreate, hotelDTO);
+	public HotelDTO createHotel(HotelCreate hotelCreate) {
+		// mapping hotel
+		Hotel hotel = new Hotel();
+		modelMapper.map(hotelCreate, hotel);
 		
 		// create hotel
-		Hotel hotel = create(hotelDTO);
+		Hotel hotelNew = new Hotel();
+		hotelNew = create(hotel);
 		
-		return hotel;
+		return getHotelDTO(hotelNew);
 	}
 
 	@Override
-	public Hotel updateHotel(HotelUpdate hotelUpdate) {
-		// mapping 
-		HotelDTO hotelDTO = new HotelDTO();
-		modelMapper.map(hotelUpdate, hotelDTO);
+	public HotelDTO updateHotel(HotelUpdate hotelUpdate) {
+		// mapping hotel
+		Hotel hotel = new Hotel();
+		hotel = getDetail(hotelUpdate.getHotelId());
+		modelMapper.map(hotelUpdate, hotel);
 		
 		// update hotel
-		Hotel hotel = update(hotelDTO);
+		Hotel hotelNew = new Hotel();
+		hotelNew = update(hotel);
 
-		return hotel;
+		return getHotelDTO(hotelNew);
 	}
 
 	@Override
-	public Hotel getDetailHotel(String hotelId) {
+	public HotelDTO getDetailHotel(String hotelId) {
 		// get hotel 
 		Hotel hotel = getDetail(hotelId);
 
-		return hotel;
+		return getHotelDTO(hotel);
 	}
 
 	@Override
-	public List<Hotel> getAllHotel() {
+	public List<HotelDTO> getAllHotel() {
 		// get all hotel
 		List<Hotel> hotelList = getAll();
 
-		return hotelList;
+		return getHotelDTOList(hotelList);
 	}
 
 	@Override
-	public List<Hotel> searchHotel(HotelSearch hotelSearch) {
+	public List<HotelDTO> searchHotel(HotelSearch hotelSearch) {
 		// search with keyword
 		List<Hotel> hotelList = new ArrayList<>();
 		List<Hotel> hotelListClone = new ArrayList<>();
@@ -267,7 +323,7 @@ public class HotelService implements IHotelService{
 			}
 		}
 
-		return hotelList;
+		return getHotelDTOList(hotelList);
 	}
 
 	@Override

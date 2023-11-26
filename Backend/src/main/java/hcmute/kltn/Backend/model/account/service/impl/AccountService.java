@@ -3,7 +3,6 @@ package hcmute.kltn.Backend.model.account.service.impl;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -17,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.component.JwtTokenUtil;
 import hcmute.kltn.Backend.exception.CustomException;
@@ -31,11 +29,8 @@ import hcmute.kltn.Backend.model.account.repository.AccountRepository;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.ERole;
-import hcmute.kltn.Backend.model.base.image.dto.Image;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
-import hcmute.kltn.Backend.model.tour.dto.TourDTO;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
@@ -62,52 +57,45 @@ public class AccountService implements IAccountService{
         return collectionName;
     }
     
-    private void checkFieldCondition(AccountDTO accountDTO) {
+    private void checkFieldCondition(Account account) {
 		// check null
-		if (accountDTO.getEmail() == null || accountDTO.getEmail().equals("")) {
+		if (account.getEmail() == null || account.getEmail().equals("")) {
 			throw new CustomException("Email is not null");
 		} 
-		if (accountDTO.getFirstName() == null || accountDTO.getFirstName().equals("")) {
+		if (account.getFirstName() == null || account.getFirstName().equals("")) {
 			throw new CustomException("First Name is not null");
 		} 
-		if (accountDTO.getLastName() == null || accountDTO.getLastName().equals("")) {
-			throw new CustomException("First Name is not null");
+		if (account.getLastName() == null || account.getLastName().equals("")) {
+			throw new CustomException("Last Name is not null");
 		} 
-		if (accountDTO.getPassword() == null || accountDTO.getPassword().equals("")) {
-			throw new CustomException("First Name is not null");
-		}
+//		if (account.getPassword() == null || account.getPassword().equals("")) {
+//			throw new CustomException("First Name is not null");
+//		}
 		
 		// check unique
-		if(accountDTO.getAccountId() == null || accountDTO.getAccountId().equals("")) {
-			if (accountRepository.existsByEmail(accountDTO.getEmail().trim())) {
+		if(account.getAccountId() == null || account.getAccountId().equals("")) {
+			if (accountRepository.existsByEmail(account.getEmail().trim())) {
 				throw new CustomException("Email is already");
 			} 
 		} else {
-			Account account = accountRepository.findById(accountDTO.getAccountId()).get();
-			List<Account> listByEmail = accountRepository.findAllByEmail(account.getEmail());
+			Account accountFind = accountRepository.findById(account.getAccountId()).get();
+			List<Account> listByEmail = accountRepository.findAllByEmail(accountFind.getEmail());
 			for (Account item : listByEmail) {
-				if (item.getEmail() == account.getEmail() && item.getAccountId() != account.getAccountId()) {
+				if (item.getEmail() == accountFind.getEmail() && item.getAccountId() != accountFind.getAccountId()) {
 					throw new CustomException("Email is already");
 				}
 			}
 		}
 	}
     
-    private Account create(AccountDTO accountDTO) {
+    private Account create(Account account) {
 		// check field condition
-		checkFieldCondition(accountDTO); 
-		
-		// get account from db
-		Account account = new Account();
-		
-		// Mapping
-		modelMapper.map(accountDTO, account);
+		checkFieldCondition(account); 
 
 		// Set default value
 		String accountId = iGeneratorSequenceService.genId(getCollectionName());
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		account.setAccountId(accountId);
-		account.setRole("CUSTOMER");
 		account.setStatus(true);			
 		account.setCreatedBy(accountId);
 		account.setCreatedAt(dateNow);
@@ -115,51 +103,20 @@ public class AccountService implements IAccountService{
 		account.setLastModifiedAt(dateNow);
 
 		// create account
-		account = accountRepository.save(account);
+		Account accountNew = new Account();
+		accountNew = accountRepository.save(account);
 		
-		return account;
+		return accountNew;
 	}
-
-	private Account update(AccountDTO accountDTO) {
+    
+    private Account update(Account account) {
 		// Check exists
-		if (!accountRepository.existsById(accountDTO.getAccountId())) {
+		if (!accountRepository.existsById(account.getAccountId())) {
 			throw new CustomException("Cannot find account");
 		} 
 		
 		// check field condition
-		checkFieldCondition(accountDTO); 
-		
-		// check role
-		boolean isRole = false;
-		for (ERole item : ERole.values()) {
-			if (item.name().equals(accountDTO.getRole())) {
-				isRole = true;
-				break;
-			}
-		}
-		if (isRole == false) {
-			throw new CustomException("Role does not exist");
-		}
-		
-		// get account from db
-		Account account = accountRepository.findById(accountDTO.getAccountId()).get();
-		
-		// check image and delete old image
-		if ((account.getAvatar() != null 
-				&& !account.getAvatar().equals(""))
-				&& !account.getAvatar().equals(accountDTO.getAvatar())) {
-			boolean checkDelete = false;
-			checkDelete = iImageService.deleteImageByUrl(account.getAvatar());
-			if (checkDelete == false) {
-				throw new CustomException("An error occurred during the processing of the old image");
-			}
-		}
-		
-		// Mapping
-		modelMapper.map(accountDTO, account);
-		
-//		// check password
-//		String passwordDTO = new BCryptPasswordEncoder().encode(accountDTO.getPassword());
+		checkFieldCondition(account); 
 		
 		// Set default value
 		String currentAccountId = iAccountDetailService.getCurrentAccount().getAccountId();
@@ -167,9 +124,10 @@ public class AccountService implements IAccountService{
 		account.setLastModifiedAt(LocalDateUtil.getDateNow());
 
 		// update account
-		account = accountRepository.save(account);
+		Account accountNew = new Account();
+		accountNew = accountRepository.save(account);
 
-		return account;
+		return accountNew;
 	}
 	
 	private Account getDetail(String accountId) {
@@ -191,16 +149,11 @@ public class AccountService implements IAccountService{
 		return foundAccount;
 	}
 	
-	private boolean delete(String id) {
+	private void delete(String id) {
 		// check exists
-		if (!accountRepository.existsById(id)) {
-			throw new CustomException("Cannot find Account");
+		if (accountRepository.existsById(id)) {
+			accountRepository.deleteById(id);
 		} 
-		
-		// delete account
-		accountRepository.deleteById(id);
-		
-		return true;
 	}
 
 	private List<Account> search(String keyword) {
@@ -233,6 +186,20 @@ public class AccountService implements IAccountService{
 		return accountList;
 	}
 	
+	private AccountDTO getAccountDTO(Account account) {
+		AccountDTO accountDTONew = new AccountDTO();
+		modelMapper.map(account, accountDTONew);
+		return accountDTONew;
+	}
+	
+	private List<AccountDTO> getAccountDTOList(List<Account> accountList) {
+		List<AccountDTO> accountDTOList = new ArrayList<>();
+		for (Account itemAccount : accountList) {
+			accountDTOList.add(getAccountDTO(itemAccount));
+		}
+		return accountDTOList;
+	}
+	
 	@Override
 	public AuthResponse login(AuthRequest request) {
 		Authentication authentication = authManager.authenticate(
@@ -257,63 +224,84 @@ public class AccountService implements IAccountService{
     }
 
 	@Override
-	public Account register(RegisterRequest registerRequest) {
-		// Mapping
-		AccountDTO accountDTO = new AccountDTO();
-		modelMapper.map(registerRequest, accountDTO);
+	public AccountDTO register(RegisterRequest registerRequest) {
+		// create hash password
+		if (registerRequest.getPassword() == null || registerRequest.getPassword().equals("")) {
+			throw new CustomException("Password is not null");
+		}
+		String password = new BCryptPasswordEncoder().encode(registerRequest.getPassword());
 		
-		String password = new BCryptPasswordEncoder().encode(accountDTO.getPassword());
-		accountDTO.setPassword(password);
-		
+		// mapping account
 		Account account = new Account();
-		account = create(accountDTO);
+		modelMapper.map(registerRequest, account);
 		
-		return account;
-	}
-
-	@Override
-	public Account updateProfile(AccountUpdateProfile accountUpdateProfile) {
-		// Get Id Account 
-		Account account = iAccountDetailService.getCurrentAccount();
+		// set default value
+		account.setRole("CUSTOMER");
+		account.setPassword(password);
 		
-
-		// Mapping
-		AccountDTO accountDTO = new AccountDTO();
-		modelMapper.map(account, accountDTO);
-		modelMapper.map(accountUpdateProfile, accountDTO);
-		
+		// create account
 		Account accountNew = new Account();
-		accountNew = update(accountDTO);
+		accountNew = create(account);
 		
-		return accountNew;
+		return getAccountDTO(accountNew);
 	}
-	
+
 	@Override
-	public Account getProfile() {
+	public AccountDTO updateProfile(AccountUpdateProfile accountUpdateProfile) {
+		// Get current Account 
 		Account account = iAccountDetailService.getCurrentAccount();
 
-		return account;
-	}
-
-	@Override
-	public List<Account> getAllAccount() {
-		List<Account> accountList = getAll();
-
-		return accountList;
+		// check image and delete old image
+		if ((account.getAvatar() != null 
+				&& !account.getAvatar().equals(""))
+				&& !account.getAvatar().equals(accountUpdateProfile.getAvatar())) {
+			boolean checkDelete = false;
+			checkDelete = iImageService.deleteImageByUrl(account.getAvatar());
+			if (checkDelete == false) {
+				throw new CustomException("An error occurred during the processing of the old image");
+			}
+		}
+		
+		// mapping account
+		modelMapper.map(accountUpdateProfile, account);
+		
+		// update account
+		Account accountNew = new Account();
+		accountNew = update(account);
+		
+		return getAccountDTO(accountNew);
 	}
 	
 	@Override
-	public Account getDetailAccount(String accountId) {
+	public AccountDTO getProfile() {
+		// get current account
+		Account account = iAccountDetailService.getCurrentAccount();
+
+		return getAccountDTO(account);
+	}
+
+	@Override
+	public List<AccountDTO> getAllAccount() {
+		// get current account list
+		List<Account> accountList = new ArrayList<>(getAll());
+
+		return getAccountDTOList(accountList);
+	}
+	
+	@Override
+	public AccountDTO getDetailAccount(String accountId) {
+		// get account from database
 		Account account = getDetail(accountId);
 
-		return account;
+		return getAccountDTO(account);
 	}
 
 	@Override
-	public List<Account> searchAccount(String keyword) {
+	public List<AccountDTO> searchAccount(String keyword) {
+		// search account with keyword
 		List<Account> accountList = search(keyword);
 
-		return accountList;
+		return getAccountDTOList(accountList);
 	}
 
 	
@@ -343,7 +331,7 @@ public class AccountService implements IAccountService{
 
 		// Set default value
 		String accountId = iGeneratorSequenceService.genId(getCollectionName());
-		String password = new BCryptPasswordEncoder().encode(account.getPassword());
+		String password = new BCryptPasswordEncoder().encode("123456");
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		account.setAccountId(accountId);
 		account.setPassword(password);
@@ -352,30 +340,52 @@ public class AccountService implements IAccountService{
 		account.setCreatedAt(dateNow);
 		account.setLastModifiedBy(accountId);
 		account.setLastModifiedAt(dateNow);
-		
-		// Set avatar
-//		if (accountDTO.getAvatar() != null && accountDTO.getAvatar() != "") {
-//			Image image = iImageService.getDetail(accountDTO.getAvatar());
-//			account.setAvatar(image);
-//		} 
-		
-		// Set parentAccount
-//		if (accountDTO.getParentAccount() != null && accountDTO.getParentAccount() != "") {
-//			Account parentAccount = getDetail(accountDTO.getParentAccount());
-//			account.setParentAccount(parentAccount);
-//		} 
+ 
 
 		account = accountRepository.save(account);
 		
 		return true;
 	}
 
-	@Override
-	public Account updateAccount(AccountDTO accountDTO) {
-		Account account = new Account();
-		account = update(accountDTO);
-		
-		return account;
-	}
+//	@Override
+//	public AccountDTO updateAccount(AccountDTO accountDTO) {
+//		// check role
+//		boolean isRole = false;
+//		for (ERole item : ERole.values()) {
+//			if (item.name().equals(accountDTO.getRole())) {
+//				isRole = true;
+//				break;
+//			}
+//		}
+//		if (isRole == false) {
+//			throw new CustomException("Role does not exist");
+//		}
+//		
+//		// get account from db
+//		Account account = getDetail(accountDTO.getAccountId());
+//		
+//		// check image and delete old image
+//		if ((account.getAvatar() != null 
+//				&& !account.getAvatar().equals(""))
+//				&& !account.getAvatar().equals(accountDTO.getAvatar())) {
+//			boolean checkDelete = false;
+//			checkDelete = iImageService.deleteImageByUrl(account.getAvatar());
+//			if (checkDelete == false) {
+//				throw new CustomException("An error occurred during the processing of the old image");
+//			}
+//		}	
+//		
+//		// Mapping
+//		modelMapper.map(accountDTO, account);
+//		
+//		// update account
+//		Account accountNew = new Account();
+//		accountNew = update(account);
+//		
+//		// mapping accountDTO
+//		AccountDTO
+//		
+//		return account;
+//	}
 
 }

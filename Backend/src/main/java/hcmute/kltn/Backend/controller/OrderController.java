@@ -15,9 +15,8 @@ import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
+import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
-import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
-import hcmute.kltn.Backend.model.order.dto.entity.Order;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,12 +43,12 @@ public class OrderController {
 	@PreAuthorize("hasAnyRole('ROLE_CUSTOMER')")
 	ResponseEntity<ResponseObject> createOrder(
 			@RequestBody OrderCreate orderCreate) {
-		Order order = iOrderService.createOrder(orderCreate);
+		OrderDTO orderDTO = iOrderService.createOrder(orderCreate);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create order successfully");
-				setData(order);
+				setData(orderDTO);
 			}
 		});
 	}
@@ -89,12 +88,12 @@ public class OrderController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> updateOrderStatus(
 			@RequestBody OrderStatusUpdate orderStatusUpdate) {
-		Order order = iOrderService.updateOrderStatus(orderStatusUpdate);
+		OrderDTO orderDTO = iOrderService.updateOrderStatus(orderStatusUpdate);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Update order status successfully");
-				setData(order);
+				setData(orderDTO);
 			}
 		});
 	}
@@ -104,12 +103,12 @@ public class OrderController {
 	@PreAuthorize("isAuthenticated()")
 	ResponseEntity<ResponseObject> updateOrder(
 			@RequestParam String orderId) {
-		Order order = iOrderService.getDetailOrder(orderId);
+		OrderDTO orderDTO = iOrderService.getDetailOrder(orderId);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get detail order successfully");
-				setData(order);
+				setData(orderDTO);
 			}
 		});
 	}
@@ -118,12 +117,12 @@ public class OrderController {
 	@Operation(summary = "Get all order - ADMIN / STAFF / CUSTOMER")
 	@PreAuthorize("isAuthenticated()")
 	ResponseEntity<ResponseObject> getAllOrder() {
-		List<Order> orderList = iOrderService.getAllOrder();
+		List<OrderDTO> orderDTOList = iOrderService.getAllOrder();
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all order successfully");
-				setData(orderList);
+				setData(orderDTOList);
 			}
 		});
 	}
@@ -133,12 +132,12 @@ public class OrderController {
 	@PreAuthorize("isAuthenticated()")
 	ResponseEntity<ResponseObject> searchOrder(
 			@RequestParam String keyword) {
-		List<Order> orderList = iOrderService.searchOrder(keyword);
+		List<OrderDTO> orderDTOList = iOrderService.searchOrder(keyword);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search order successfully");
-				setData(orderList);
+				setData(orderDTOList);
 			}
 		});
 	}

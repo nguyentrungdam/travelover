@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,8 +16,8 @@ import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceCreate;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
-import hcmute.kltn.Backend.model.generatorSequence.dto.entity.GeneratorSequence;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,12 +36,12 @@ public class GeneratorSequenceController {
     @Operation(summary = "Create Generator Sequence - ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> createGenSeq(@RequestBody GeneratorSequenceCreate generatorSequenceCreate) {
-    	GeneratorSequence generatorSequence = iGeneratorSequenceService.createGenSeq(generatorSequenceCreate);
+    	GeneratorSequenceDTO generatorSequenceDTO = iGeneratorSequenceService.createGenSeq(generatorSequenceCreate);
         
         return iResponseObjectService.success(new Response() {
 					{
 						setMessage("Create Generator Sequence successfully");
-						setData(generatorSequence);
+						setData(generatorSequenceDTO);
 					}
 				});
     }
@@ -51,13 +50,13 @@ public class GeneratorSequenceController {
     @Operation(summary = "Update Generator Sequence - ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> updateGenSeq(@RequestBody GeneratorSequenceDTO generatorSequenceDTO) {
-    	GeneratorSequence generatorSequence = iGeneratorSequenceService.updateGenSeq(generatorSequenceDTO);
+    	GeneratorSequenceDTO generatorSequenceDTONew = iGeneratorSequenceService.updateGenSeq(generatorSequenceDTO);
     	
     	return iResponseObjectService
 				.success(new Response() {
 					{
 						setMessage("Update Generator Sequence successfully");
-						setData(generatorSequence);
+						setData(generatorSequenceDTONew);
 					}
 				});
     }
@@ -66,12 +65,12 @@ public class GeneratorSequenceController {
     @Operation(summary = "Get detail Generator Sequence - ADMIN")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> getDetailGenSeq(@RequestParam String id) {
-    	GeneratorSequence generatorSequence = iGeneratorSequenceService.getDetailGenSeq(id);
+    	GeneratorSequenceDTO generatorSequenceDTO = iGeneratorSequenceService.getDetailGenSeq(id);
     	
     	return iResponseObjectService.success(new Response() {
 					{
 						setMessage("Get detail Generator Sequence successfully");
-						setData(generatorSequence);
+						setData(generatorSequenceDTO);
 					}
 				});
     }
@@ -80,12 +79,12 @@ public class GeneratorSequenceController {
     @Operation(summary = "Get all Generator Sequence - ADMIN")
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
     ResponseEntity<ResponseObject> getAllGenSeq() {
-        List<GeneratorSequence> generatorSequenceList = iGeneratorSequenceService.getAllGenSeq();
+        List<GeneratorSequenceDTO> generatorSequenceDTOList = iGeneratorSequenceService.getAllGenSeq();
         
         return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all Generator Sequence");
-				setData(generatorSequenceList);
+				setData(generatorSequenceDTOList);
 			}
 		});
     }

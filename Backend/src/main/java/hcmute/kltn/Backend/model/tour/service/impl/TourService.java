@@ -3,6 +3,8 @@ package hcmute.kltn.Backend.model.tour.service.impl;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -21,8 +23,10 @@ import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
+import hcmute.kltn.Backend.model.tour.dto.TourFilter;
 import hcmute.kltn.Backend.model.tour.dto.TourSearch;
 import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
+import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
@@ -72,58 +76,52 @@ public class TourService implements ITourService{
         return collectionName;
     }
     
-    private void checkFieldCondition(TourDTO tourDTO) {
+    private void checkFieldCondition(Tour tour) {
 		// check null
-		if(tourDTO.getTourTitle() == null || tourDTO.getTourTitle().equals("")) {
+		if(tour.getTourTitle() == null || tour.getTourTitle().equals("")) {
 			throw new CustomException("Title is not null");
 		}
-//		if(tourDTO.getThumbnailUrl() == null || tourDTO.getThumbnailUrl() == "") {
-//			throw new CustomException("Thumbnail Url is not null");
-//		}
-		if(tourDTO.getNumberOfDay() <= 0 ) {
+		if(tour.getNumberOfDay() <= 0 ) {
 			throw new CustomException("Number Of Day must be greater than 0");
 		}
-		if(tourDTO.getAddress() == null) {
+		if(tour.getNumberOfNight() < 0 ) {
+			throw new CustomException("Number Of Night must be greater than or equal 0");
+		}
+		if(tour.getAddress() == null) {
 			throw new CustomException("Address is not null");
 		}
-		if(tourDTO.getReasonableTime() == null) {
+		if(tour.getTourDetailList() == null) {
+			throw new CustomException("Tour Detail List Time is not null");
+		}
+		if(tour.getReasonableTime() == null) {
 			throw new CustomException("Reasonable Time is not null");
 		}
 		
 		// check unique
-		if(tourDTO.getTourId() == null || tourDTO.getTourId().equals("")) {
-			if(tourRepository.existsByTourTitle(tourDTO.getTourTitle().trim())) {
+		if(tour.getTourId() == null || tour.getTourId().equals("")) {
+			if(tourRepository.existsByTourTitle(tour.getTourTitle().trim())) {
 				throw new CustomException("Title is already");
 			}
 		} else {
-			Tour tour = tourRepository.findById(tourDTO.getTourId()).get();
-			List<Tour> titleList = tourRepository.findAllByTourTitle(tourDTO.getTourTitle());
+			Tour tourFind = tourRepository.findById(tour.getTourId()).get();
+			List<Tour> titleList = tourRepository.findAllByTourTitle(tour.getTourTitle());
 			for(Tour item : titleList) {
-				if (item.getTourTitle() == tour.getTourTitle() && item.getTourId() != tour.getTourId()) {
+				if (item.getTourTitle() == tourFind.getTourTitle() && item.getTourId() != tourFind.getTourId()) {
 					throw new CustomException("Title is already");
 				}
 			}
 		}
 	}
-
-	private Tour create(TourDTO tourDTO) {
-		// check field condition
-		checkFieldCondition(tourDTO);
-		
-		// Mapping
-		Tour tour = new Tour();
-		modelMapper.map(tourDTO, tour);
-		
-		// mapping image
-		tour.setImage(tourDTO.getImage());
-		
-		// set tour detail list
-		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
-
+    
+    private Tour create(Tour tour) {
+    	// check field condition
+		checkFieldCondition(tour);
+    	
 		// Set default value
 		String tourId = iGeneratorSequenceService.genId(getCollectionName());
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		LocalDate dateNow = LocalDateUtil.getDateNow();
+		
 		tour.setTourId(tourId);
 		tour.setStatus(true);
 		tour.setCreatedBy(accountId);
@@ -131,75 +129,34 @@ public class TourService implements ITourService{
 		tour.setLastModifiedBy(accountId);
 		tour.setLastModifiedAt(dateNow);
 		
-		tour = tourRepository.save(tour);
+		// create tour
+		Tour tourNew = new Tour();
+		tourNew = tourRepository.save(tour);
 		
-		return tour;
+		return tourNew;
 	}
-
-	private Tour update(TourDTO tourDTO) {
-		// Check exists
-		if (!tourRepository.existsById(tourDTO.getTourId())) {
+    
+    private Tour update(Tour tour) {
+    	// Check exists
+		if (!tourRepository.existsById(tour.getTourId())) {
 			throw new CustomException("Cannot find tour");
 		}
-				
+		
 		// check field condition
-		checkFieldCondition(tourDTO);
-		
-		// get tour from database
-		Tour tour = tourRepository.findById(tourDTO.getTourId()).get();
-		
-		// check thumbnail image and delete
-		if ((tour.getThumbnailUrl() != null 
-				&& !tour.getThumbnailUrl().equals(""))
-				&& !tour.getThumbnailUrl().equals(tourDTO.getThumbnailUrl())) {
-			boolean checkDelete = iImageService.deleteImageByUrl(tour.getThumbnailUrl());
-			if (checkDelete == false) {
-				throw new CustomException("An error occurred during the processing of the old image");
-			}
-		}
-		
-		// check image update
-		boolean checkExists = false;
-		if (tour.getImage() != null) {
-			for (String itemString : tour.getImage()) {
-				checkExists = false;
-				for (String itemStringDTO : tourDTO.getImage()) {
-					if (itemString.equals(itemStringDTO)) {
-						checkExists = true;
-						break;
-					}
-				}
-				
-				if (checkExists == false) {
-					boolean checkDelete = false;
-					checkDelete = iImageService.deleteImageByUrl(itemString);
-					if (checkDelete == false) {
-						throw new CustomException("An error occurred during the processing of the old image");
-					}
-				}
-			}
-		}
-
-		// Mapping
-		modelMapper.map(tourDTO, tour);
-		
-		// mapping image
-		tour.setImage(tourDTO.getImage());
-		
-		// set tour detail list
-		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
-
-		// Set default value
+		checkFieldCondition(tour);
+    	
+    	// Set default value
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		tour.setLastModifiedBy(accountId);
 		tour.setLastModifiedAt(dateNow);
 		
 		// update tour
-		tour = tourRepository.save(tour);
+		Tour tourNew = new Tour();
+		tourNew = tourRepository.save(tour);
 		
-		return tour;
-	}
+		return tourNew;
+    }
 
 	private Tour getDetail(String tourId) {
 		// Check exists
@@ -220,16 +177,11 @@ public class TourService implements ITourService{
 		return list;
 	}
 
-	private boolean delete(String tourId) {
+	private void delete(String tourId) {
 		// Check exists
-		if (!tourRepository.existsById(tourId)) {
-			throw new CustomException("Cannot find tour");
+		if (tourRepository.existsById(tourId)) {
+			tourRepository.deleteById(tourId);
 		}
-		
-		// Delete tour
-		tourRepository.deleteById(tourId);
-		
-		return true;
 	}
 	
 	private List<Tour> search(String keyword) {
@@ -261,47 +213,107 @@ public class TourService implements ITourService{
 		
 		return tourList;
 	}
-
-	@Override
-	public Tour createTour(TourCreate tourCreate) {
+	
+	private TourDTO getTourDTO(Tour tour) {
 		// mapping tourDTO
-		TourDTO tourDTO = new TourDTO();
-		modelMapper.map(tourCreate, tourDTO);
+		TourDTO tourDTONew = new TourDTO();
+		modelMapper.map(tour, tourDTONew);
 		
-		// create tour
-		Tour tour = new Tour();
-		tour = create(tourDTO);
-		
-		return tour;
+		return tourDTONew;
+	}
+	
+	private List<TourDTO> getTourDTOList(List<Tour> tourList) {
+		List<TourDTO> tourDTOList = new ArrayList<>();
+		for (Tour itemTour : tourList) {
+			tourDTOList.add(getTourDTO(itemTour));
+		}
+		return tourDTOList;
 	}
 
 	@Override
-	public Tour updateTour(TourUpdate tourUpdate) {
-		// mapping tourDTO
-		TourDTO tourDTO = new TourDTO();
-		modelMapper.map(tourUpdate, tourDTO);
+	public TourDTO createTour(TourCreate tourCreate) {
+		// mapping tour
+		Tour tour = new Tour();
+		modelMapper.map(tourCreate, tour);
+
+		// set tour detail list
+		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 		
-		// check condition
-		checkFieldCondition(tourDTO);
+		// check field condition
+		checkFieldCondition(tour);
+
+		// create tour
+		Tour tourNew = new Tour();
+		tourNew = create(tour);
+		
+		return getTourDTO(tourNew);
+	}
+
+	@Override
+	public TourDTO updateTour(TourUpdate tourUpdate) {
+		// get tour from database
+		Tour tour = getDetail(tourUpdate.getTourId());
+		
+		// check thumbnail image and delete
+		if ((tour.getThumbnailUrl() != null 
+				&& !tour.getThumbnailUrl().equals(""))
+				&& !tour.getThumbnailUrl().equals(tourUpdate.getThumbnailUrl())) {
+			boolean checkDelete = iImageService.deleteImageByUrl(tour.getThumbnailUrl());
+			if (checkDelete == false) {
+				throw new CustomException("An error occurred during the processing of the old image");
+			}
+		}
+		
+		// check image update
+		boolean checkExists = false;
+		if (tour.getImage() != null) {
+			for (String itemString : tour.getImage()) {
+				checkExists = false;
+				for (String itemStringDTO : tourUpdate.getImage()) {
+					if (itemString.equals(itemStringDTO)) {
+						checkExists = true;
+						break;
+					}
+				}
+				
+				if (checkExists == false) {
+					boolean checkDelete = false;
+					checkDelete = iImageService.deleteImageByUrl(itemString);
+					if (checkDelete == false) {
+						throw new CustomException("An error occurred during the processing of the old image");
+					}
+				}
+			}
+		}
+		
+		// mapping tour
+		modelMapper.map(tourUpdate, tour);
+		
+		// update image by handle
+		tour.setImage(tourUpdate.getImage());
+		
+		// set tour detail list
+		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 		
 		// update tour
-		Tour tourNew = update(tourDTO);
+		Tour tourNew = new Tour();
+		tourNew = update(tour);
 		
-		return tourNew;
+		return getTourDTO(tourNew);
 	}
 
 	@Override
-	public Tour getDetailTour(String tourId) {
+	public TourDTO getDetailTour(String tourId) {
 		Tour tour  = getDetail(tourId);
 
-		return tour;
+		return getTourDTO(tour);
 	}
 
 	@Override
-	public List<Tour> getAllTour() {
-		List<Tour> tourList = getAll();
+	public List<TourDTO> getAllTour() {
+		List<Tour> tourList = new ArrayList<>(getAll());
 
-		return tourList;
+		return getTourDTOList(tourList);
 	}
 	
 	@Override
@@ -310,6 +322,7 @@ public class TourService implements ITourService{
 		List<Tour> tourList = new ArrayList<>();
 		List<Tour> tourListClone = new ArrayList<>();
 		List<TourSearchRes> tourSearchResList = new ArrayList<>(); 
+		int totalPrice = 0;
 		
 		if(tourSearch.getKeyword() != null) {
 			tourList = search(tourSearch.getKeyword());
@@ -382,8 +395,10 @@ public class TourService implements ITourService{
 		// search with number of people
 		
 		for(Tour itemTour : tourList) {
+			totalPrice = 0;
 			TourSearchRes tourSearchRes = new TourSearchRes();
 			tourSearchRes.setTour(itemTour);
+			totalPrice += itemTour.getPrice();
 			
 			if(tourSearch.getStartDate() != null && tourSearch.getNumberOfPeople() > 0) {
 				// search hotel
@@ -391,10 +406,10 @@ public class TourService implements ITourService{
 				hotelSearch.setProvince(tourSearch.getProvince());
 				hotelSearch.setDistrict(tourSearch.getDistrict());
 				hotelSearch.setCommune(tourSearch.getCommune());
-				List<hcmute.kltn.Backend.model.hotel.dto.entity.Hotel> hotelList = iHotelService.searchHotel(hotelSearch);
+				List<hcmute.kltn.Backend.model.hotel.dto.HotelDTO> hotelDTOList = iHotelService.searchHotel(hotelSearch);
 				
 				// search room in hotel
-				for(hcmute.kltn.Backend.model.hotel.dto.entity.Hotel itemHotel : hotelList) {
+				for(hcmute.kltn.Backend.model.hotel.dto.HotelDTO itemHotel : hotelDTOList) {
 					RoomSearch roomSearch = new RoomSearch();
 					roomSearch.setEHotelId(itemHotel.getEHotelId());
 					roomSearch.setStartDate(tourSearch.getStartDate());
@@ -412,6 +427,7 @@ public class TourService implements ITourService{
 							Room room = new Room();
 							modelMapper.map(itemRoom, room);
 							roomListRes.add(room);
+							totalPrice += room.getPrice();
 						}
 
 						hotel.setRoom(roomListRes);
@@ -423,7 +439,114 @@ public class TourService implements ITourService{
 				}
 			}
 			
+			tourSearchRes.setTotalPrice(totalPrice);
 			tourSearchResList.add(tourSearchRes);
+		}
+
+		return tourSearchResList;
+	}
+
+	@Override
+	public List<TourSearchRes> searchFilter(TourFilter tourFilter, List<TourSearchRes> tourSearchResList) {
+		try {
+			// price filter
+			int minPrice = Integer.valueOf(tourFilter.getMinPrice());
+			int maxPrice = Integer.valueOf(tourFilter.getMaxPrice());
+			if (minPrice >= 0 && maxPrice >= minPrice) {
+				List<TourSearchRes> tourSearchResListClone = new ArrayList<>();
+				tourSearchResListClone.addAll(tourSearchResList);
+				for (TourSearchRes itemTourSearchRes : tourSearchResListClone) {
+					if (itemTourSearchRes.getTotalPrice() < minPrice 
+							|| itemTourSearchRes.getTotalPrice() > maxPrice) {
+						tourSearchResList.remove(itemTourSearchRes);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search filter min max: " + e.getMessage());
+		}
+		
+		try {
+			// rating filter
+			int ratingFilter = Integer.valueOf(tourFilter.getRatingFilter());
+			if (ratingFilter >= 1 && ratingFilter <= 5) {
+				List<TourSearchRes> tourSearchResListClone = new ArrayList<>();
+				tourSearchResListClone.addAll(tourSearchResList);
+				for (TourSearchRes itemTourSearchRes : tourSearchResListClone) {
+					if (itemTourSearchRes.getTour().getRate() < ratingFilter) {
+						tourSearchResList.remove(itemTourSearchRes);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search filter rating: " + e.getMessage());
+		}
+		
+		return tourSearchResList;
+	}
+
+	@Override
+	public List<TourSearchRes> searchSort(TourSort tourSort, List<TourSearchRes> tourSearchResList) {
+		// sort by popular
+		try {
+			if (tourSort.getSortBy().equals("popular")) {
+				Collections.sort(tourSearchResList, new Comparator<TourSearchRes>() {
+		            @Override
+		            public int compare(TourSearchRes e1, TourSearchRes e2) {
+		            	int result = 0;
+		            	if (tourSort.getOrder().equals("asc")) {
+		            		result = Integer.compare(e1.getTour().getNumberOfOrdered(), e2.getTour().getNumberOfOrdered());
+		            	} else if (tourSort.getOrder().equals("desc")) {
+		            		result = Integer.compare(e2.getTour().getNumberOfOrdered(), e1.getTour().getNumberOfOrdered());
+		            	} else {
+		            		result = 0;
+		            	}
+		                return result;
+		            }
+		        });
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search sort by popular: " + e.getMessage());
+		}
+		
+		// sort by price
+		try {
+			if (tourSort.getSortBy().equals("price")) {
+				Collections.sort(tourSearchResList, new Comparator<TourSearchRes>() {
+		            @Override
+		            public int compare(TourSearchRes e1, TourSearchRes e2) {
+		            	int result = 0;
+		            	if (tourSort.getOrder().equals("asc")) {
+		            		result = Integer.compare(e1.getTotalPrice(), e2.getTotalPrice());
+		            	} else if (tourSort.getOrder().equals("desc")) {
+		            		result = Integer.compare(e2.getTotalPrice(), e1.getTotalPrice());
+		            	} else {
+		            		result = 0;
+		            	}
+		                return result;
+		            }
+		        });
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search sort by price: " + e.getMessage());
+		}
+		
+		// sort by promotion
+		try {	
+//		if (tourSort.getSortBy().equals("promotion")) {
+//			Collections.sort(tourSearchResList, new Comparator<TourSearchRes>() {
+//	            @Override
+//	            public int compare(TourSearchRes e1, TourSearchRes e2) {
+//	                int result = Integer.compare(e1.getTour().getNumberOfOrdered(), e2.getTour().getNumberOfOrdered());
+////		                if (result == 0) {
+////		                    result = e1.field2.compareTo(e2.field2);
+////		                }
+//	                return result;
+//	            }
+//	        });
+//		}	
+		} catch (Exception e) {
+			System.out.println("Tour search sort by promotion: " + e.getMessage());
 		}
 
 		return tourSearchResList;

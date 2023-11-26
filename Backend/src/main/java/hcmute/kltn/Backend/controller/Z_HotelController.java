@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
-import hcmute.kltn.Backend.model.tour.dto.TourCreate;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderUpdate;
@@ -26,9 +24,9 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/ehotels")

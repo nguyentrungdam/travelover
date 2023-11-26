@@ -23,16 +23,18 @@ public class TourDTO {
 	private List<String> image;
 	private String video;
 	private int numberOfDay; // not null
+	private int numberOfNight; // not null
 	private Address address; // not null
 	private String tourDescription;
-	private int price;
+	private int price; // not null
 	private String tourDetail;
 	private List<TourDetail> tourDetailList; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;
 	private String termAndCondition;
+	private int numberOfOrdered;
 	private int numberOfReviewer;
-	private int rate;
+	private double rate;
 	private List<Reviewer> reviewer;
 	private List<Discount> discount;
 }

@@ -102,7 +102,7 @@ public class DataLoader implements CommandLineRunner {
 		user1.setFirstName("dev");
 		user1.setLastName("dev");
 		user1.setEmail("dev@gmail.com");
-		user1.setPassword("123456");
+//		user1.setPassword("123456");
 		user1.setRole("ADMIN");
 		initCheck = iAccountService.initData(user1);
 		if (initCheck) {

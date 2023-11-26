@@ -27,12 +27,12 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 	@Autowired
     private MongoTemplate mongoTemplate;
 	
-	private void checkFieldCondition(GeneratorSequenceDTO generatorSequenceDTO) {
+	private void checkFieldCondition(GeneratorSequence generatorSequence) {
 		// check null
-		if(generatorSequenceDTO.getCollectionName() == null || generatorSequenceDTO.getCollectionName().equals("")) {
+		if(generatorSequence.getCollectionName() == null || generatorSequence.getCollectionName().equals("")) {
 			throw new CustomException("Collection Name is not null");
 		}
-		if(generatorSequenceDTO.getPrefix() == null || generatorSequenceDTO.getPrefix().equals("")) {
+		if(generatorSequence.getPrefix() == null || generatorSequence.getPrefix().equals("")) {
 			throw new CustomException("Prefix is not null");
 		}
 //		if(generatorSequenceDTO.getNumber() < 0) {
@@ -40,70 +40,97 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 //		}
 		
 		// check unique
-		if(generatorSequenceDTO.getId() == null || generatorSequenceDTO.getId().equals("")) {
-			if(generatorSequenceRepository.existsByCollectionName(generatorSequenceDTO.getCollectionName())) {
+		if(generatorSequence.getId() == null || generatorSequence.getId().equals("")) {
+			if(generatorSequenceRepository.existsByCollectionName(generatorSequence.getCollectionName())) {
 				throw new CustomException("Collection Name is already");
 			}
-			if(generatorSequenceRepository.existsByPrefix(generatorSequenceDTO.getPrefix())) {
+			if(generatorSequenceRepository.existsByPrefix(generatorSequence.getPrefix())) {
 				throw new CustomException("Prefix is already");
 			}
 		} else {
-			GeneratorSequence generatorSequence = generatorSequenceRepository.findById(generatorSequenceDTO.getId()).get();
-			List<GeneratorSequence> generatorSequencesCltNList = generatorSequenceRepository.findAllByCollectionName(generatorSequenceDTO.getCollectionName());
+			GeneratorSequence generatorSequenceFind = generatorSequenceRepository.findById(generatorSequence.getId()).get();
+			List<GeneratorSequence> generatorSequencesCltNList = generatorSequenceRepository.findAllByCollectionName(generatorSequence.getCollectionName());
 			for(GeneratorSequence item : generatorSequencesCltNList) {
-				if(item.getCollectionName() == generatorSequence.getCollectionName() && item.getId() != generatorSequence.getId()) {
+				if(item.getCollectionName() == generatorSequenceFind.getCollectionName() && item.getId() != generatorSequenceFind.getId()) {
 					throw new CustomException("Collection Name is already");
 				}
 			}
 
-			List<GeneratorSequence> generatorSequencesPrfNList = generatorSequenceRepository.findAllByPrefix(generatorSequenceDTO.getPrefix());
+			List<GeneratorSequence> generatorSequencesPrfNList = generatorSequenceRepository.findAllByPrefix(generatorSequence.getPrefix());
 			for(GeneratorSequence item : generatorSequencesPrfNList) {
-				if(item.getPrefix() == generatorSequence.getPrefix() && item.getId() != generatorSequence.getId()) {
+				if(item.getPrefix() == generatorSequenceFind.getPrefix() && item.getId() != generatorSequenceFind.getId()) {
 					throw new CustomException("Prefix is already");
 				}
 			}
 		}
 	}
-
-	private GeneratorSequence create(GeneratorSequenceDTO generatorSequenceDTO) {
+	
+	private GeneratorSequence create(GeneratorSequence generatorSequence) {
 		// check field condition
-		checkFieldCondition(generatorSequenceDTO);
-		
-		// Mapping
-		GeneratorSequence generatorSequence = new GeneratorSequence();
-		modelMapper.map(generatorSequenceDTO, generatorSequence);
-
-		// Set default value
-		generatorSequence.setNumber(0);
+		checkFieldCondition(generatorSequence);
 		
 		// create generator sequence
-		generatorSequence = generatorSequenceRepository.save(generatorSequence);
+		GeneratorSequence genSeqNew = new GeneratorSequence();
+		genSeqNew = generatorSequenceRepository.save(generatorSequence);
 		
-		return generatorSequence;
+		return genSeqNew;
 	}
 
-	private GeneratorSequence update(GeneratorSequenceDTO generatorSequenceDTO) {
+//	private GeneratorSequence create(GeneratorSequenceDTO generatorSequenceDTO) {
+//		// check field condition
+//		checkFieldCondition(generatorSequenceDTO);
+//		
+//		// Mapping
+//		GeneratorSequence generatorSequence = new GeneratorSequence();
+//		modelMapper.map(generatorSequenceDTO, generatorSequence);
+//
+//		// Set default value
+//		generatorSequence.setNumber(0);
+//		
+//		// create generator sequence
+//		generatorSequence = generatorSequenceRepository.save(generatorSequence);
+//		
+//		return generatorSequence;
+//	}
+	
+	private GeneratorSequence update(GeneratorSequence generatorSequence) {
 		// Check exists
-		if (!generatorSequenceRepository.existsById(generatorSequenceDTO.getId())) {
+		if (!generatorSequenceRepository.existsById(generatorSequence.getId())) {
 			throw new CustomException("Cannot find generator sequence");
 		}
 		
 		// check field condition
-		checkFieldCondition(generatorSequenceDTO);
-		
-		// get GeneratorSequence from db
-		GeneratorSequence generatorSequence = generatorSequenceRepository.findById(generatorSequenceDTO.getId()).get();
-		
-		// Mapping
-		modelMapper.map(generatorSequenceDTO, generatorSequence);
-		
-		// set default value
+		checkFieldCondition(generatorSequence);
 		
 		// update
-		generatorSequence = generatorSequenceRepository.save(generatorSequence);
+		GeneratorSequence genSeqNew = new GeneratorSequence();
+		genSeqNew = generatorSequenceRepository.save(generatorSequence);
 		
-		return generatorSequence;
+		return genSeqNew;
 	}
+
+//	private GeneratorSequence update(GeneratorSequenceDTO generatorSequenceDTO) {
+//		// Check exists
+//		if (!generatorSequenceRepository.existsById(generatorSequenceDTO.getId())) {
+//			throw new CustomException("Cannot find generator sequence");
+//		}
+//		
+//		// check field condition
+//		checkFieldCondition(generatorSequenceDTO);
+//		
+//		// get GeneratorSequence from db
+//		GeneratorSequence generatorSequence = generatorSequenceRepository.findById(generatorSequenceDTO.getId()).get();
+//		
+//		// Mapping
+//		modelMapper.map(generatorSequenceDTO, generatorSequence);
+//		
+//		// set default value
+//		
+//		// update
+//		generatorSequence = generatorSequenceRepository.save(generatorSequence);
+//		
+//		return generatorSequence;
+//	}
 
 	private GeneratorSequence getDetail(String generatorSequenceId) {
 		// Check exists
@@ -125,16 +152,11 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 		
 	}
 
-	private boolean delete(String generatorSequenceId) {
+	private void delete(String generatorSequenceId) {
 		// Check exists
-		if (!generatorSequenceRepository.existsById(generatorSequenceId)) {
-			throw new CustomException("Cannot find generator sequence");
+		if (generatorSequenceRepository.existsById(generatorSequenceId)) {
+			generatorSequenceRepository.deleteById(generatorSequenceId);
 		} 
-		
-		// delete generatorSequence
-		generatorSequenceRepository.deleteById(generatorSequenceId);
-		
-		return true;
 	}
 	
 	private List<GeneratorSequence> search(String keyword) {
@@ -164,45 +186,68 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 		
 		return genSeqList;
 	}
+	
+	private GeneratorSequenceDTO getGenSeqDTO (GeneratorSequence genSeq) {
+		GeneratorSequenceDTO genSeqDTONew = new GeneratorSequenceDTO();
+		modelMapper.map(genSeq, genSeqDTONew);
+		return genSeqDTONew;
+	}
+	
+	private List<GeneratorSequenceDTO> getGenSeqDTOList(List<GeneratorSequence> genSeqList) {
+		List<GeneratorSequenceDTO> genSeqDTOList = new ArrayList<>();
+		for (GeneratorSequence itemGenSeq : genSeqList) {
+			genSeqDTOList.add(getGenSeqDTO(itemGenSeq));
+		}
+		return genSeqDTOList;
+	}
 
 	@Override
-	public GeneratorSequence createGenSeq(GeneratorSequenceCreate generatorSequenceCreate) {
+	public GeneratorSequenceDTO createGenSeq(GeneratorSequenceCreate generatorSequenceCreate) {
 		// mapping
-		GeneratorSequenceDTO generatorSequenceDTO = new GeneratorSequenceDTO();
-		modelMapper.map(generatorSequenceCreate, generatorSequenceDTO);
+		GeneratorSequence generatorSequence = new GeneratorSequence();
+		modelMapper.map(generatorSequenceCreate, generatorSequence);
+		
+		// set default value
+		generatorSequence.setNumber(0);
 		
 		// create generatorSequence
-		GeneratorSequence generatorSequence = create(generatorSequenceDTO);
+		GeneratorSequence generatorSequenceNew = new GeneratorSequence();
+		generatorSequenceNew = create(generatorSequence);
 		
-		return generatorSequence;
+		return getGenSeqDTO(generatorSequenceNew);
 	}
 
 	@Override
-	public GeneratorSequence updateGenSeq(GeneratorSequenceDTO generatorSequenceDTO) {
-		GeneratorSequence genSeq = update(generatorSequenceDTO);
+	public GeneratorSequenceDTO updateGenSeq(GeneratorSequenceDTO generatorSequenceDTO) {
+		// mapping
+		GeneratorSequence generatorSequence = new GeneratorSequence();
+		modelMapper.map(generatorSequenceDTO, generatorSequence);
+				
+		GeneratorSequence genSeqNew = new GeneratorSequence();
+		genSeqNew =	update(generatorSequence);
 		
-		return genSeq;
+		return getGenSeqDTO(genSeqNew);
 	}
 
 	@Override
-	public GeneratorSequence getDetailGenSeq(String id) {
+	public GeneratorSequenceDTO getDetailGenSeq(String id) {
 		GeneratorSequence genSeq = getDetail(id);
 
-		return genSeq;
+		return getGenSeqDTO(genSeq);
 	}
 
 	@Override
-	public List<GeneratorSequence> getAllGenSeq() {
+	public List<GeneratorSequenceDTO> getAllGenSeq() {
 		List<GeneratorSequence> genSeqList = getAll();
 
-		return genSeqList;
+		return getGenSeqDTOList(genSeqList);
 	}
 
 	@Override
-	public List<GeneratorSequence> searchGenSeq(String keyword) {
+	public List<GeneratorSequenceDTO> searchGenSeq(String keyword) {
 		List<GeneratorSequence> genSeqList = search(keyword);
-		
-		return genSeqList;
+
+		return getGenSeqDTOList(genSeqList);
 	}
 	
 	@Override

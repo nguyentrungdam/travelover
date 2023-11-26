@@ -18,6 +18,7 @@ public class TourCreate {
 	private List<String> image;
 	private String video;
 	private int numberOfDay; // not null
+	private int numberOfNight; // not null
 	private Address address; // not null
 	private String tourDescription;
 	private int price;

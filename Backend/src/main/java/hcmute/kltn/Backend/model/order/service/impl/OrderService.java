@@ -17,6 +17,7 @@ import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.EOrderStatus;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
 import hcmute.kltn.Backend.model.hotel.dto.entity.Hotel;
 import hcmute.kltn.Backend.model.hotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
@@ -32,6 +33,7 @@ import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import hcmute.kltn.Backend.model.order.dto.extend.VOTourDetail;
 import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
+import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
@@ -74,49 +76,44 @@ public class OrderService implements IOrderService{
         return collectionName;
     }
     
-    private void checkFieldCondition(OrderDTO orderDTO) {
+    private void checkFieldCondition(Order order) {
 		// check null
 		LocalDate dateNow = LocalDateUtil.getDateNow();
-		if(orderDTO.getStartDate() == null || orderDTO.getStartDate().isEqual(dateNow) || orderDTO.getStartDate().isBefore(dateNow)) {
+		if(order.getStartDate() == null || order.getStartDate().isEqual(dateNow) || order.getStartDate().isBefore(dateNow)) {
 			throw new CustomException("The start date must greater than the current date");
 		}
-//		if(orderDTO.getEndDate() == null || orderDTO.getEndDate().isEqual(dateNow) 
+//		if(order.getEndDate() == null || order.getEndDate().isEqual(dateNow) 
 //				|| orderDTO.getEndDate().isBefore(dateNow) || orderDTO.getEndDate().isBefore(orderDTO.getStartDate())) {
 //			throw new CustomException("The end date must greater or equal than the start date");
 //		}
-		if(orderDTO.getCustomerInformation() == null) {
+		if(order.getCustomerInformation() == null) {
 			throw new CustomException("Customer Information is not null");
 		}
-		if(orderDTO.getNumberOfChildren() < 0) {
+		if(order.getNumberOfChildren() < 0) {
 			throw new CustomException("Number of children must greater or equal than 0");
 		}
-		if(orderDTO.getNumberOfAdult() <= 0) {
+		if(order.getNumberOfAdult() <= 0) {
 			throw new CustomException("Number of adult must greate than 0");
 		}
-//		if(orderDTO.getPrice() <= 0) {
+//		if(order.getPrice() <= 0) {
 //			throw new CustomException("Price must greate than 0");
 //		}
-		if(orderDTO.getTotalPrice() <= 0) {
+		if(order.getTotalPrice() <= 0) {
 			throw new CustomException("Total price must greate than 0");
 		}
 		
 		// check unique
 	}
-
-	private Order create(OrderDTO orderDTO) {
+    
+    private Order create(Order order) {
 		// check field condition
-		checkFieldCondition(orderDTO);
-		
-		// mapping
-		Order order = new Order();
-		modelMapper.map(orderDTO, order);
+		checkFieldCondition(order);
 		
 		// set default value
 		String orderId = iGeneratorSequenceService.genId(getCollectionName());
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		order.setOrderId(orderId);
-		order.setOrderStatus(getOrderStatus("1"));
 		order.setStatus(true);
 		order.setCreatedBy(accountId);
 		order.setCreatedAt(dateNow);
@@ -124,42 +121,91 @@ public class OrderService implements IOrderService{
 		order.setLastModifiedAt(dateNow);
 		
 		// create order
-		order = orderRepository.save(order);
+		Order orderNew = new Order();
+		orderNew = orderRepository.save(order);
 		
-		return order;
+		return orderNew;
 	}
 
-	private Order update(OrderDTO orderDTO) {
+//	private Order create(OrderDTO orderDTO) {
+//		// check field condition
+//		checkFieldCondition(orderDTO);
+//		
+//		// mapping
+//		Order order = new Order();
+//		modelMapper.map(orderDTO, order);
+//		
+//		// set default value
+//		String orderId = iGeneratorSequenceService.genId(getCollectionName());
+//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+//		LocalDate dateNow = LocalDateUtil.getDateNow();
+//		order.setOrderId(orderId);
+//		order.setOrderStatus(getOrderStatus("1"));
+//		order.setStatus(true);
+//		order.setCreatedBy(accountId);
+//		order.setCreatedAt(dateNow);
+//		order.setLastModifiedBy(accountId);
+//		order.setLastModifiedAt(dateNow);
+//		
+//		// create order
+//		order = orderRepository.save(order);
+//		
+//		return order;
+//	}
+    
+    private Order update(Order order) {
 		// check exists
-		if(!orderRepository.existsById(orderDTO.getOrderId())) {
+		if(!orderRepository.existsById(order.getOrderId())) {
 			throw new CustomException("Cannot find order");
 		}
 		
 		// check field condition
-		checkFieldCondition(orderDTO);
-		
-		// get order from db
-		Order order = orderRepository.findById(orderDTO.getOrderId()).get();
-		
-		// mapping
-		modelMapper.map(orderDTO, order);
+		checkFieldCondition(order);
 		
 		// set default value
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		LocalDate dateNow = LocalDateUtil.getDateNow();
-		String orderStatus = getOrderStatus(orderDTO.getOrderStatus());
-		if (orderStatus == null) {
-			throw new CustomException("Order status does not exist");
-		}
-		order.setOrderStatus(orderStatus);
 		order.setLastModifiedBy(accountId);
 		order.setLastModifiedAt(dateNow);
 		
 		// update order
-		order = orderRepository.save(order);
+		Order orderNew = new Order();
+		orderNew = orderRepository.save(order);
 
-		return order;
+		return orderNew;
 	}
+
+//	private Order update(OrderDTO orderDTO) {
+//		// check exists
+//		if(!orderRepository.existsById(orderDTO.getOrderId())) {
+//			throw new CustomException("Cannot find order");
+//		}
+//		
+//		// check field condition
+//		checkFieldCondition(orderDTO);
+//		
+//		// get order from db
+//		Order order = orderRepository.findById(orderDTO.getOrderId()).get();
+//		
+//		// mapping
+//		modelMapper.map(orderDTO, order);
+//		
+//		// set default value
+//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+//		LocalDate dateNow = LocalDateUtil.getDateNow();
+//		String orderStatus = getOrderStatus(orderDTO.getOrderStatus());
+//		if (orderStatus == null) {
+//			throw new CustomException("Order status does not exist");
+//		}
+//		order.setOrderStatus(orderStatus);
+//		order.setLastModifiedBy(accountId);
+//		order.setLastModifiedAt(dateNow);
+//		
+//		// update order
+//		order = orderRepository.save(order);
+//
+//		return order;
+//	}
 
 	private Order getDetail(String orderId) {
 		// check exists
@@ -180,9 +226,10 @@ public class OrderService implements IOrderService{
 		return orderList;
 	}
 
-	private boolean delete(String orderId) {
-		// TODO Auto-generated method stub
-		return false;
+	private void delete(String orderId) {
+		if (orderRepository.existsById(orderId)) {
+			orderRepository.deleteById(orderId);
+		}
 	}
 
 	private List<Order> search(String keyword) {
@@ -214,18 +261,28 @@ public class OrderService implements IOrderService{
 
 		return orderList;
 	}
-
 	
+	private OrderDTO getOrderDTO(Order order) {
+		OrderDTO orderDTONew = new OrderDTO();
+		modelMapper.map(order, orderDTONew);
+		return orderDTONew;
+	}
+	
+	private List<OrderDTO> getOrderDTOList(List<Order> orderList) {
+		List<OrderDTO> orderDTOList = new ArrayList<>();
+		for (Order itemOrder : orderList) {
+			orderDTOList.add(getOrderDTO(itemOrder));
+		}
+		return orderDTOList;
+	}
 
 	@Override
-	public Order createOrder(OrderCreate orderCreate) {
+	public OrderDTO createOrder(OrderCreate orderCreate) {
 		int totalPrice = 0;
 		
-		// mapping orderDto
-		OrderDTO orderDTO = new OrderDTO();
-		modelMapper.map(orderCreate, orderDTO);
-		
-		
+		// mapping order
+		Order order = new Order();
+		modelMapper.map(orderCreate, order);
 		
 		// init order detail
 		OrderDetail orderDetail = new OrderDetail();
@@ -233,12 +290,12 @@ public class OrderService implements IOrderService{
 		// get tour information
 		orderDetail.setTourId(orderCreate.getTourId());
 		
-		Tour tour = new Tour();
-		tour = iTourService.getDetailTour(orderCreate.getTourId());
+		TourDTO tourDTO = new TourDTO();
+		tourDTO = iTourService.getDetailTour(orderCreate.getTourId());
 		VOTourDetail vOTourDetail = new VOTourDetail();
-		vOTourDetail.setTourTitle(tour.getTourTitle());
-		vOTourDetail.setThumbnailUrl(tour.getThumbnailUrl());
-		vOTourDetail.setPrice(tour.getPrice());
+		vOTourDetail.setTourTitle(tourDTO.getTourTitle());
+		vOTourDetail.setThumbnailUrl(tourDTO.getThumbnailUrl());
+		vOTourDetail.setPrice(tourDTO.getPrice());
 		
 		orderDetail.setTourDetail(vOTourDetail);
 		
@@ -246,17 +303,17 @@ public class OrderService implements IOrderService{
 		totalPrice += vOTourDetail.getPrice();
 		
 		// update endDate
-		LocalDate endDate = orderDTO.getStartDate().plusDays((long) (tour.getNumberOfDay() - 1));
-		orderDTO.setEndDate(endDate);
+		LocalDate endDate = order.getStartDate().plusDays((long) (tourDTO.getNumberOfDay() - 1));
+		order.setEndDate(endDate);
 		
 		// get hotel information
 		List<HotelDetail> hotelDetailList = new ArrayList<>();
 		orderDetail.setHotelId(orderCreate.getHotelId());
-		Hotel hotel = new Hotel();
-		hotel = iHotelService.getDetailHotel(orderCreate.getHotelId());
+		HotelDTO hotelDTO = new HotelDTO();
+		hotelDTO = iHotelService.getDetailHotel(orderCreate.getHotelId());
 		for (String itemString : orderCreate.getRoomIdList()) {
 			Room room = new Room();
-			room = iHotelService.getRoomDetail(hotel.getEHotelId(), itemString);
+			room = iHotelService.getRoomDetail(hotelDTO.getEHotelId(), itemString);
 			HotelDetail hotelDetail = new HotelDetail();
 			hotelDetail.setRoomId(room.getRoomId());
 			hotelDetail.setCapacity(room.getCapacity());
@@ -274,71 +331,80 @@ public class OrderService implements IOrderService{
 		
 		// get guider information
 		
-		orderDTO.setOrderDetail(orderDetail);
-		orderDTO.setTotalPrice(totalPrice);
+		order.setOrderDetail(orderDetail);
+		order.setTotalPrice(totalPrice);
+		order.setOrderStatus(getOrderStatus("1"));
 		
 		// create order
-		Order order = new Order();
-		order = create(orderDTO);
+		Order orderNew = new Order();
+		orderNew = create(order);
 
-		return order;
+		return getOrderDTO(orderNew);
 	}
 
 	@Override
-	public Order updateOrder(OrderUpdate orderUpdate) {
-		// mapping orderDTO
-		OrderDTO orderDTO = new OrderDTO();
-		modelMapper.map(orderUpdate, orderDTO);
+	public OrderDTO updateOrder(OrderUpdate orderUpdate) {
+		// mapping order
+		Order order = new Order();
+		order = getDetail(orderUpdate.getOrderId());
+		modelMapper.map(orderUpdate, order);
+		
+		// set default value
+		String orderStatus = getOrderStatus(orderUpdate.getOrderStatus());
+		if (orderStatus == null) {
+			throw new CustomException("Order status does not exist");
+		}
+		order.setOrderStatus(orderStatus);
 		
 		// update order
-		Order order = new Order();
-		order = update(orderDTO);
+		Order orderNew = new Order();
+		orderNew = update(order);
 
-		return order;
+		return getOrderDTO(orderNew);
 	}
 
 	@Override
-	public Order getDetailOrder(String orderId) {
+	public OrderDTO getDetailOrder(String orderId) {
 		Order order = getDetail(orderId);
 
-		return order;
+		return getOrderDTO(order);
 	}
 
 	@Override
-	public List<Order> getAllOrder() {
+	public List<OrderDTO> getAllOrder() {
 		List<Order> orderList = getAll();
 
-		return orderList;
+		return getOrderDTOList(orderList);
 	}
 
 	@Override
-	public List<Order> searchOrder(String keyword) {
+	public List<OrderDTO> searchOrder(String keyword) {
 		List<Order> orderList = search(keyword);
 
-		return orderList;
+		return getOrderDTOList(orderList);
 	}
 
 	@Override
-	public Order updateOrderStatus(OrderStatusUpdate orderStatusUpdate) {
+	public OrderDTO updateOrderStatus(OrderStatusUpdate orderStatusUpdate) {
 		// get order from database
 		Order order = new Order();
 		order = getDetail(orderStatusUpdate.getOrderId());
 		
-		// get order dto
-		OrderDTO orderDTO = new OrderDTO();
-		modelMapper.map(order, orderDTO);
-		
-		// update order status
-		orderDTO.setOrderStatus(orderStatusUpdate.getStatus());
+		String orderStatus = getOrderStatus(orderStatusUpdate.getStatus());
+		if (orderStatus == null) {
+			throw new CustomException("Order status does not exist");
+		}
+		order.setOrderStatus(orderStatus);
 
 		// update order
-		order = update(orderDTO);
+		Order orderNew = new Order();
+		orderNew = update(order);
 		
-		return order;
+		return getOrderDTO(orderNew);
 	}
 
 	@Override
-	public Order updateOrderPayment(OrderPaymentUpdate orderPaymentUpdate) {
+	public OrderDTO updateOrderPayment(OrderPaymentUpdate orderPaymentUpdate) {
 		// get order from database
 		Order order = new Order();
 		order = getDetail(orderPaymentUpdate.getOrderId());
@@ -369,8 +435,9 @@ public class OrderService implements IOrderService{
 		}
 		
 		// update order
-		order = orderRepository.save(order);
+		Order orderNew = new Order();
+		orderNew = update(order);
 		
-		return order;
+		return getOrderDTO(orderNew);
 	}
 }

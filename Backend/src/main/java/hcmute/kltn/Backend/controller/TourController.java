@@ -17,10 +17,12 @@ import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
+import hcmute.kltn.Backend.model.tour.dto.TourDTO;
+import hcmute.kltn.Backend.model.tour.dto.TourFilter;
 import hcmute.kltn.Backend.model.tour.dto.TourSearch;
 import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
+import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,12 +50,12 @@ public class TourController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> createTour(
 			@RequestBody TourCreate tourCreate) {
-		Tour tour = iTourService.createTour(tourCreate);
+		TourDTO tourDTO = iTourService.createTour(tourCreate);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Create Tour successfully");
-				setData(tour);
+				setData(tourDTO);
 			}
 		});
 	}
@@ -71,12 +73,12 @@ public class TourController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> updateTour(
 			@RequestBody TourUpdate tourUpdate) {
-		Tour tour = iTourService.updateTour(tourUpdate);
+		TourDTO tourDTO = iTourService.updateTour(tourUpdate);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Update tour successfulle");
-				setData(tour);
+				setData(tourDTO);
 			}
 		});
 	}
@@ -84,12 +86,12 @@ public class TourController {
 	@RequestMapping(value = "/detail", method = RequestMethod.GET)
 	@Operation(summary = "Get tour detail")
 	ResponseEntity<ResponseObject> getDetail(@RequestParam String tourId) {
-		Tour tour = iTourService.getDetailTour(tourId);
+		TourDTO tourDTO = iTourService.getDetailTour(tourId);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get detail tour successfully");
-				setData(tour);
+				setData(tourDTO);
 			}
 		});
 	}
@@ -114,14 +116,14 @@ public class TourController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> getAllTour(
 			@ModelAttribute Pagination Pagination) {
-		List<Tour> list = iTourService.getAllTour();
+		List<TourDTO> tourDTOList = iTourService.getAllTour();
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all tour successfully");
 				setPageSize(Pagination.getPageSize());
 				setPageNumber(Pagination.getPageNumber());
-				setData(list);
+				setData(tourDTOList);
 			}
 		});
 	}
@@ -140,21 +142,34 @@ public class TourController {
 			+ "- - pageNumber > 0\n"
 			+ "- Lấy trang cuối cùng: \n"
 			+ "- - pageSize > 0\n"
-			+ "- - pageNumber = -1\n";
+			+ "- - pageNumber = -1\n\n"
+			+ "tourFilter: không dùng thì không truyền gì hết\n"
+			+ "- - minPrice >= 0\n"
+			+ "- - maxPrice >= minPrice\n"
+			+ "- - 1 <= ratingFilter <= 5\n\n"
+			+ "tourSort: không dùng thì không truyền gì hết (chưa xử lý promotion)\n"
+			+ "- - sortBy = 1 trong 3 loại là popular, price, promotion\n"
+			+ "- - order = 1 trong 2 loại là asc, desc\n";
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@Operation(summary = "Search tour", description = searchTourDesc)
 //	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> searchTour(
 			@ModelAttribute TourSearch tourSearch,
+			@ModelAttribute TourFilter tourFilter,
+			@ModelAttribute TourSort tourSort,
 			@ModelAttribute Pagination Pagination) {
 		List<TourSearchRes> tourList = iTourService.searchTour(tourSearch);
+		
+		List<TourSearchRes> tourFilterList = iTourService.searchFilter(tourFilter, tourList);
+		
+		List<TourSearchRes> tourSortList = iTourService.searchSort(tourSort, tourFilterList);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search tour successfully");
 				setPageSize(Pagination.getPageSize());
 				setPageNumber(Pagination.getPageNumber());
-				setData(tourList);
+				setData(tourSortList);
 			}
 		});
 	}
