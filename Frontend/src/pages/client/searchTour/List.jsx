@@ -1,7 +1,7 @@
 import "./list.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
 import ScrollToTop from "../../../shared/ScrollToTop";
@@ -87,6 +87,7 @@ const List = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  const tomorrow = addDays(new Date(), 1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,6 +143,10 @@ const List = () => {
       },
     });
   };
+  // Hàm tính tổng tiền từ mảng các phòng
+  const calculateRoomTotalPrice = (rooms) => {
+    return rooms.reduce((total, room) => total + room.price, 0);
+  };
   return (
     <>
       {isHeaderVisible ? <Header /> : " "}
@@ -176,7 +181,7 @@ const List = () => {
                       value={selectedDate}
                       locale={vi} // Thiết lập ngôn ngữ Tiếng Việt
                       dateFormat="dd-MM-yyyy" // Định dạng ngày tháng
-                      minDate={new Date()} // Chỉ cho phép chọn ngày từ hôm nay trở đi
+                      minDate={tomorrow} // Chỉ cho phép chọn ngày từ mai trở đi
                     />
                   </div>
                   <div className="tour-search-result__filter__block mb-2 d-flex align-items-center">
@@ -368,7 +373,11 @@ const List = () => {
                               <div className="tour-item__price--old"></div>
                               <div className="tour-item__price--current fix-leftalign">
                                 <span className="tour-item__price--current__number pe-2 mb-0">
-                                  {formatCurrencyWithoutD(item.tour.price)}₫
+                                  {formatCurrencyWithoutD(
+                                    item?.tour?.price +
+                                      calculateRoomTotalPrice(item?.hotel?.room)
+                                  )}
+                                  ₫
                                 </span>
                               </div>
                               <div className="tour-item__price--current">

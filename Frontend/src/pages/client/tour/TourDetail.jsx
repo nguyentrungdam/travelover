@@ -50,18 +50,25 @@ const TourDetail = () => {
     ).unwrap();
   }, []);
   console.log(tours);
-  const handleOrder = () => {
-    navigate(`/tours/tour-booking`);
+  const handleOrder = (tourId) => {
+    navigate(`/tours/tour-booking/${tourId}`, {
+      state: {
+        province,
+        startDate,
+        numberOfDay,
+        numberOfPeople,
+      },
+    });
   };
 
   const handleOpenOverlay = (i) => {
     setSlideNumber(i);
     setOpen(true);
-    document.body.classList.add("no-scroll");
+    document.body.classList.add("modal-open1");
   };
   const handleCloseOverlay = () => {
     setOpen(false);
-    document.body.classList.remove("no-scroll");
+    document.body.classList.remove("modal-open1");
   };
   const handleMove = (direction) => {
     let newSlideNumber;
@@ -74,7 +81,7 @@ const TourDetail = () => {
 
     setSlideNumber(newSlideNumber);
   };
-  const totalPriceRoom = tours[0]?.hotel.room.reduce((acc, room) => {
+  const totalPriceRoom = tours[0]?.hotel?.room.reduce((acc, room) => {
     if (room.status) {
       return acc + room.price;
     }
@@ -98,7 +105,11 @@ const TourDetail = () => {
               onClick={() => handleMove("l")}
             />
             <div className="sliderWrapper">
-              <img src={photos[slideNumber].src} alt="" className="sliderImg" />
+              <img
+                src={tours[0]?.tour?.image[slideNumber]}
+                alt=""
+                className="sliderImg"
+              />
             </div>
             <FontAwesomeIcon
               icon={faCircleArrowRight}
@@ -120,7 +131,10 @@ const TourDetail = () => {
                 </span>
                 /khách
               </p>
-              <button className="bookNow" onClick={() => handleOrder()}>
+              <button
+                className="bookNow"
+                onClick={() => handleOrder(tours[0]?.tour?.tourId)}
+              >
                 Đặt Ngay
               </button>
             </div>
@@ -130,11 +144,11 @@ const TourDetail = () => {
             <span className="fz-14">{tours[0]?.tour?.address.province}</span>
           </div>
           <div className="hotelImages">
-            {photos.map((photo, i) => (
+            {tours[0]?.tour?.image.map((photo, i) => (
               <div className="hotelImgWrapper" key={i}>
                 <img
                   onClick={() => handleOpenOverlay(i)}
-                  src={photo.src}
+                  src={photo}
                   alt=""
                   className="hotelImg"
                 />

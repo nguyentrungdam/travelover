@@ -53,6 +53,7 @@ const AddTours = () => {
         setFormData(formDataClone);
       })
       .catch((error) => {
+        notify(2);
         console.error("Lỗi khi gọi API:", error);
       });
   };

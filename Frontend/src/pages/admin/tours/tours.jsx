@@ -6,7 +6,7 @@ import { getAllTours } from "../../../slices/tourSlice";
 import Loading from "../../../components/Loading/Loading";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 40, type: "string" },
+  { field: "stt", headerName: "ID", width: 40, type: "string" },
   {
     field: "img",
     headerName: "Image",
@@ -19,18 +19,18 @@ const columns = [
     field: "title",
     type: "string",
     headerName: "Tour Title",
-    width: 600,
+    width: 650,
   },
   {
     field: "days",
     type: "string",
     headerName: "Days",
-    width: 150,
+    width: 80,
   },
   {
     field: "createdAt",
     headerName: "Created At",
-    width: 100,
+    width: 120,
     type: "string",
   },
 ];
@@ -41,7 +41,8 @@ const ToursList = () => {
   const transformedData =
     tours && Array.isArray(tours)
       ? tours.map((item, index) => ({
-          id: item.tourId ? item.tourId.slice(-2) : index,
+          stt: index + 1,
+          id: item?.tourId,
           img: item?.thumbnailUrl,
           title: item.tourTitle,
           days: item.numberOfDay,

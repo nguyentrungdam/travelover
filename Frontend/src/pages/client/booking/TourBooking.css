@@ -179,10 +179,11 @@
   flex-direction: column;
 }
 .checkout-main.order-tour .customer-contact .customer-contact-inner > * label {
-  font-size: 13px;
+  font-size: 14px;
   line-height: 16px;
   display: flex;
   align-items: center;
+  font-weight: bold;
   color: #2d4271;
   margin-bottom: 5px;
 }
@@ -199,7 +200,7 @@
 }
 .checkout-main.order-tour .customer-contact .customer-contact-inner > * input {
   background: #fff;
-  border: 1px solid #e7e7e7;
+  border: 1px solid #c6c5c5;
   box-sizing: border-box;
   border-radius: 5px;
   height: 40px;
@@ -446,4 +447,12 @@
 .btn-order:hover {
   transition: transform 0.3s ease;
   transform: scale(1.04);
+}
+.error-container1 {
+  position: absolute;
+  bottom: -26px;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 3px;
+  color: rgb(226, 12, 12);
 }
