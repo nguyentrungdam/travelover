@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -189,7 +190,7 @@ public class TourService implements ITourService{
 		// init Tour List
 		List<Tour> tourList = new ArrayList<>();
 		
-		if(keyword == null || keyword.equals("")) {
+		if(keyword == null || keyword.trim().isEmpty()) {
 			tourList = getAll();
 		} else {
 			// create list field name
@@ -197,8 +198,9 @@ public class TourService implements ITourService{
 			for(Field itemField : Tour.class.getDeclaredFields()) {
 				 if (itemField.getType() == String.class) {
 					 criteriaList.add(Criteria.where(itemField.getName()).regex(keyword, "i"));
-				 }
+				 } 
 	    	}
+			criteriaList.add(Criteria.where("_id").is(keyword));
 
 			// create criteria
 			Criteria criteria = new Criteria();

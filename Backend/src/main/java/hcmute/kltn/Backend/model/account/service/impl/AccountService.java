@@ -170,6 +170,7 @@ public class AccountService implements IAccountService{
 					 criteriaList.add(Criteria.where(itemField.getName()).regex(keyword, "i"));
 				 }
 	    	}
+			criteriaList.add(Criteria.where("_id").is(keyword));
 
 			// create criteria
 			Criteria criteria = new Criteria();

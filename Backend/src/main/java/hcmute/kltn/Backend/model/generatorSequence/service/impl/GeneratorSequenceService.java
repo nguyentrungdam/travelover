@@ -173,6 +173,8 @@ public class GeneratorSequenceService implements IGeneratorSequenceService {
 					criteriaList.add(Criteria.where(itemField.getName()).regex(keyword, "i"));
 				}
 			}
+			criteriaList.add(Criteria.where("_id").is(keyword));
+			
 			Criteria criteria = new Criteria();
 			criteria.orOperator(criteriaList.toArray(new Criteria[0]));
 			
