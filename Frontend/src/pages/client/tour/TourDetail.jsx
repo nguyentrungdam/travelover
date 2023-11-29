@@ -162,7 +162,10 @@ const TourDetail = () => {
                 <div className="item">
                   <img src="/noavatar.png" className="icon-img" alt="" />
                   <label>Thời gian</label>
-                  <p>{tours[0]?.tour?.numberOfDay} ngày</p>
+                  <p>
+                    {tours[0]?.tour?.numberOfDay} ngày{" "}
+                    {tours[0]?.tour?.numberOfNight} đêm
+                  </p>
                 </div>
                 <div className="item">
                   <img src="/noavatar.png" className="icon-img" alt="" />

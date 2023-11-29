@@ -41,18 +41,6 @@ const columns = [
     headerName: "Role",
     width: 150,
   },
-  {
-    field: "createdAt",
-    headerName: "Create At",
-    width: 120,
-    type: "string",
-  },
-  {
-    field: "verified",
-    headerName: "Verified",
-    width: 100,
-    type: "boolean",
-  },
 ];
 
 const Users = () => {
@@ -68,8 +56,6 @@ const Users = () => {
           firstName: item.firstName,
           email: item.email,
           role: item.role,
-          createdAt: item.createdAt,
-          verified: item.status,
         }))
       : [];
 
@@ -81,7 +67,7 @@ const Users = () => {
     <div className="users">
       <div className="info">
         <h1>Users</h1>
-        <button onClick={() => setOpen(true)}>Add New User</button>
+        {/* <button onClick={() => setOpen(true)}>Add New User</button> */}
       </div>
 
       {loading ? (

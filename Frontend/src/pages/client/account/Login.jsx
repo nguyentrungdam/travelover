@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Container, Row, Col, Form, Button } from "reactstrap";
 import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,7 +30,7 @@ const Login = () => {
         setTimeout(() => {
           navigate("/");
         }, 1500);
-      } else if (res.data.status === "ok" && res.data.data.role === "ADMIN") {
+      } else if (res.data.status === "ok" && res?.data?.data.role === "ADMIN") {
         notify(1);
         setTimeout(() => {
           navigate("/dashboard");

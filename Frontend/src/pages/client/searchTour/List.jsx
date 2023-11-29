@@ -9,6 +9,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import {
   formatCurrencyWithoutD,
+  saveToLocalStorage,
   validateOriginalDate,
 } from "../../../utils/validate";
 import { useDispatch, useSelector } from "react-redux";
@@ -133,15 +134,30 @@ const List = () => {
       setIsChecked2(!isChecked2);
     }
   };
-  const handleViewDetail = (tourId) => {
-    navigate(`/tours/tour-detail/${tourId}`, {
-      state: {
-        province: province || location.state.province,
-        startDate,
-        numberOfDay,
-        numberOfPeople,
-      },
-    });
+  const handleViewDetailOrPayNow = (tourId, number) => {
+    if (number === 1) {
+      navigate(`/tours/tour-detail/${tourId}`, {
+        state: {
+          province: province || location.state.province,
+          startDate,
+          numberOfDay,
+          numberOfPeople,
+        },
+      });
+    } else {
+      navigate(`/tours/tour-booking/${tourId}`, {
+        state: {
+          province: province || location.state.province,
+          startDate,
+          numberOfDay,
+          numberOfPeople,
+        },
+      });
+      saveToLocalStorage("province", province || location.state.province);
+      saveToLocalStorage("startDate", startDate);
+      saveToLocalStorage("numberOfDay", numberOfDay);
+      saveToLocalStorage("numberOfPeople", numberOfPeople);
+    }
   };
   // Hàm tính tổng tiền từ mảng các phòng
   const calculateRoomTotalPrice = (rooms) => {
@@ -382,7 +398,15 @@ const List = () => {
                               </div>
                               <div className="tour-item__price--current">
                                 <div className="btn-book">
-                                  <div className=" btn-sm btnOptionTour">
+                                  <div
+                                    className=" btn-sm btnOptionTour"
+                                    onClick={() =>
+                                      handleViewDetailOrPayNow(
+                                        item.tour.tourId,
+                                        2
+                                      )
+                                    }
+                                  >
                                     <FontAwesomeIcon
                                       className="me-1"
                                       icon={faCartShopping}
@@ -393,7 +417,10 @@ const List = () => {
                                 <div
                                   className="btn-block"
                                   onClick={() =>
-                                    handleViewDetail(item.tour.tourId)
+                                    handleViewDetailOrPayNow(
+                                      item.tour.tourId,
+                                      1
+                                    )
                                   }
                                 >
                                   Xem chi tiết

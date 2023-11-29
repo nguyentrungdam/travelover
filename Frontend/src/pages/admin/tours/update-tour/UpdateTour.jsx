@@ -69,6 +69,7 @@ const UpdateTour = () => {
     thumbnailUrl: "",
     profilePicture: "",
     numberOfDay: 0,
+    numberOfNight: 0,
     moreLocation: "",
     tourDescription: "",
     tourDetail: "",
@@ -112,6 +113,10 @@ const UpdateTour = () => {
     formDataUpdate.append(
       "numberOfDay",
       formData.numberOfDay || tour.numberOfDay
+    );
+    formDataUpdate.append(
+      "numberOfNight",
+      formData.numberOfNight || tour.numberOfNight
     );
     formDataUpdate.append(
       "tourDescription",
@@ -220,11 +225,21 @@ const UpdateTour = () => {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-2">
                     <label className="small mb-1">Days</label>
                     <input
                       defaultValue={tour.numberOfDay}
                       name="numberOfDay"
+                      className="form-control"
+                      type="text"
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-md-2">
+                    <label className="small mb-1">Nights</label>
+                    <input
+                      defaultValue={tour.numberOfNight}
+                      name="numberOfNight"
                       className="form-control"
                       type="text"
                       onChange={handleChange}

@@ -41,6 +41,26 @@ export function validateOriginalDate(day) {
     : "";
   return formattedDate;
 }
+export function formatDateToVietnamese(dateString) {
+  const daysOfWeek = [
+    "Chủ Nhật",
+    "Thứ Hai",
+    "Thứ Ba",
+    "Thứ Tư",
+    "Thứ Năm",
+    "Thứ Sáu",
+    "Thứ Bảy",
+  ];
+
+  const date = new Date(dateString);
+  const dayOfWeek = daysOfWeek[date.getDay()];
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+
+  return `${dayOfWeek}, ${day} tháng ${month}, ${year}`;
+}
+
 export function formatCurrencyWithoutD(amount) {
   const formatter = new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -60,3 +80,13 @@ export function FormatLine({ text }) {
     </p>
   ));
 }
+// Lưu giá trị vào localStorage
+export const saveToLocalStorage = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+// Đọc giá trị từ localStorage
+export const getFromLocalStorage = (key) => {
+  const storedValue = localStorage.getItem(key);
+  return storedValue ? JSON.parse(storedValue) : null;
+};

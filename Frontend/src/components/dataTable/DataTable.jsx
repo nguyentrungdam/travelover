@@ -13,6 +13,7 @@ const DataTable = (props) => {
   const actionColumn = {
     field: "action",
     headerName: "Action",
+    sortable: false,
     width: 200,
     renderCell: (params) => {
       return (
@@ -52,7 +53,7 @@ const DataTable = (props) => {
             },
           },
         }}
-        slots={{ toolbar: GridToolbar }}
+        // slots={{ toolbar: GridToolbar }}
         slotProps={{
           toolbar: {
             showQuickFilter: true,
@@ -60,11 +61,6 @@ const DataTable = (props) => {
           },
         }}
         pageSizeOptions={[5, 10, 20, 50]}
-        checkboxSelection
-        disableRowSelectionOnClick
-        disableColumnFilter
-        disableDensitySelector
-        disableColumnSelector
       />
     </div>
   );

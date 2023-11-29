@@ -39,3 +39,10 @@
   font-size: 1rem !important;
   margin-bottom: 0px !important;
 }
+.css-kzyyzb-MuiDataGrid-root .MuiDataGrid-columnHeaderDraggableContainer {
+  margin: 0 10px;
+}
+.MuiDataGrid-cell,
+.MuiDataGrid-columnHeaderTitleContainer {
+  justify-content: center !important;
+}

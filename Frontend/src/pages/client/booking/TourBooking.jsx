@@ -9,10 +9,12 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { orderTour } from "../../../slices/orderSlice";
 import { axiosInstance } from "../../../apis/axios";
-import { addDays, format } from "date-fns";
-import { vi } from "date-fns/locale";
+import { addDays } from "date-fns";
 import {
   formatCurrencyWithoutD,
+  formatDateToVietnamese,
+  getFromLocalStorage,
+  saveToLocalStorage,
   validateEmail,
   validateVietnameseName,
   validateVietnamesePhoneNumber,
@@ -20,6 +22,7 @@ import {
 
 const TourBooking = () => {
   const { loading, tours } = useSelector((state) => state.tour);
+  const { account } = useSelector((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
   const { tourId } = useParams();
@@ -27,15 +30,20 @@ const TourBooking = () => {
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const { state } = location;
-  const province = state ? state.province : "";
-  const startDate = state ? state.startDate : "";
-  const numberOfDay = state ? state.numberOfDay : "";
-  const numberOfPeople = state ? state.numberOfPeople : 1;
-  const [customerInformation, setCustomerInformation] = useState({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
-  });
+  const province = state
+    ? state.province
+    : getFromLocalStorage("province") || "";
+  const startDateFromLocalStorage = getFromLocalStorage("startDate");
+  const startDate = state
+    ? state.startDate
+    : new Date(startDateFromLocalStorage) || "";
+  const numberOfDay = state
+    ? state.numberOfDay
+    : getFromLocalStorage("numberOfDay") || "";
+  const numberOfPeople = state
+    ? state.numberOfPeople
+    : getFromLocalStorage("numberOfPeople") || 1;
+
   const [note, setNote] = useState("");
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -51,16 +59,17 @@ const TourBooking = () => {
       })
     ).unwrap();
   }, []);
-  console.log(tours);
-  //validate date
+
+  // validate date
   const startDateString = new Date(startDate);
   const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
   const endDateString = new Date(endDate);
-  const formattedEndDate = format(endDateString, "iii, dd MMMM, yyyy", {
-    locale: vi,
-  });
-  const formattedStartDate = format(startDateString, "iii, dd MMMM, yyyy", {
-    locale: vi,
+  const formattedStartDate = formatDateToVietnamese(startDateString);
+  const formattedEndDate = formatDateToVietnamese(endDateString);
+  const [customerInformation, setCustomerInformation] = useState({
+    fullName: getFromLocalStorage("fullName") || "",
+    email: getFromLocalStorage("email") || "",
+    phoneNumber: getFromLocalStorage("phoneNumber") || "",
   });
   const totalPriceRoom = tours[0]?.hotel?.room.reduce((acc, room) => {
     if (room.status) {
@@ -100,55 +109,46 @@ const TourBooking = () => {
     }
   };
 
-  console.log(tours);
+  console.log(customerInformation);
   const handlePayment = async (e) => {
     e.preventDefault();
-    if (
-      !customerInformation.fullName ||
-      !customerInformation.email ||
-      !customerInformation.phoneNumber
-    ) {
-      alert("Vui lòng nhập đầy đủ các thông tin bắt buộc!");
-      return;
-    } else {
-      try {
-        const res = await dispatch(
-          orderTour({
-            startDate: startDate,
-            tourId,
-            hotelId: tours[0]?.hotel?.hotelId,
-            roomIdList: tours[0]?.hotel?.room.map((room) => room.roomId),
-            vehivleId: "",
-            carIdList: [],
-            guiderId: "",
-            personIdList: [],
-            customerInformation,
-            numberOfChildren: 0,
-            numberOfAdult: numberOfPeople,
-            note,
+    try {
+      const res = await dispatch(
+        orderTour({
+          startDate: startDate,
+          tourId,
+          hotelId: tours[0]?.hotel?.hotelId,
+          roomIdList: tours[0]?.hotel?.room.map((room) => room.roomId),
+          vehivleId: "",
+          carIdList: [],
+          guiderId: "",
+          personIdList: [],
+          customerInformation,
+          numberOfChildren: 0,
+          numberOfAdult: numberOfPeople,
+          note,
+        })
+      ).unwrap();
+      console.log(res);
+      if (res.data.status === "ok") {
+        let orderVNPayData = {
+          amount: res.data.data.totalPrice,
+          orderType: "tour",
+          orderInfo: res.data.data.orderId,
+          returnUrl: "http://localhost:3000/thank-you",
+        };
+        console.log(orderVNPayData);
+        axiosInstance
+          .post("/payments/vnpay/create", orderVNPayData)
+          .then((response) => {
+            window.location.href = response.data.data;
           })
-        ).unwrap();
-        console.log(res);
-        if (res.data.status === "ok") {
-          let orderVNPayData = {
-            amount: res.data.data.totalPrice,
-            orderType: "tour",
-            orderInfo: res.data.data.orderId,
-            returnUrl: "http://localhost:3000/thank-you",
-          };
-          console.log(orderVNPayData);
-          axiosInstance
-            .post("/payments/vnpay/create", orderVNPayData)
-            .then((response) => {
-              window.location.href = response.data.data;
-            })
-            .catch((error) => {
-              console.error("Lỗi khi gọi API:", error);
-            });
-        }
-      } catch (err) {
-        alert(err);
+          .catch((error) => {
+            console.error("Lỗi khi gọi API:", error);
+          });
       }
+    } catch (err) {
+      alert(err);
     }
   };
 
@@ -211,6 +211,10 @@ const TourBooking = () => {
                     </label>
                     <input
                       className="form-control"
+                      defaultValue={account.data?.firstName.concat(
+                        " ",
+                        account.data?.lastName
+                      )}
                       placeholder="Vd: Nguyễn Văn A"
                       id="contact_name"
                       name="fullName"
@@ -226,6 +230,7 @@ const TourBooking = () => {
                       Email <b>*</b>
                     </label>
                     <input
+                      defaultValue={account.data?.email}
                       placeholder="Vd: nguyenvana@gmail.com"
                       className="form-control"
                       id="email"
@@ -242,6 +247,7 @@ const TourBooking = () => {
                       Số điện thoại <b>*</b>
                     </label>
                     <input
+                      defaultValue={account.data?.phoneNumber}
                       placeholder="Vd: 0398765432"
                       className="form-control"
                       id="mobilephone"

@@ -100,6 +100,9 @@ export const accountSlice = createSlice({
       state.account = {};
       console.log(state.account);
       localStorage.removeItem("token");
+      localStorage.removeItem("fullName");
+      localStorage.removeItem("email");
+      localStorage.removeItem("phoneNumber");
     },
   },
   extraReducers: {
