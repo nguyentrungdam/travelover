@@ -29,6 +29,7 @@ import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
 import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
+import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
@@ -550,5 +551,17 @@ public class TourService implements ITourService{
 		}
 
 		return tourSearchResList;
+	}
+
+	@Override
+	public Discount updateDiscount(String tourId, Discount discount) {
+		Tour tour = new Tour();
+		tour = getDetail(tourId);
+		tour.setDiscount(discount);
+		
+		Tour tourNew = new Tour();
+		tourNew = update(tour);
+		
+		return tourNew.getDiscount();
 	}
 }

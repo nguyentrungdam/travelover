@@ -44,7 +44,7 @@ public class Tour extends BaseEntity{
 	private int numberOfReviewer;
 	private double rate;
 	private List<Reviewer> reviewer;
-	private List<Discount> discount;
+	private Discount discount;
 }
 
 

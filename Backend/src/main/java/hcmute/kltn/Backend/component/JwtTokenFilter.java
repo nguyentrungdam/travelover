@@ -100,6 +100,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 //			    authorities.add(new SimpleGrantedAuthority(role.toString()));
 //			}
     		if (user.get().getRole().equals("SUPER_ADMIN")) {
+    			authorities.add(new SimpleGrantedAuthority("ROLE_ENTERPRISE"));
+    			
     			authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
     			authorities.add(new SimpleGrantedAuthority("ROLE_STAFF"));
     			authorities.add(new SimpleGrantedAuthority("ROLE_CUSTOMER"));

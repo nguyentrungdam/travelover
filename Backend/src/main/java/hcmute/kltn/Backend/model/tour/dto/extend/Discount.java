@@ -17,6 +17,7 @@ public class Discount {
 	private LocalDate startDate;
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate endDate;
+	private String discountType;
 	private int discountValue;
 	private boolean auto;
 	private boolean status;

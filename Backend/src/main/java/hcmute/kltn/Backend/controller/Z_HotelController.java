@@ -44,7 +44,7 @@ public class Z_HotelController {
 			+ "- 'room': ''\n";
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@Operation(tags = "Z Enterprise Hotels", summary = "Create Hotel - ADMIN", description = createHotelDescription)
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> createEHotel(
 			@RequestBody EHotelCreate eHotelCreate) {
 		
@@ -66,7 +66,7 @@ public class Z_HotelController {
 			+ "- 'room': ''\n";
 	@RequestMapping(value = "/update", method = RequestMethod.PUT)
 	@Operation(tags = "Z Enterprise Hotels", summary = "Update Hotel - ADMIN", description = updateHotelDescription)
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> updateEHotel(
 			@RequestBody EHotelUpdate eHotelUpdate) {
 		
@@ -84,7 +84,7 @@ public class Z_HotelController {
 			+ "- 'hotelId': ''\n";
 	@RequestMapping(value = "/detail", method = RequestMethod.GET)
 	@Operation(tags = "Z Enterprise Hotels", summary = "Get Hotel detail- ADMIN", description = detailHotelDescription)
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getEHotelDetail(
 			@RequestParam String eHotelId) {
 		
@@ -100,7 +100,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@Operation(tags = {"Z Enterprise Hotels"}, summary = "Get all EHotel - ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getAllEHotel() {
 		
 		List<EHotel> eHotelList = iEHotelService.getAllEHotel();
@@ -115,7 +115,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@Operation(tags = "Z Enterprise Hotels", summary = "Search hotel by keyword- ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> searchEHotel(@RequestParam String keyword) {
 		List<EHotel> eHotelList = iEHotelService.searchEHotel(keyword);
 		
@@ -129,7 +129,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/room/search", method = RequestMethod.GET)
 	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room - ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> searchRoom(@ModelAttribute RoomSearch roomSearch) {
 		System.out.println("room search = " + roomSearch);
 		
@@ -145,7 +145,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/order/create", method = RequestMethod.POST)
 	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Create Order Hotel - ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> createOrderEHotel(
 			@RequestBody EHotelOrderCreate eHotelOrderCreate) {
 		
@@ -161,7 +161,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/order/update", method = RequestMethod.PUT)
 	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Update Order Hotel - ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> updateOrderEHotel(
 			@RequestBody EHotelOrderUpdate eHotelOrderUpdate) {
 		
@@ -177,7 +177,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/order/detail", method = RequestMethod.GET)
 	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Get one Order - ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getOneOrder(
 			@RequestBody String eHotelId, String orderId) {
 		
@@ -193,7 +193,7 @@ public class Z_HotelController {
 	
 	@RequestMapping(value = "/order/list", method = RequestMethod.GET)
 	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Get all Order - ADMIN")
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getAllOrder(
 			@RequestBody String eHotelId) {
 		

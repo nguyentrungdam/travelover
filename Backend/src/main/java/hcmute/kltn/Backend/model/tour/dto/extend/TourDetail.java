@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class TourDetail {
 	private String title;
 	private String description;
+	private String imageUrl;
 }
