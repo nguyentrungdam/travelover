@@ -4,6 +4,7 @@ import DataTable from "../../../components/dataTable/DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllTours } from "../../../slices/tourSlice";
 import Loading from "../../../components/Loading/Loading";
+import { formatCurrencyWithoutD } from "../../../utils/validate";
 
 const columns = [
   { field: "stt", headerName: "ID", width: 40, type: "string" },
@@ -14,23 +15,24 @@ const columns = [
     renderCell: (params) => {
       return <img src={params.row.img || "/noavatar.png"} alt="" />;
     },
+    sortable: false,
   },
   {
     field: "title",
     type: "string",
     headerName: "Tour Title",
-    width: 650,
+    width: 500,
   },
   {
     field: "days",
     type: "string",
     headerName: "Days",
-    width: 80,
+    width: 120,
   },
   {
-    field: "createdAt",
-    headerName: "Created At",
-    width: 120,
+    field: "price",
+    headerName: "Price",
+    width: 160,
     type: "string",
   },
 ];
@@ -46,7 +48,7 @@ const ToursList = () => {
           img: item?.thumbnailUrl,
           title: item.tourTitle,
           days: item.numberOfDay,
-          createdAt: item.createdAt,
+          price: formatCurrencyWithoutD(item.price),
         }))
       : [];
 

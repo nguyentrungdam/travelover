@@ -89,7 +89,6 @@ export const tourSlice = createSlice({
       state.loading = false;
       state.tours = action.payload.data.data;
       state.totalData = action.payload.data.totalData;
-      console.log(state.totalData);
     },
     [updateTour.pending]: (state) => {
       state.loading = true;

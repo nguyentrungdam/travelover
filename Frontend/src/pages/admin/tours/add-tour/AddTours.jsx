@@ -18,6 +18,7 @@ const AddTours = () => {
     profilePicture: "",
     profileThumbnail: "",
     numberOfDay: 0,
+    numberOfNight: 0,
     moreLocation: "",
     tourDescription: "",
     tourDetail: "",
@@ -89,7 +90,6 @@ const AddTours = () => {
         [name]: value,
       });
     }
-    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
@@ -104,6 +104,7 @@ const AddTours = () => {
       formDataObject.append(`image[${index}]`, image);
     });
     formDataObject.append("numberOfDay", formData.numberOfDay);
+    formDataObject.append("numberOfNight", formData.numberOfNight);
     formDataObject.append("tourDescription", formData.tourDescription);
     formDataObject.append("tourDetail", formData.tourDetail);
     formDataObject.append("suitablePerson", formData.suitablePerson);
@@ -186,13 +187,23 @@ const AddTours = () => {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-2">
                     <label className="small mb-1">Days</label>
                     <input
                       name="numberOfDay"
                       className="form-control"
                       type="text"
-                      placeholder="Number of days..."
+                      placeholder="Ex:3"
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-md-2">
+                    <label className="small mb-1">Nights</label>
+                    <input
+                      name="numberOfNight"
+                      className="form-control"
+                      type="text"
+                      placeholder="Ex:2"
                       onChange={handleChange}
                     />
                   </div>

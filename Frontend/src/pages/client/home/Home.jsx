@@ -16,9 +16,19 @@ import NewsLetter from "../../../shared/Newsletter";
 import ScrollToTop from "../../../shared/ScrollToTop";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
+import { saveToLocalStorage } from "../../../utils/validate";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  const { account } = useSelector((state) => state.account);
+
   useEffect(() => {
+    saveToLocalStorage(
+      "fullName",
+      account?.data?.firstName.concat(" ", account?.data?.lastName)
+    );
+    saveToLocalStorage("email", account?.data?.email);
+    saveToLocalStorage("phoneNumber", account?.data?.phoneNumber);
     window.scrollTo(0, 0);
   }, []);
   return (
