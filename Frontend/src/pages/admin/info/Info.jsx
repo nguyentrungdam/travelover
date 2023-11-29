@@ -1,17 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  getAccountProfile,
-  updateUserInfo,
-} from "../../../slices/accountSlice";
 import { axiosMultipart } from "../../../apis/axios";
-import "react-toastify/dist/ReactToastify.css";
+import { updateUserInfo } from "../../../slices/accountSlice";
 import { ToastContainer, toast } from "react-toastify";
-const ProfilePage = () => {
+import { useDispatch, useSelector } from "react-redux";
+
+const Info = () => {
   const fileInputRef = useRef();
   const dispatch = useDispatch();
   const { account } = useSelector((state) => state.account);
-  // console.log(account);
+  console.log(account);
   const [userInfo, setUserInfo] = useState({
     firstName: "",
     lastName: "",
@@ -118,12 +115,13 @@ const ProfilePage = () => {
       });
     }
   };
+
   return (
-    <div>
-      <div className="row">
+    <div className="vh-100 ">
+      <div className="row mx-0">
         <div className="col-xl-4">
           <div className="card mb-4 mb-xl-0">
-            <div className="card-header">Ảnh Cá Nhân</div>
+            <div className="card-header">Profile picture</div>
             <div className="card-body text-center">
               <img
                 className="img-account-profile rounded-circle mb-2"
@@ -143,73 +141,61 @@ const ProfilePage = () => {
                 ref={fileInputRef}
               />
               <div className="small font-italic text-muted mb-4">
-                JPG hoặc PNG không quá 5 MB
+                JPG or PNG must not exceed 2 MB
               </div>
               <button
                 className="btn btn-primary"
                 type="button"
                 onClick={handleUploadButtonClick}
               >
-                Tải lên ảnh
+                Upload Image
               </button>
             </div>
           </div>
         </div>
         <div className="col-xl-8">
           <div className="card mb-4">
-            <div className="card-header">Chi tiết tài khoản</div>
+            <div className="card-header">Account Detail</div>
             <div className="card-body">
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-6">
                     <label className="small mb-1" htmlFor="inputFirstName">
-                      Họ
+                      Frist name
                     </label>
                     <input
                       className="form-control"
                       id="inputFirstName"
                       type="text"
-                      placeholder="Điền họ"
+                      placeholder="Frist name"
                       defaultValue={account?.data?.firstName}
                       onChange={handleChangeFirstName}
                     />
                   </div>
                   <div className="col-md-6">
                     <label className="small mb-1" htmlFor="inputLastName">
-                      Tên
+                      Last name
                     </label>
                     <input
                       className="form-control"
                       id="inputLastName"
                       type="text"
-                      placeholder="Điền tên"
+                      placeholder="Last name"
                       defaultValue={account?.data?.lastName}
                       onChange={handleChangeLastName}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  {/* <div className="col-md-6">
-                    <label className="small mb-1" htmlFor="inputOrgName">
-                      Organization name
-                    </label>
-                    <input
-                      className="form-control"
-                      id="inputOrgName"
-                      type="text"
-                      placeholder="Enter your organization name"
-                      defaultValue="Start Bootstrap"
-                    />
-                  </div> */}
                   <div className="">
                     <label className="small mb-1" htmlFor="inputLocation">
-                      Địa chỉ
+                      Address
                     </label>
                     <input
                       className="form-control"
                       id="inputLocation"
                       type="text"
-                      placeholder="Nhập địa chỉ của bạn"
+                      placeholder="Address"
                       defaultValue={account?.data?.address}
                       onChange={handleChangeAddress}
                     />
@@ -217,7 +203,7 @@ const ProfilePage = () => {
                 </div>
                 <div className="mb-3">
                   <label className="small mb-1" htmlFor="inputEmailAddress">
-                    Địa chỉ email
+                    Email address
                   </label>
                   <input
                     className="form-control"
@@ -230,13 +216,13 @@ const ProfilePage = () => {
                 <div className="row gx-3 mb-3">
                   <div className="col-md-6">
                     <label className="small mb-1" htmlFor="inputPhone">
-                      Số điện thoại
+                      Phone number
                     </label>
                     <input
                       className="form-control"
                       id="inputPhone"
                       type="tel"
-                      placeholder="Nhập số điện thoại"
+                      placeholder="Phone number"
                       defaultValue={account?.data?.phoneNumber}
                       onChange={handleChangePhone}
                     />
@@ -272,4 +258,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default Info;

@@ -41,6 +41,8 @@ const List = () => {
   );
   const [selectedDate, setSelectedDate] = useState(location.state.selectedDate);
   const [isHeaderVisible, setHeaderVisible] = useState(true);
+  const [orderBy, setOrderBy] = useState("price");
+  const [orderDirection, setOrderDirection] = useState("asc");
   const [isChecked1, setIsChecked1] = useState(false);
   const [isChecked2, setIsChecked2] = useState(false);
   // Phân trang
@@ -58,7 +60,7 @@ const List = () => {
     setNextPage(event.selected + 1);
     window.scrollTo(0, 0);
   };
-  console.log(tours);
+  // console.log(tours);
 
   useEffect(() => {
     setProvince(location.state.selectedLocation.province);
@@ -71,6 +73,8 @@ const List = () => {
         numberOfPeople,
         pageSize: 9,
         pageNumber: 1,
+        sortBy: "price",
+        order: "asc",
       })
     ).unwrap();
     console.log(res);
@@ -89,6 +93,13 @@ const List = () => {
     };
   }, []);
   const tomorrow = addDays(new Date(), 1);
+  const [priceRange, setPriceRange] = useState([0, 100]);
+  const handlePriceChange = (value) => {
+    setPriceRange(value);
+  };
+  const [min, max] = priceRange;
+  const minPrice = min * 100000;
+  const maxPrice = max * 100000;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,20 +112,30 @@ const List = () => {
           numberOfPeople,
           pageSize: itemsPerPage,
           pageNumber: nextPage,
+          minPrice: `${minPrice}`,
+          maxPrice: `${maxPrice}`,
+          sortBy: orderBy,
+          order: orderDirection,
         })
       ).unwrap();
       setCountData(res.data?.totalData);
     };
     fetchData();
-  }, [dispatch, province, startDate, numberOfDay, numberOfPeople, nextPage]);
-  console.log(province, startDate, numberOfDay, numberOfPeople, nextPage);
+  }, [
+    dispatch,
+    province,
+    startDate,
+    numberOfDay,
+    numberOfPeople,
+    nextPage,
+    minPrice,
+    maxPrice,
+    orderDirection,
+  ]);
   const handleSelectLocation = (location) => {
     setProvince(location.province);
   };
-  const [priceRange, setPriceRange] = useState([0, 100]);
-  const handlePriceChange = (value) => {
-    setPriceRange(value);
-  };
+
   const handleDateChange = (date) => {
     const formattedDisplayDate = format(date, "yyyy-MM-dd");
     setSelectedDate(date);
@@ -159,10 +180,7 @@ const List = () => {
       saveToLocalStorage("numberOfPeople", numberOfPeople);
     }
   };
-  // Hàm tính tổng tiền từ mảng các phòng
-  const calculateRoomTotalPrice = (rooms) => {
-    return rooms.reduce((total, room) => total + room.price, 0);
-  };
+
   return (
     <>
       {isHeaderVisible ? <Header /> : " "}
@@ -260,7 +278,7 @@ const List = () => {
                       className="range-slider"
                     />
                   </div>
-                  <h5 className="s-title">Hiển thị những chuyến đi có</h5>
+                  {/* <h5 className="s-title">Hiển thị những chuyến đi có</h5>
                   <div className="filter-sale">
                     <div className="switch-container">
                       <label className="switch-label">Khuyễn mãi:</label>
@@ -285,7 +303,7 @@ const List = () => {
                       />
                       <div className="switch-slider"></div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -312,13 +330,23 @@ const List = () => {
                           <span>Sắp xếp theo</span>
                           <select
                             className="form-control dropdown Filter"
-                            id="sllOrder"
-                            name="sllOrder"
+                            id="orderBy"
+                            name="orderBy"
+                            onChange={(e) => setOrderBy(e.target.value)}
                           >
-                            <option value="-1">--- Chọn ---</option>
-                            <option value="0">Theo giá thấp -&gt; cao</option>
-                            <option value="1">Theo giá cao -&gt; thấp</option>
-                            <option value="2">Giảm giá nhiều nhất</option>
+                            <option value="-1">----Chọn----</option>
+                            <option value="price">Giá</option>
+                            <option value="popular">Độ phổ biến</option>
+                          </select>
+                          <select
+                            className="form-control dropdown Filter ms-2"
+                            id="orderDirection"
+                            name="orderDirection"
+                            onChange={(e) => setOrderDirection(e.target.value)}
+                          >
+                            <option value="-1">----Chọn----</option>
+                            <option value="asc">Thấp -&gt; cao</option>
+                            <option value="desc">Cao -&gt; thấp</option>
                           </select>
                         </div>
                       </div>
@@ -336,10 +364,10 @@ const List = () => {
                         <div className="position-relative">
                           <div className="tour-item__image">
                             <img
-                              src={item.tour.thumbnailUrl}
+                              src={item?.tour?.thumbnailUrl}
                               id="imgaddtour_0ae974d0-6bf1-489c-9949-1d74ce7d887b"
                               className="card-img-top img-fluid"
-                              alt={item.tour.tourTitle}
+                              alt={item?.tour?.tourTitle}
                               width="309"
                               height="220"
                               loading="lazy"
@@ -361,27 +389,27 @@ const List = () => {
                           <p className="tour-item__date mb-1">
                             Thời gian thích hợp:{" "}
                             {validateOriginalDate(
-                              item.tour.reasonableTime.startDate
+                              item.tour?.reasonableTime.startDate
                             )}{" "}
                             đến{" "}
                             {validateOriginalDate(
-                              item.tour.reasonableTime.endDate
+                              item.tour?.reasonableTime.endDate
                             )}
                           </p>
                           <h3 className="card-text tour-item__title mb-1">
-                            {item.tour.tourTitle}
+                            {item.tour?.tourTitle}
                           </h3>
                           <div className="tour-item__code">
                             <div>Đối tượng thích hợp:</div>
                             <span className="font-weight-bold">
                               {" "}
-                              {item.tour.suitablePerson}
+                              {item.tour?.suitablePerson}
                             </span>
                           </div>
                           <p className="tour-item__departure mb-3">
                             Điểm đến:{" "}
                             <span className="font-weight-bold">
-                              {item.tour.address.province}
+                              {item.tour?.address.province}
                             </span>
                           </p>
                           <div className="tour-item__price mb-2 w-100">
@@ -389,11 +417,7 @@ const List = () => {
                               <div className="tour-item__price--old"></div>
                               <div className="tour-item__price--current fix-leftalign">
                                 <span className="tour-item__price--current__number pe-2 mb-0">
-                                  {formatCurrencyWithoutD(
-                                    item?.tour?.price +
-                                      calculateRoomTotalPrice(item?.hotel?.room)
-                                  )}
-                                  ₫
+                                  {formatCurrencyWithoutD(item?.totalPrice)}₫
                                 </span>
                               </div>
                               <div className="tour-item__price--current">
@@ -402,7 +426,7 @@ const List = () => {
                                     className=" btn-sm btnOptionTour"
                                     onClick={() =>
                                       handleViewDetailOrPayNow(
-                                        item.tour.tourId,
+                                        item.tour?.tourId,
                                         2
                                       )
                                     }
@@ -418,7 +442,7 @@ const List = () => {
                                   className="btn-block"
                                   onClick={() =>
                                     handleViewDetailOrPayNow(
-                                      item.tour.tourId,
+                                      item.tour?.tourId,
                                       1
                                     )
                                   }

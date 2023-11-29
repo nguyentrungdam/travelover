@@ -23,6 +23,7 @@ import UpdateTour from "./pages/admin/tours/update-tour/UpdateTour";
 import Hotels from "./pages/admin/hotels/Hotels";
 import ThankYou from "./pages/client/booking/ThankYou";
 import OrderList from "./pages/admin/orders/orders";
+import Info from "./pages/admin/info/Info";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -67,7 +68,7 @@ function App() {
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />
-        <Route path="users/:id" element={<User />} />
+        <Route path="user-profile" element={<Info />} />
         <Route path="tours-list" element={<ToursList />} />
         <Route path="tours-list/:id" element={<UpdateTour />} />
         <Route path="tours-list/add-new" element={<AddTours />} />

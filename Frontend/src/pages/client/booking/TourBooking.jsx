@@ -71,12 +71,6 @@ const TourBooking = () => {
     email: getFromLocalStorage("email") || "",
     phoneNumber: getFromLocalStorage("phoneNumber") || "",
   });
-  const totalPriceRoom = tours[0]?.hotel?.room.reduce((acc, room) => {
-    if (room.status) {
-      return acc + room.price;
-    }
-    return acc;
-  }, 0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,7 +103,6 @@ const TourBooking = () => {
     }
   };
 
-  console.log(customerInformation);
   const handlePayment = async (e) => {
     e.preventDefault();
     try {
@@ -344,9 +337,11 @@ const TourBooking = () => {
                           {formatCurrencyWithoutD(tours[0]?.tour?.price)}₫
                         </td>
                       </tr>
-                      <td>Khách sạn:</td>
+                      <tr>
+                        <td>Khách sạn:</td>
+                      </tr>
                       {tours[0]?.hotel?.room.map((room, i) => (
-                        <tr>
+                        <tr key={room.roomId}>
                           <td className="ps-4 p-0">Phòng {i + 1}</td>
                           <td className="t-price p-0 text-right">
                             {formatCurrencyWithoutD(room.price)}₫
@@ -379,10 +374,7 @@ const TourBooking = () => {
                       <tr className="total">
                         <td>Tổng cộng</td>
                         <td className="t-price text-right" id="TotalPrice">
-                          {formatCurrencyWithoutD(
-                            tours[0]?.tour?.price + totalPriceRoom
-                          )}
-                          ₫
+                          {formatCurrencyWithoutD(tours[0].totalPrice)}₫
                         </td>
                       </tr>
                     </tbody>

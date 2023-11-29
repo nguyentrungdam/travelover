@@ -5,11 +5,7 @@ import "./user.css";
 const User = () => {
   //Fetch data and send to Single Component
 
-  return (
-    <div className="user">
-      <Single {...singleUser} />
-    </div>
-  );
+  return <div className="user">user pages</div>;
 };
 
 export default User;

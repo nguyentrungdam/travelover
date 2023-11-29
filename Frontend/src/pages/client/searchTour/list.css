@@ -181,7 +181,11 @@ strong {
   text-transform: uppercase;
   color: #2d4271;
   height: 40px;
-  width: 270px;
+  width: 140px;
+}
+.order-wrap select option {
+  text-align: center;
+  padding: 0.5em;
 }
 .tour-item {
   background: #fff;

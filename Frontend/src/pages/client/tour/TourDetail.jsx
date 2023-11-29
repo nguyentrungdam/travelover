@@ -81,12 +81,7 @@ const TourDetail = () => {
 
     setSlideNumber(newSlideNumber);
   };
-  const totalPriceRoom = tours[0]?.hotel?.room.reduce((acc, room) => {
-    if (room.status) {
-      return acc + room.price;
-    }
-    return acc;
-  }, 0);
+
   return (
     <div>
       <ScrollToTop />
@@ -124,10 +119,7 @@ const TourDetail = () => {
             <div className="col-md-6 d-flex gap-2  align-items-center justify-content-end">
               <p className="mb-0">
                 <span className="price-total ">
-                  {formatCurrencyWithoutD(
-                    tours[0]?.tour?.price + totalPriceRoom
-                  )}
-                  ₫{" "}
+                  {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫{" "}
                 </span>
                 /khách
               </p>
@@ -209,9 +201,11 @@ const TourDetail = () => {
                         {formatCurrencyWithoutD(tours[0]?.tour?.price)}₫
                       </td>
                     </tr>
-                    <td>Khách sạn:</td>
+                    <tr>
+                      <td>Khách sạn:</td>
+                    </tr>
                     {tours[0]?.hotel?.room.map((room, i) => (
-                      <tr>
+                      <tr key={room.roomId}>
                         <td className="ps-4 p-0">Phòng {i + 1}</td>
                         <td className="t-price p-0">
                           {formatCurrencyWithoutD(room.price)}₫
@@ -222,10 +216,7 @@ const TourDetail = () => {
                     <tr className="total1">
                       <td>Tổng cộng</td>
                       <td className="t-price">
-                        {formatCurrencyWithoutD(
-                          tours[0]?.tour?.price + totalPriceRoom
-                        )}
-                        ₫
+                        {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
                       </td>
                     </tr>
                   </tbody>
