@@ -59,13 +59,13 @@ const TourBooking = () => {
       })
     ).unwrap();
   }, []);
-
+  console.log(tours);
   // validate date
   const startDateString = new Date(startDate);
-  const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
-  const endDateString = new Date(endDate);
-  const formattedStartDate = formatDateToVietnamese(startDateString);
-  const formattedEndDate = formatDateToVietnamese(endDateString);
+  // const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
+  // const endDateString = new Date(endDate);
+  // const formattedStartDate = formatDateToVietnamese(startDateString);
+  // const formattedEndDate = formatDateToVietnamese(endDateString);
   const [customerInformation, setCustomerInformation] = useState({
     fullName: getFromLocalStorage("fullName") || "",
     email: getFromLocalStorage("email") || "",
@@ -299,7 +299,7 @@ const TourBooking = () => {
 
                     <div className="start-content">
                       <h4>Bắt đầu chuyến đi</h4>
-                      <p className="time">{formattedStartDate}</p>
+                      {/* <p className="time">{formattedStartDate}</p> */}
                       <p className="from"></p>
                     </div>
                   </div>
@@ -311,7 +311,7 @@ const TourBooking = () => {
 
                     <div className="start-content">
                       <h4>Kết thúc chuyến đi</h4>
-                      <p className="time">{formattedEndDate}</p>
+                      {/* <p className="time">{formattedEndDate}</p> */}
                       <p className="from"></p>
                     </div>
                   </div>

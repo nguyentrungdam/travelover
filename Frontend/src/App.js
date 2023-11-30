@@ -24,6 +24,7 @@ import Hotels from "./pages/admin/hotels/Hotels";
 import ThankYou from "./pages/client/booking/ThankYou";
 import OrderList from "./pages/admin/orders/orders";
 import Info from "./pages/admin/info/Info";
+import ZHotel from "./pages/enterprise/ZHotel";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -52,6 +53,7 @@ function App() {
 
   return (
     <Routes>
+      {/* client route */}
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
       <Route path="/tours" element={<Tours />} />
@@ -63,8 +65,8 @@ function App() {
       <Route path="/tours/tour-booking/:tourId" element={<TourBooking />} />
       <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/*" element={<Page404 />} />
-      {/* admin route */}
 
+      {/* admin route */}
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />
@@ -77,6 +79,12 @@ function App() {
         <Route path="hotels/add-new" element={<AddTours />} /> */}
         <Route path="orders-list" element={<OrderList />} />
       </Route>
+
+      {/* enterprise route */}
+      <Route path="/" element={<LayoutAdmin />}>
+        <Route path="hotel-z" element={<ZHotel />} />
+      </Route>
+
       {/* <Route path="users">
         <Route
           index
