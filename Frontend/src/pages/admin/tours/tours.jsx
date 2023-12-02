@@ -39,6 +39,7 @@ const columns = [
 
 const ToursList = () => {
   const dispatch = useDispatch();
+  const { zhotels } = useSelector((state) => state.hotelz);
   const { loading, tours } = useSelector((state) => state.tour);
   const transformedData =
     tours && Array.isArray(tours)
@@ -55,8 +56,8 @@ const ToursList = () => {
   useEffect(() => {
     dispatch(getAllTours()).unwrap();
   }, []);
-  console.log(tours);
 
+  console.log(zhotels);
   return (
     <div className="products">
       <div className="info">

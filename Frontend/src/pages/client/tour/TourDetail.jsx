@@ -152,7 +152,11 @@ const TourDetail = () => {
               <p className="hotelDesc">{tours[0]?.tour?.tourDescription}</p>
               <div className="group-services">
                 <div className="item">
-                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/826/826165.png"
+                    className="icon-img"
+                    alt=""
+                  />
                   <label>Thời gian</label>
                   <p>
                     {tours[0]?.tour?.numberOfDay} ngày{" "}
@@ -160,12 +164,20 @@ const TourDetail = () => {
                   </p>
                 </div>
                 <div className="item">
-                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/32/32441.png"
+                    className="icon-img"
+                    alt=""
+                  />
                   <label>Đối tượng phù hợp</label>
                   <p>{tours[0]?.tour?.suitablePerson} </p>
                 </div>
                 <div className="item">
-                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <img
+                    src="https://cdn4.iconfinder.com/data/icons/time-management-22/64/9-512.png"
+                    className="icon-img"
+                    alt=""
+                  />
                   <label>Mùa thích hợp</label>
                   <p>
                     {validateOriginalDate(
@@ -178,7 +190,11 @@ const TourDetail = () => {
                   </p>
                 </div>
                 <div className="item">
-                  <img src="/noavatar.png" className="icon-img" alt="" />
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/3009/3009710.png"
+                    className="icon-img"
+                    alt=""
+                  />
                   <label>Khách sạn</label>
                   <p>{tours[0]?.hotel?.hotelName} </p>
                 </div>

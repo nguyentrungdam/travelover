@@ -48,7 +48,26 @@ export const menu = [
     ],
   },
 ];
-
+export const menuEnterprise = [
+  {
+    id: 1,
+    title: "List",
+    listItems: [
+      {
+        id: 1,
+        title: "Hotels",
+        url: "/hotel-z",
+        icon: "/hotel.svg",
+      },
+      {
+        id: 2,
+        title: "Order",
+        url: "/order-z",
+        icon: "/order.svg",
+      },
+    ],
+  },
+];
 export const topDealUsers = [
   {
     id: 1,
