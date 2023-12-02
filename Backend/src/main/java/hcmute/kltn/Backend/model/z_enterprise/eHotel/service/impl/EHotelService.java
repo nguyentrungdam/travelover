@@ -3,6 +3,8 @@ package hcmute.kltn.Backend.model.z_enterprise.eHotel.service.impl;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
@@ -347,6 +350,16 @@ public class EHotelService implements IEHotelService{
 
 	@Override
 	public List<Room> searchRoom(RoomSearch roomSearch) {
+		// 1. Chia số người lớn theo số phòng = A
+		// 2. Tìm phòng chứa được A hoặc phòng to nhất chứa được A
+		// 3. Nếu còn dư người, tìm 1 phòng chứa đủ người còn dư hoặc phòng to nhất chứa đủ người còn dư
+		// 4. nếu còn dư người, lặp lại bước 3
+		
+		// check number of adult than number of room
+		if (roomSearch.getNumberOfAdult() < roomSearch.getNumberOfRoom()) {
+			throw new CustomException("The number of adults must be greater than or equal to the number of rooms");
+		}
+		
 		// get hotel from db
 		EHotel eHotel = getDetail(roomSearch.getEHotelId());
 		
@@ -373,7 +386,7 @@ public class EHotelService implements IEHotelService{
 				}
 			}
 			
-			// search with startDate and numberOfPeople
+			// search with startDate
 			roomListClone.clear();
 			roomListClone.addAll(roomList);
 			for(Room itemRoom : roomListClone) {
@@ -388,19 +401,79 @@ public class EHotelService implements IEHotelService{
 				}
 			}
 		}
+		
+		// sort roomList by capacity asc
+		Collections.sort(roomList, new Comparator<Room>() {
+            @Override
+            public int compare(Room e1, Room e2) {
+            	int result = 0;
+            	result = Integer.compare(e1.getCapacity(), e2.getCapacity());
+                return result;
+            }
+        });
 
 		// search with numberOfPeople
-		int totalCaptity = 0;
-		roomListClone.clear();
-		roomListClone.addAll(roomList);
-		for(Room itemRoom : roomListClone) {
-			if(totalCaptity >= roomSearch.getNumberOfPeople()) {
-				roomList.remove(itemRoom);
+		List<Room> roomListResult = new ArrayList<>();
+		int numberOfPeople = 0;
+		numberOfPeople = roomSearch.getNumberOfAdult();
+		int currentCaptity = 0;
+		int numberOfPeoplePerRoom = 0;
+		
+		// Find with number of room
+		numberOfPeoplePerRoom = roomSearch.getNumberOfAdult() / roomSearch.getNumberOfRoom();
+		for (int i = 0; i < roomSearch.getNumberOfRoom(); i++) {
+			Room roomMaxCapacity = new Room();
+			roomMaxCapacity.setCapacity(0);
+			roomListClone.clear();
+			roomListClone.addAll(roomList);
+			for (Room itemRoom : roomListClone) {
+				if (itemRoom.getCapacity() >= numberOfPeoplePerRoom) {
+					currentCaptity += itemRoom.getCapacity();
+					roomListResult.add(itemRoom);
+					roomList.remove(itemRoom);
+					roomMaxCapacity.setCapacity(0);
+					break;
+				}
+				if (roomMaxCapacity.getCapacity() < itemRoom.getCapacity()) {
+					modelMapper.map(itemRoom, roomMaxCapacity);
+				}
+			}
+			if (roomMaxCapacity.getCapacity() > 0) {
+				currentCaptity += roomMaxCapacity.getCapacity();
+				roomListResult.add(roomMaxCapacity);
+				roomList.remove(roomMaxCapacity);
+			}
+		}
+		
+		// Continue find if there are more people left
+		while (currentCaptity < numberOfPeople) {
+			if(roomList.size() == 0) {
+				throw new CustomException("There are not enough available rooms");
 			}
 			
-			totalCaptity += itemRoom.getCapacity();
+			Room roomMaxCapacity = new Room();
+			roomMaxCapacity.setCapacity(0);
+			roomListClone.clear();
+			roomListClone.addAll(roomList);
+			for (Room itemRoom : roomListClone) {
+				if (itemRoom.getCapacity() >= numberOfPeople) {
+					currentCaptity += itemRoom.getCapacity();
+					roomListResult.add(itemRoom);
+					roomList.remove(itemRoom);
+					roomMaxCapacity.setCapacity(0);
+					break;
+				}
+				if (roomMaxCapacity.getCapacity() < itemRoom.getCapacity()) {
+					modelMapper.map(itemRoom, roomMaxCapacity);
+				}
+			}
+			if (roomMaxCapacity.getCapacity() > 0) {
+				currentCaptity += roomMaxCapacity.getCapacity();
+				roomListResult.add(roomMaxCapacity);
+				roomList.remove(roomMaxCapacity);
+			}
 		}
 
-		return roomList;
+		return roomListResult;
 	}
 }

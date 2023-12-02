@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Discount {
+	private String code;
 	private String discountType;
-	private int value;
+	private int discountValue;
 }

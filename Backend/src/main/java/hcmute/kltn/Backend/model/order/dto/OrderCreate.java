@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import hcmute.kltn.Backend.model.order.dto.extend.CustomerInformation;
+import hcmute.kltn.Backend.model.order.dto.extend.Discount;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,9 @@ public class OrderCreate {
 	private List<String> carIdList;
 	private String guiderId;
 	private List<String> personIdList;
-	private CustomerInformation customerInformation; // not null
 	private int numberOfChildren; // not null
 	private int numberOfAdult; // not null
+	private Discount discount;
+	private CustomerInformation customerInformation; // not null
 	private String note;
 }

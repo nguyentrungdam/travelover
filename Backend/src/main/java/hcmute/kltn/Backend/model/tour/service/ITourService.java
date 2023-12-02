@@ -16,9 +16,11 @@ public interface ITourService {
 	public TourDTO createTour(TourCreate tourCreate);
 	public TourDTO updateTour(TourUpdate tourUpdate);
 	public TourDTO getDetailTour(String tourId);
-	public Discount updateDiscount(String tourId, Discount discount);
 	public List<TourDTO> getAllTour();
 	public List<TourSearchRes> searchTour(TourSearch tourSearch);
 	public List<TourSearchRes> searchFilter(TourFilter tourFilter, List<TourSearchRes> tourSearchResList);
 	public List<TourSearchRes> searchSort(TourSort tourSort, List<TourSearchRes> tourSearchResList);
+	
+	public void updateIsDiscount();
+	public void updateIsDiscountNoCheck();
 }

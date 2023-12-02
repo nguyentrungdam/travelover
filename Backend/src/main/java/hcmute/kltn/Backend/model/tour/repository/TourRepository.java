@@ -9,4 +9,5 @@ import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 public interface TourRepository extends MongoRepository<Tour, String>{
 	boolean existsByTourTitle(String tourTitle);
 	List<Tour> findAllByTourTitle(String tourTitle);
+	Tour findFirstBy();
 }

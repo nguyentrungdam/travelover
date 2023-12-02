@@ -30,8 +30,9 @@ public class OrderDTO {
 	private int numberOfAdult; // not null
 	private String note;
 //	private int price; // not null
-	private List<Discount> discount;
-	private int totalPrice; // not null
+	private int totalPrice;
+	private Discount discount;
+	private int finalPrice; // not null
 	private List<Payment> payment; 
-	private String orderStatus;  
+	private String orderStatus; 
 }

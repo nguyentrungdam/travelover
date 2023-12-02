@@ -31,7 +31,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/tours")
-@Tag(name = "Tours", description = "APIs for managing tours")
+@Tag(name = "Tours", description = "APIs for managing tours\n\n"
+		+ "03/12/2023\n\n"
+		+ "Thêm discount cho tour:\n\n"
+		+ "- startDate và endDate chỉ cần cho nhập ngày và tháng\n"
+		+ "- discountType chỉ để mở rộng sau này, có thể nhập là percent hoặc có thể không nhập gì\n"
+		+ "- discountValue giá trị phần trăm được giảm: ví dụ nhập 10 là giảm 10% khi đặt hàng\n"
+		+ "- auto là để hệ thống tự cập nhập cho biến isDiscount (mỗi ngày 1 lần)\n"
+		+ "- isDiscount để biết tour có đang giảm giá hay không\n"
+		+ "- updateIsDiscount ngày cập nhật biến isDiscount\n\n"
+		+ "Thêm priceOfAdult, priceOfChildren, \n\n"
+		+ "Thêm numberOfAdult, numberOfChildren, numberOfRoom khi search tour\n\n"
+		+ "Thêm totalPriceNotDiscount cho kết quả của search tour")
 @SecurityRequirement(name = "Bearer Authentication")
 public class TourController {
 	@Autowired
@@ -50,6 +61,7 @@ public class TourController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> createTour(
 			@RequestBody TourCreate tourCreate) {
+		iTourService.updateIsDiscount();
 		TourDTO tourDTO = iTourService.createTour(tourCreate);
 		
 		return iResponseObjectService.success(new Response() {
@@ -73,6 +85,7 @@ public class TourController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> updateTour(
 			@RequestBody TourUpdate tourUpdate) {
+		iTourService.updateIsDiscount();
 		TourDTO tourDTO = iTourService.updateTour(tourUpdate);
 		
 		return iResponseObjectService.success(new Response() {
@@ -86,6 +99,7 @@ public class TourController {
 	@RequestMapping(value = "/detail", method = RequestMethod.GET)
 	@Operation(summary = "Get tour detail")
 	ResponseEntity<ResponseObject> getDetail(@RequestParam String tourId) {
+		iTourService.updateIsDiscount();
 		TourDTO tourDTO = iTourService.getDetailTour(tourId);
 		
 		return iResponseObjectService.success(new Response() {
@@ -116,6 +130,7 @@ public class TourController {
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> getAllTour(
 			@ModelAttribute Pagination Pagination) {
+		iTourService.updateIsDiscount();
 		List<TourDTO> tourDTOList = iTourService.getAllTour();
 		
 		return iResponseObjectService.success(new Response() {
@@ -124,6 +139,19 @@ public class TourController {
 				setPageSize(Pagination.getPageSize());
 				setPageNumber(Pagination.getPageNumber());
 				setData(tourDTOList);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/discount/update", method = RequestMethod.GET)
+	@Operation(summary = "Manual update isDiscount - ADMIN / STAFF")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> updateIsDiscountNoCheck() {
+		iTourService.updateIsDiscountNoCheck();
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("update isDiscount successfully");
 			}
 		});
 	}
@@ -158,6 +186,7 @@ public class TourController {
 			@ModelAttribute TourFilter tourFilter,
 			@ModelAttribute TourSort tourSort,
 			@ModelAttribute Pagination Pagination) {
+		iTourService.updateIsDiscount();
 		List<TourSearchRes> tourList = iTourService.searchTour(tourSearch);
 		
 		List<TourSearchRes> tourFilterList = iTourService.searchFilter(tourFilter, tourList);
@@ -173,4 +202,6 @@ public class TourController {
 			}
 		});
 	}
+	
+	
 }

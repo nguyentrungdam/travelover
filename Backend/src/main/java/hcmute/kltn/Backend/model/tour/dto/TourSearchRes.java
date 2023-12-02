@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class TourSearchRes {
 	private Tour tour;
 	private Hotel hotel;
+	private int totalPriceNotDiscount;
 	private int totalPrice;
 }

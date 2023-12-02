@@ -325,6 +325,7 @@ public class TourService implements ITourService{
 		List<Tour> tourList = new ArrayList<>();
 		List<Tour> tourListClone = new ArrayList<>();
 		List<TourSearchRes> tourSearchResList = new ArrayList<>(); 
+		int totalPriceNotDiscount = 0;
 		int totalPrice = 0;
 		
 		if(tourSearch.getKeyword() != null) {
@@ -401,9 +402,10 @@ public class TourService implements ITourService{
 			totalPrice = 0;
 			TourSearchRes tourSearchRes = new TourSearchRes();
 			tourSearchRes.setTour(itemTour);
-			totalPrice += itemTour.getPrice();
+			totalPrice += (tourSearch.getNumberOfAdult() * itemTour.getPriceOfAdult()) 
+					+ (tourSearch.getNumberOfChildren() * itemTour.getPriceOfChildren());
 			
-			if(tourSearch.getStartDate() != null && tourSearch.getNumberOfPeople() > 0) {
+			if(tourSearch.getStartDate() != null && tourSearch.getNumberOfAdult() > 0) {
 				// search hotel
 				HotelSearch hotelSearch = new HotelSearch();
 				hotelSearch.setProvince(tourSearch.getProvince());
@@ -417,7 +419,9 @@ public class TourService implements ITourService{
 					roomSearch.setEHotelId(itemHotel.getEHotelId());
 					roomSearch.setStartDate(tourSearch.getStartDate());
 					roomSearch.setEndDate(tourSearch.getStartDate().plusDays(itemTour.getNumberOfDay()));
-					roomSearch.setNumberOfPeople(tourSearch.getNumberOfPeople());
+					roomSearch.setNumberOfAdult(tourSearch.getNumberOfAdult());
+					roomSearch.setNumberOfChildren(tourSearch.getNumberOfChildren());
+					roomSearch.setNumberOfRoom(tourSearch.getNumberOfRoom());
 					List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = iHotelService.searchRoom(roomSearch);
 					if(roomList.size() > 0) {
 						// mapping hotel
@@ -430,7 +434,7 @@ public class TourService implements ITourService{
 							Room room = new Room();
 							modelMapper.map(itemRoom, room);
 							roomListRes.add(room);
-							totalPrice += room.getPrice();
+							totalPrice += room.getPrice() * itemTour.getNumberOfDay();
 						}
 
 						hotel.setRoom(roomListRes);
@@ -441,7 +445,12 @@ public class TourService implements ITourService{
 					}
 				}
 			}
+			totalPriceNotDiscount = totalPrice;
+			if (itemTour.getDiscount().getIsDiscount() == true) {
+				totalPrice = totalPriceNotDiscount * (100 - itemTour.getDiscount().getDiscountValue()) / 100;
+			}
 			
+			tourSearchRes.setTotalPriceNotDiscount(totalPriceNotDiscount);
 			tourSearchRes.setTotalPrice(totalPrice);
 			tourSearchResList.add(tourSearchRes);
 		}
@@ -556,14 +565,108 @@ public class TourService implements ITourService{
 	}
 
 	@Override
-	public Discount updateDiscount(String tourId, Discount discount) {
+	public void updateIsDiscount() {
+		LocalDate dateNow = LocalDateUtil.getDateNow();
+		LocalDate yesterday = dateNow.plusDays(-1);
+		
 		Tour tour = new Tour();
-		tour = getDetail(tourId);
-		tour.setDiscount(discount);
+		tour = tourRepository.findFirstBy();
 		
-		Tour tourNew = new Tour();
-		tourNew = update(tour);
+		boolean update = false;
+		if (tour.getDiscount() == null) {
+			update = true;
+		} else if (!tour.getDiscount().getUpdateIsDiscount().equals(dateNow)) {
+			
+			update = true;
+		}
+
+		// update
+		if (update == true) {
+			List<Tour> tourList = new ArrayList<>();
+			tourList = getAll();
+			for (Tour itemTour : tourList) {
+				if (itemTour.getDiscount() == null) {
+					Discount discount = new Discount();
+					discount.setStartDate(yesterday);
+					discount.setEndDate(yesterday);
+					discount.setDiscountType("percent");
+					discount.setDiscountValue(0);
+					discount.setAuto(false);
+					discount.setIsDiscount(false);
+					discount.setUpdateIsDiscount(yesterday);
+					
+					itemTour.setDiscount(discount);
+				}
+				
+				Discount discountNew = new Discount();
+				discountNew = itemTour.getDiscount();
+				
+				discountNew.setUpdateIsDiscount(dateNow);
+				
+				if (itemTour.getDiscount().getAuto() == true) {
+					LocalDate startDate = discountNew.getStartDate();
+					LocalDate endDate = discountNew.getEndDate();
+					
+					if ((startDate.isBefore(dateNow) || startDate.equals(dateNow))
+							&& (endDate.isAfter(dateNow) || endDate.equals(dateNow))
+							) {
+						discountNew.setIsDiscount(true);
+					} else {
+						discountNew.setIsDiscount(false);
+					}
+				}
+				
+				itemTour.setDiscount(discountNew);
+				tourRepository.save(itemTour);
+			}
+			System.out.println("Update isDiscount successfully");
+		}
+	}
+
+	@Override
+	public void updateIsDiscountNoCheck() {
+		LocalDate dateNow = LocalDateUtil.getDateNow();
+		LocalDate yesterday = dateNow.plusDays(-1);
 		
-		return tourNew.getDiscount();
+		List<Tour> tourList = new ArrayList<>();
+		tourList = getAll();
+		for (Tour itemTour : tourList) {
+			if (itemTour.getDiscount() == null) {
+				Discount discount = new Discount();
+				discount.setStartDate(yesterday);
+				discount.setEndDate(yesterday);
+				discount.setDiscountType("percent");
+				discount.setDiscountValue(0);
+				discount.setAuto(false);
+				discount.setIsDiscount(false);
+				discount.setUpdateIsDiscount(yesterday);
+				
+				itemTour.setDiscount(discount);
+			}
+			
+			Discount discountNew = new Discount();
+			discountNew = itemTour.getDiscount();
+			
+			discountNew.setUpdateIsDiscount(dateNow);
+			
+			if (itemTour.getDiscount().getAuto() == true) {
+				LocalDate startDate = discountNew.getStartDate();
+				LocalDate endDate = discountNew.getEndDate();
+				
+				if ((startDate.isBefore(dateNow) || startDate.equals(dateNow))
+						&& (endDate.isAfter(dateNow) || endDate.equals(dateNow))
+						) {
+					discountNew.setIsDiscount(true);
+				} else {
+					discountNew.setIsDiscount(false);
+				}
+			}
+			
+			itemTour.setDiscount(discountNew);
+			tourRepository.save(itemTour);
+			
+		}
+		
+		System.out.println("Update isDiscount successfully");
 	}
 }

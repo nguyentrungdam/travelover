@@ -26,7 +26,8 @@ public class TourDTO {
 	private int numberOfNight; // not null
 	private Address address; // not null
 	private String tourDescription;
-	private int price; // not null
+	private int priceOfAdult; // not null
+	private int priceOfChildren; // not null
 	private String tourDetail;
 	private List<TourDetail> tourDetailList; // not null
 	private ReasonableTime reasonableTime; // not null

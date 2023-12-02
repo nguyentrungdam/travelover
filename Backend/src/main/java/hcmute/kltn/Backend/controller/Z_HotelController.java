@@ -131,7 +131,7 @@ public class Z_HotelController {
 	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> searchRoom(@ModelAttribute RoomSearch roomSearch) {
-		System.out.println("room search = " + roomSearch);
+//		System.out.println("room search = " + roomSearch);
 		
 		List<Room> roomList = iEHotelService.searchRoom(roomSearch);
 		

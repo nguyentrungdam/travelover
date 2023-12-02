@@ -296,7 +296,8 @@ public class OrderService implements IOrderService{
 		VOTourDetail vOTourDetail = new VOTourDetail();
 		vOTourDetail.setTourTitle(tourDTO.getTourTitle());
 		vOTourDetail.setThumbnailUrl(tourDTO.getThumbnailUrl());
-		vOTourDetail.setPrice(tourDTO.getPrice());
+//		vOTourDetail.setPrice(tourDTO.getPrice());
+		/////////////////////////////////////////////////////////////////////////
 		
 		orderDetail.setTourDetail(vOTourDetail);
 		

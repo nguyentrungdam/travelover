@@ -19,5 +19,7 @@ public class TourSearch {
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate startDate;
 	private String numberOfDay;
-	private int numberOfPeople;
+	private int numberOfAdult;
+	private int numberOfChildren;
+	private int numberOfRoom;
 }

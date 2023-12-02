@@ -20,5 +20,7 @@ public class RoomSearch {
 	private LocalDate startDate;
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate endDate;
-	private int numberOfPeople;
+	private int numberOfAdult;
+	private int numberOfChildren;
+	private int numberOfRoom;
 }

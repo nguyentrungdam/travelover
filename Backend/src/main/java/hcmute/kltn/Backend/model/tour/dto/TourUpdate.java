@@ -3,6 +3,7 @@ package hcmute.kltn.Backend.model.tour.dto;
 import java.util.List;
 
 import hcmute.kltn.Backend.model.base.extend.Address;
+import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 
@@ -23,9 +24,11 @@ public class TourUpdate {
 	private int numberOfNight; // not null
 	private Address address; // not null
 	private String tourDescription;
-	private int price;
+	private int priceOfAdult; // not null
+	private int priceOfChildren; // not null
 	private String tourDetail; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;
 	private String termAndCondition;
+	private Discount discount;
 }
