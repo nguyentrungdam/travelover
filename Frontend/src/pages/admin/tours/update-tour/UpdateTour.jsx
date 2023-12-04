@@ -74,16 +74,28 @@ const UpdateTour = () => {
     tourDescription: "",
     tourDetail: "",
     startDate: "",
-    price: 0,
+    priceOfAdult: 0,
+    priceOfChildren: 0,
     endDate: "",
     suitablePerson: "",
     termAndCondition: "",
     image: ["", "", "", "", "", ""],
+    //discount
+    startDateDiscount: "",
+    endDateDiscount: "",
+    discountValue: 0,
+    auto: true,
+    isDiscount: true,
   });
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedFormData = { ...formData }; // Tạo một bản sao của formData
-    if (name === "startDate" || name === "endDate") {
+    if (
+      name === "startDate" ||
+      name === "endDate" ||
+      name === "startDateDiscount" ||
+      name === "endDateDiscount"
+    ) {
       const inputDate = e.target.value;
       const regex = /^(\d{2})-(\d{2})$/;
       if (regex.test(inputDate)) {
@@ -131,7 +143,14 @@ const UpdateTour = () => {
       "termAndCondition",
       formData.termAndCondition || tour.termAndCondition
     );
-    formDataUpdate.append("price", formData.price || tour.price);
+    formDataUpdate.append(
+      "priceOfAdult",
+      formData.priceOfAdult || tour.priceOfAdult
+    );
+    formDataUpdate.append(
+      "priceOfChildren",
+      formData.priceOfChildren || tour.priceOfChildren
+    );
 
     // Thêm địa chỉ
     formDataUpdate.append(
@@ -158,7 +177,28 @@ const UpdateTour = () => {
       "reasonableTime[endDate]",
       formData.endDate || tour.reasonableTime.endDate
     );
-
+    //discount
+    formDataUpdate.append(
+      "discount[startDate]",
+      formData.startDateDiscount || tour.discount.startDate
+    );
+    formDataUpdate.append(
+      "discount[endDate]",
+      formData.endDateDiscount || tour.discount.endDate
+    );
+    formDataUpdate.append(
+      "discount[discountValue]",
+      formData.discountValue || tour.discount.discountValue
+    );
+    formDataUpdate.append(
+      "discount[auto]",
+      formData.auto || tour.discount.auto
+    );
+    formDataUpdate.append(
+      "discount[isDiscount]",
+      formData.isDiscount || tour.discount.isDiscount
+    );
+    formDataUpdate.append("discount[updateIsDiscount]", "2023-12-04");
     for (const [name, value] of formDataUpdate.entries()) {
       console.log(name, ":", value);
     }
@@ -200,6 +240,20 @@ const UpdateTour = () => {
   const handleOverlayClick = (e) => {
     if (e.target.classList.contains("modal-overlay2")) {
       closeModal();
+    }
+  };
+  const handleCheckboxChange = (e) => {
+    if (e.target.name === "discount") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        auto: false,
+        isDiscount: !prevFormData.isDiscount,
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        auto: !prevFormData.auto,
+      }));
     }
   };
   return (
@@ -282,14 +336,30 @@ const UpdateTour = () => {
                       type="text"
                       onChange={handleChange}
                     />
-                    <label className="small ">Price</label>
-                    <input
-                      name="price"
-                      className="form-control"
-                      type="text"
-                      defaultValue={tour.price}
-                      onChange={handleChange}
-                    />
+                    <div className="d-flex gap-1 mt-2">
+                      <div className="">
+                        <label className="small ">Price of adult</label>
+                        <input
+                          name="priceOfAdult"
+                          defaultValue={tour.priceOfAdult}
+                          className="form-control"
+                          type="text"
+                          placeholder="Enter price..."
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="">
+                        <label className="small ">Price of children</label>
+                        <input
+                          name="priceOfChildren"
+                          defaultValue={tour.priceOfChildren}
+                          className="form-control"
+                          type="text"
+                          placeholder="Enter price..."
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="row gx-3 mb-3 ">
@@ -335,6 +405,74 @@ const UpdateTour = () => {
                     />
                   </div>
                 </div>
+                {/* Discount */}
+                <div className="col-md-3 d-flex align-items-center">
+                  <label className="small mb-1 me-2">Discount: </label>
+                  <input
+                    defaultValue={tour.discount?.isDiscount}
+                    name="discount"
+                    className="checkbox-tour"
+                    type="checkbox"
+                    checked={formData.isDiscount}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+                {formData.isDiscount ? (
+                  <>
+                    <div className="row gx-3 mb-3 ">
+                      <div className="col-md-4 d-flex align-items-center w-27">
+                        <label className="small mb-1">Discount date:</label>
+                        <input
+                          defaultValue={validateOriginalDate(
+                            tour.discount?.startDate
+                          )}
+                          maxLength={5}
+                          name="startDateDiscount"
+                          className="form-control w-50 ms-2"
+                          placeholder="Ex: 15-05"
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="col-md-4 d-flex  align-items-center w-27">
+                        <label className="small mb-1 me-2">to</label>
+                        <input
+                          maxLength={5}
+                          defaultValue={validateOriginalDate(
+                            tour.discount?.endDate
+                          )}
+                          name="endDateDiscount"
+                          className="form-control w-50 ms-2"
+                          placeholder="Ex: 15-07"
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="row gx-3 mb-3">
+                      <div className="col-md-4 position-relative">
+                        <label className="small mb-1">Discount value</label>
+                        <input
+                          defaultValue={tour.discount?.discountValue}
+                          name="discountValue"
+                          className="form-control "
+                          type="text"
+                          onChange={handleChange}
+                        />
+                        <span className="discountValue">%</span>
+                      </div>
+                      <div className="col-md-3">
+                        <label className="small mb-1">Auto update</label>
+                        <input
+                          name="auto"
+                          defaultValue={tour.discount?.auto}
+                          className="checkbox-tour"
+                          type="checkbox"
+                          checked={formData.auto}
+                          onChange={handleCheckboxChange}
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : null}
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 border-top">
                     <label className="small mb-1">Policies and terms</label>

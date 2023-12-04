@@ -91,3 +91,12 @@
 body.modal-open {
   overflow: hidden;
 }
+.w-27 {
+  width: 27.333333% !important;
+}
+
+.checkbox-tour {
+  width: 20px;
+  height: 20px;
+  display: block;
+}

@@ -10,6 +10,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { signin } from "../../../slices/accountSlice";
 import Footer from "../../../components/Footer/Footer";
 import Header from "../../../components/Header/Header";
+import { saveToLocalStorage } from "../../../utils/validate";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,63 +19,70 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [redirecting, setRedirecting] = useState(false);
+  const notify = (prop) => {
+    return new Promise((resolve) => {
+      if (prop === 1) {
+        toast.success("Đăng nhập thành công ! 👌", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
+      } else {
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+          position: toast.POSITION.TOP_RIGHT,
+          pauseOnHover: true,
+          autoClose: 1000,
+          onClose: resolve,
+        });
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (redirecting) {
+      return;
+    }
     try {
       const res = await dispatch(
         signin({ email: values.email, password: values.password })
       ).unwrap();
-
-      if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
-        notify(1);
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
-      } else if (
-        (res.data.status === "ok" && res?.data?.data.role === "ADMIN") ||
-        res?.data?.data.role === "SUPER_ADMIN"
-      ) {
-        notify(1);
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 1500);
-      } else if (
-        res.data.status === "ok" &&
-        res?.data?.data.role === "ENTERPRISE"
-      ) {
-        notify(1);
-        setTimeout(() => {
-          navigate("/hotel-z");
-        }, 1500);
-      } else {
-        notify(2);
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
-      }
+      notify(1).then(() => {
+        if (!redirecting) {
+          setRedirecting(true);
+          setTimeout(() => {
+            if (res.data.status === "ok" && res.data.data.role === "CUSTOMER") {
+              navigate("/");
+            } else if (
+              res.data.status === "ok" &&
+              res?.data?.data.role === "ADMIN"
+            ) {
+              saveToLocalStorage("role", res.data.data.role);
+              navigate("/dashboard");
+            } else if (
+              res.data.status === "ok" &&
+              res?.data?.data.role === "ENTERPRISE"
+            ) {
+              navigate("/hotel-z");
+            }
+          }, 1500);
+        }
+      });
     } catch (error) {
       console.log(error);
-      notify(2);
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
-    }
-  };
-  const notify = (prop) => {
-    if (prop === 1) {
-      toast.success("Đăng nhập thành công ! 👌", {
-        position: toast.POSITION.TOP_RIGHT,
-        autoClose: 1000,
-        pauseOnHover: true,
-      });
-    } else {
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
-        position: toast.POSITION.TOP_RIGHT,
-        pauseOnHover: true,
-        autoClose: 1000,
+      notify(2).then(() => {
+        if (!redirecting) {
+          setRedirecting(true);
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
+        }
       });
     }
   };
+
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };

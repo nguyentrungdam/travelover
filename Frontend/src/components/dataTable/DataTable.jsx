@@ -43,6 +43,7 @@ const DataTable = (props) => {
   return (
     <div className="dataTable">
       <DataGrid
+        key={props.rows.id}
         className="dataGrid"
         rows={props.rows}
         columns={[...props.columns, actionColumn]}

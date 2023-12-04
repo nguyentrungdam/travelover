@@ -9,6 +9,7 @@ import {
   faMagnifyingGlass,
   faCalendarDays,
   faPerson,
+  faPeopleGroup,
 } from "@fortawesome/free-solid-svg-icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -24,14 +25,18 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
   const [numberOfDay, setNumberOfDay] = useState("1-3");
   const [openOptions, setOpenOptions] = useState(false);
   const optionsRef = useRef(null);
-  const [numberOfPeople, setNumberOfPeople] = useState(1);
+  const [numberOfAdult, setNumberOfAdult] = useState(1);
+  const [numberOfChildren, setNumberOfChildren] = useState(0);
+  const [numberOfRoom, setNumberOfRoom] = useState(1);
   const [selectedLocation, setSelectedLocation] = useState("");
   const handleSearch = () => {
     const newState = {
       selectedLocation,
       startDate,
       numberOfDay,
-      numberOfPeople,
+      numberOfAdult,
+      numberOfChildren,
+      numberOfRoom,
       selectedDate,
     };
     if (isTours) {
@@ -50,13 +55,26 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
-  const handleOption = (operation) => {
-    if (operation === "decrease" && numberOfPeople > 1) {
-      setNumberOfPeople(numberOfPeople - 1);
+  const handleOption = (category, operation) => {
+    if (operation === "decrease") {
+      if (category === "adults" && numberOfAdult > 1) {
+        setNumberOfAdult(numberOfAdult - 1);
+      } else if (category === "children" && numberOfChildren > 0) {
+        setNumberOfChildren(numberOfChildren - 1);
+      } else if (category === "rooms" && numberOfRoom > 1) {
+        setNumberOfRoom(numberOfRoom - 1);
+      }
     } else if (operation === "increase") {
-      setNumberOfPeople(numberOfPeople + 1);
+      if (category === "adults") {
+        setNumberOfAdult(numberOfAdult + 1);
+      } else if (category === "children") {
+        setNumberOfChildren(numberOfChildren + 1);
+      } else if (category === "rooms" && numberOfRoom < numberOfAdult) {
+        setNumberOfRoom(numberOfRoom + 1);
+      }
     }
   };
+
   const handleClickOutside = (event) => {
     if (optionsRef.current && !optionsRef.current.contains(event.target)) {
       setOpenOptions(false);
@@ -120,30 +138,73 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
             </div>
           </div>
           <div className="headerSearchItem headerSearchItem1 ">
-            <FontAwesomeIcon icon={faPerson} className="icon-search" />
-            <div className="headerSearch-location">
+            <FontAwesomeIcon icon={faPeopleGroup} className="icon-search" />
+            <div className="headerSearch-location w280">
               <h5>Số người</h5>
-              <span onClick={handlePeopleClick} className="headerSearchText ">
-                {numberOfPeople} người
+              <span onClick={handlePeopleClick} className="headerSearchText">
+                {numberOfAdult} người lớn, {numberOfChildren} trẻ em,{" "}
+                {numberOfRoom} phòng
               </span>
               {openOptions && (
                 <div className="options" ref={optionsRef}>
                   <div className="optionItem">
-                    <span className="optionText">Số người </span>
+                    <span className="optionText">Người lớn </span>
                     <div className="optionCounter">
                       <button
-                        disabled={numberOfPeople <= 1}
+                        disabled={numberOfAdult <= 1}
                         className="optionCounterButton"
-                        onClick={() => handleOption("decrease")}
+                        onClick={() => handleOption("adults", "decrease")}
                       >
                         -
                       </button>
                       <span className="optionCounterNumber">
-                        {numberOfPeople}
+                        {numberOfAdult}
                       </span>
                       <button
                         className="optionCounterButton"
-                        onClick={() => handleOption("increase")}
+                        onClick={() => handleOption("adults", "increase")}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="optionItem">
+                    <span className="optionText">Trẻ em </span>
+                    <div className="optionCounter">
+                      <button
+                        disabled={numberOfChildren < 1}
+                        className="optionCounterButton"
+                        onClick={() => handleOption("children", "decrease")}
+                      >
+                        -
+                      </button>
+                      <span className="optionCounterNumber">
+                        {numberOfChildren}
+                      </span>
+                      <button
+                        className="optionCounterButton"
+                        onClick={() => handleOption("children", "increase")}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="optionItem">
+                    <span className="optionText">Số phòng </span>
+                    <div className="optionCounter">
+                      <button
+                        disabled={numberOfRoom <= 1}
+                        className="optionCounterButton"
+                        onClick={() => handleOption("rooms", "decrease")}
+                      >
+                        -
+                      </button>
+                      <span className="optionCounterNumber">
+                        {numberOfRoom}
+                      </span>
+                      <button
+                        className="optionCounterButton"
+                        onClick={() => handleOption("rooms", "increase")}
                       >
                         +
                       </button>

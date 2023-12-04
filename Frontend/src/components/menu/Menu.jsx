@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
 import "./menu.css";
 import { menu, menuEnterprise } from "../../assets/data/dataAdmin";
-import { useSelector } from "react-redux";
+import { getFromLocalStorage } from "../../utils/validate";
 
 const Menu = () => {
-  const { account } = useSelector((state) => state.account);
-  console.log(account.data.role);
+  const role = getFromLocalStorage("role");
+  console.log(role);
   return (
     <div className="menu">
-      {account.data.role === "ADMIN"
+      {role === "ADMIN"
         ? menu.map((item) => (
             <div className="item" key={item.id}>
               <span className="title">{item.title}</span>

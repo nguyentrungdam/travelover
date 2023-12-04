@@ -64,7 +64,7 @@ const Users = () => {
   }, []);
 
   return (
-    <div className="users">
+    <div className="users vh-100">
       <div className="info">
         <h1>Users</h1>
       </div>
