@@ -435,7 +435,16 @@ public class TourService implements ITourService{
 					roomSearch.setNumberOfAdult(tourSearch.getNumberOfAdult());
 					roomSearch.setNumberOfChildren(tourSearch.getNumberOfChildren());
 					roomSearch.setNumberOfRoom(tourSearch.getNumberOfRoom());
-					List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = iHotelService.searchRoom(roomSearch);
+					
+					List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = new ArrayList<>();
+					try {
+						roomList = iHotelService.searchRoom(roomSearch);
+						
+						
+					} catch (Exception e) {
+						
+					}
+					
 					if(roomList.size() > 0) {
 						// mapping hotel
 						Hotel hotel = new Hotel();
@@ -465,7 +474,11 @@ public class TourService implements ITourService{
 			
 			tourSearchRes.setTotalPriceNotDiscount(totalPriceNotDiscount);
 			tourSearchRes.setTotalPrice(totalPrice);
-			tourSearchResList.add(tourSearchRes);
+			
+			if (tourSearchRes.getHotel() != null) {
+				tourSearchResList.add(tourSearchRes);
+			}
+			
 		}
 
 		return tourSearchResList;
