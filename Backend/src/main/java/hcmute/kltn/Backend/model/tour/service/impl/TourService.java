@@ -636,7 +636,7 @@ public class TourService implements ITourService{
 						discountNew.setIsDiscount(false);
 					}
 				} catch (Exception e) {
-					// TODO: handle exception
+					discountNew.setIsDiscount(false);
 				}
 				
 				itemTour.setDiscount(discountNew);
@@ -686,7 +686,7 @@ public class TourService implements ITourService{
 					discountNew.setIsDiscount(false);
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
+				discountNew.setIsDiscount(false);
 			}
 			
 			itemTour.setDiscount(discountNew);
