@@ -60,7 +60,7 @@ public class TourService implements ITourService{
 		
 		String[] tourDetailSplit = tourDetail.split("\\n");
 		if(tourDetailSplit.length % 2 != 0) {
-			throw new CustomException("The number of titles and descriptions does not match");
+			throw new CustomException("Tour detail: The number of titles and descriptions does not match");
 		}
 		
 		for(int i = 0; i < tourDetailSplit.length; i += 2) {
@@ -289,6 +289,13 @@ public class TourService implements ITourService{
 			}
 		}
 		
+		LocalDate updateIsDiscount;
+		try {
+			updateIsDiscount = tour.getDiscount().getUpdateIsDiscount();
+		} catch (Exception e) {
+			updateIsDiscount = null;
+		}
+		
 		// mapping tour
 		modelMapper.map(tourUpdate, tour);
 		
@@ -297,6 +304,12 @@ public class TourService implements ITourService{
 		
 		// set tour detail list
 		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
+		
+		// set Tour.Discount.UpdateIsDiscount
+		Discount discount = new Discount();
+		discount = tourUpdate.getDiscount();
+		discount.setUpdateIsDiscount(updateIsDiscount);
+		tour.setDiscount(discount);
 		
 		// update tour
 		Tour tourNew = new Tour();
@@ -575,10 +588,16 @@ public class TourService implements ITourService{
 		boolean update = false;
 		if (tour.getDiscount() == null) {
 			update = true;
-		} else if (!tour.getDiscount().getUpdateIsDiscount().equals(dateNow)) {
+		} else {
+			try {
+				if (!tour.getDiscount().getUpdateIsDiscount().equals(dateNow)) {
+					update = true;
+				}
+			} catch (Exception e) {
+				update = true;
+			}
 			
-			update = true;
-		}
+		}	
 
 		// update
 		if (update == true) {
@@ -587,9 +606,9 @@ public class TourService implements ITourService{
 			for (Tour itemTour : tourList) {
 				if (itemTour.getDiscount() == null) {
 					Discount discount = new Discount();
-					discount.setStartDate(yesterday);
-					discount.setEndDate(yesterday);
-					discount.setDiscountType("percent");
+					discount.setStartDate(null);
+					discount.setEndDate(null);
+					discount.setDiscountType(null);
 					discount.setDiscountValue(0);
 					discount.setAuto(false);
 					discount.setIsDiscount(false);
@@ -603,17 +622,21 @@ public class TourService implements ITourService{
 				
 				discountNew.setUpdateIsDiscount(dateNow);
 				
-				if (itemTour.getDiscount().getAuto() == true) {
+				try {
 					LocalDate startDate = discountNew.getStartDate();
 					LocalDate endDate = discountNew.getEndDate();
 					
 					if ((startDate.isBefore(dateNow) || startDate.equals(dateNow))
 							&& (endDate.isAfter(dateNow) || endDate.equals(dateNow))
 							) {
-						discountNew.setIsDiscount(true);
+						if (itemTour.getDiscount().getAuto() == true) {
+							discountNew.setIsDiscount(true);
+						}
 					} else {
 						discountNew.setIsDiscount(false);
 					}
+				} catch (Exception e) {
+					// TODO: handle exception
 				}
 				
 				itemTour.setDiscount(discountNew);
@@ -633,9 +656,9 @@ public class TourService implements ITourService{
 		for (Tour itemTour : tourList) {
 			if (itemTour.getDiscount() == null) {
 				Discount discount = new Discount();
-				discount.setStartDate(yesterday);
-				discount.setEndDate(yesterday);
-				discount.setDiscountType("percent");
+				discount.setStartDate(null);
+				discount.setEndDate(null);
+				discount.setDiscountType(null);
 				discount.setDiscountValue(0);
 				discount.setAuto(false);
 				discount.setIsDiscount(false);
@@ -649,17 +672,21 @@ public class TourService implements ITourService{
 			
 			discountNew.setUpdateIsDiscount(dateNow);
 			
-			if (itemTour.getDiscount().getAuto() == true) {
+			try {
 				LocalDate startDate = discountNew.getStartDate();
 				LocalDate endDate = discountNew.getEndDate();
 				
 				if ((startDate.isBefore(dateNow) || startDate.equals(dateNow))
 						&& (endDate.isAfter(dateNow) || endDate.equals(dateNow))
 						) {
-					discountNew.setIsDiscount(true);
+					if (itemTour.getDiscount().getAuto() == true) {
+						discountNew.setIsDiscount(true);
+					}
 				} else {
 					discountNew.setIsDiscount(false);
 				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 			
 			itemTour.setDiscount(discountNew);
