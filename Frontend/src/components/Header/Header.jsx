@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Container, Row, Button } from "reactstrap";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../assets/images/travel-love.png";
 import "./header.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,10 +24,10 @@ const nav__links = [
 
 const Header = ({ noneSticky }) => {
   const menuRef = useRef(null);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isSticky, setIsSticky] = useState(false);
-
+  const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, account } = useSelector((state) => state.account);
 
   const handleLogout = async (e) => {
@@ -38,6 +38,7 @@ const Header = ({ noneSticky }) => {
       navigate("/login");
     }, 1500);
   };
+
   const notify2 = (prop) => {
     if (prop === 1) {
       toast.success("Đăng xuất thành công! 👌", {
@@ -66,14 +67,29 @@ const Header = ({ noneSticky }) => {
         setIsSticky(false);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [noneSticky]);
 
   const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
 
+  const handleNavLinkClick = (path) => {
+    // Nếu đường dẫn hiện tại không giống với đường dẫn đang được chọn, thì mới thực hiện reload
+    if (location.pathname !== path) {
+      navigate(path);
+      window.location.reload();
+    }
+  };
+  const handleDropDownLinkClick = (path) => {
+    // Kiểm tra nếu đường dẫn là "/account" hoặc "/user/purchase" thì không thêm chatbot
+    if (path === "/account" || path === "/register" || path === "/login") {
+      navigate(path);
+      window.location.reload();
+    }
+  };
   return (
     <header className={`header ${isSticky ? "sticky__header" : ""}`}>
       <Container>
@@ -97,6 +113,7 @@ const Header = ({ noneSticky }) => {
                       className={(navClass) =>
                         navClass.isActive ? "active__link" : ""
                       }
+                      onClick={handleNavLinkClick}
                     >
                       {item.display}
                     </NavLink>
@@ -121,12 +138,14 @@ const Header = ({ noneSticky }) => {
                           alt={account.data.lastName}
                         />
                         <div className="DropDownContent">
-                          <Link className="link1" to="/account">
+                          <Link
+                            className="link1"
+                            to="/account"
+                            onClick={() => handleDropDownLinkClick("/account")}
+                          >
                             <span className="SubA">Tài Khoản</span>
                           </Link>
-                          <Link className="link1" to="/user/purchase">
-                            <span className="SubA">Đơn Mua</span>
-                          </Link>
+
                           <span
                             className="SubA seperate"
                             onClick={handleLogout}
@@ -140,10 +159,20 @@ const Header = ({ noneSticky }) => {
                 ) : (
                   <>
                     <Button className="btn secondary__btn">
-                      <Link to="/login">Đăng Nhập</Link>
+                      <Link
+                        to="/login"
+                        onClick={() => handleDropDownLinkClick("/login")}
+                      >
+                        Đăng Nhập
+                      </Link>
                     </Button>
                     <Button className="btn primary__btn">
-                      <Link to="/register">Đăng Ký</Link>
+                      <Link
+                        to="/register"
+                        onClick={() => handleDropDownLinkClick("/register")}
+                      >
+                        Đăng Ký
+                      </Link>
                     </Button>
                   </>
                 )}

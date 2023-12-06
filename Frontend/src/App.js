@@ -54,9 +54,9 @@ function App() {
   return (
     <Routes>
       {/* client route */}
-      <Route path="/" element={<Navigate to="/home" />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/tours" element={<Tours />} />
+      <Route path="/" element={<Navigate to="/home" />} key="home" />
+      <Route path="/home" element={<Home />} key="home" />
+      <Route path="/tours" element={<Tours />} key="tours" />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<AccountDetail />} />

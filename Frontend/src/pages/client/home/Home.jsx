@@ -18,6 +18,7 @@ import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
 import { saveToLocalStorage } from "../../../utils/validate";
 import { useSelector } from "react-redux";
+import ChatBot from "../../../components/chatbot/ChatBot";
 
 const Home = () => {
   const { account } = useSelector((state) => state.account);
@@ -184,6 +185,7 @@ const Home = () => {
         </Container>
       </section>
       {/* ========== TESTIMONIAL SECTION END ================== */}
+      <ChatBot />
       <NewsLetter />
       <ScrollToTop />
       <Footer />
