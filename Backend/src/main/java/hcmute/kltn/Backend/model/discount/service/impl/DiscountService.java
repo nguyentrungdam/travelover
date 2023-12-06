@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,6 +104,7 @@ public class DiscountService implements IDiscountService{
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		LocalDate currentDate = LocalDateUtil.getDateNow();
 		
+		discount.setNumberOfCodeUsed(0);
 		discount.setDiscountId(discountId);
 		discount.setStatus(true);
 		discount.setCreatedBy(accountId);
@@ -229,6 +231,30 @@ public class DiscountService implements IDiscountService{
 		}
 		return discountDTOList;
 	}
+	
+	private boolean checkValid(Discount discount) {
+		LocalDate currentDate = LocalDateUtil.getDateNow();
+		
+		if (discount.getStatus() == false) {
+			return false;
+		}
+		
+		if (discount.getStartDate().isAfter(currentDate)) {
+			return false;
+		}
+		
+		if (discount.getEndDate().isBefore(currentDate)) {
+			return false;
+		}
+		
+		if (discount.getIsQuantityLimit() == true) {
+			if (discount.getNumberOfCodeUsed() >= discount.getNumberOfCode()) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
 	@Override
 	public DiscountDTO createDiscount(DiscountCreate discountCreate) {
@@ -310,4 +336,57 @@ public class DiscountService implements IDiscountService{
 		return getDiscountDTO(discount);
 	}
 
+	@Override
+	public int getActualDiscountValue(String discountCode,int totalPrice) {
+		// find discount
+		Optional<Discount> discountFind = discountRepository.findByDiscountCode(discountCode);
+		if (discountFind.isEmpty()) {
+			throw new CustomException("Cannot find discount");
+		}
+		Discount discount = discountFind.get();
+		
+		// check valid
+		boolean checkValid = true;
+		checkValid = checkValid(discount);
+		if (checkValid == false) {
+			throw new CustomException("Expired discount code");
+		}
+		
+		// check min order
+		if (discount.getMinOrder() > totalPrice) {
+			throw new CustomException("The order value has not reached the minimum order value");
+		}
+		
+		// get actual discount value
+		int actualDiscountValue = 0;
+		actualDiscountValue = totalPrice * discount.getDiscountValue() / 100;
+		
+		// check max discount
+		if (actualDiscountValue > discount.getMaxDiscount()) {
+			actualDiscountValue = discount.getMaxDiscount();
+		}
+		
+		return actualDiscountValue;
+	}
+
+	@Override
+	public void usedDiscount(String discountCode) {
+		// find discount
+		Optional<Discount> discountFind = discountRepository.findByDiscountCode(discountCode);
+		if (discountFind.isEmpty()) {
+			throw new CustomException("Cannot find discount");
+		}
+		Discount discount = new Discount();
+		discount = discountFind.get();
+		
+		// update number of code used
+		int numberOfCodeUsed = discount.getNumberOfCodeUsed() + 1;
+		discount.setNumberOfCodeUsed(numberOfCodeUsed);
+		
+		// update discount
+		
+		// update discount
+		Discount discountNew = new Discount();
+		discountNew = discountRepository.save(discount);
+	}
 }

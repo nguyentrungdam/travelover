@@ -28,7 +28,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/payments")
-@Tag(name = "Payments", description = "APIs for managing payments")
+@Tag(name = "Payments", description = "APIs for managing payments\n\n"
+		+ "06/12/2023\n\n"
+		+ "Thêm field khi trả về url:\n\n"
+		+ "- paymentStatus: trạng thái là 1 thì thành công, còn lại là thất bại\n"
+		+ "- orderId: mã đơn hàng để gọi detail order lấy thông tin của đơn hàng đã đặt")
 @SecurityRequirement(name = "Bearer Authentication")
 public class PaymentController {
 	@Autowired
@@ -67,7 +71,9 @@ public class PaymentController {
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web
 		String paymentStatus = String.valueOf(checkPayment);
-        response.sendRedirect(redirectUrl + "?paymentStatus=" + paymentStatus);
+        response.sendRedirect(redirectUrl 
+        		+ "?paymentStatus=" + paymentStatus
+        		+ "&orderId=" + orderId);
     }
 	
 	private final String createVNPayPaymentDesc = "Các field bắt buộc phải nhập (Tạo Order trước để lấy các 2 field bên dưới):\n\n"

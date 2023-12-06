@@ -142,4 +142,21 @@ public class DiscountController {
 			}
 		});
 	}
+	
+	private final String getActualDiscountValue = "Nhập discount code và total price để nhận về số tiền được giảm, trả về lỗi "
+			+ "nếu mã áp dụng không thành công";
+	@RequestMapping(value = "/actual-discount-value", method = RequestMethod.GET)
+	@Operation(summary = "Get actual discount value", description = getActualDiscountValue)
+	ResponseEntity<ResponseObject> getActualDiscountValue(
+			@RequestParam String discountCode,
+			@RequestParam int totalPrice) {
+		int actualDiscountValue = iDiscountService.getActualDiscountValue(discountCode, totalPrice);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get actual discount value successfully");
+				setData(actualDiscountValue);
+			}
+		});
+	}
 }

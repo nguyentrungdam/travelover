@@ -3,10 +3,11 @@ package hcmute.kltn.Backend.model.order.service.impl;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,11 +15,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.EOrderStatus;
+import hcmute.kltn.Backend.model.discount.dto.DiscountDTO;
+import hcmute.kltn.Backend.model.discount.dto.DiscountUpdate;
+import hcmute.kltn.Backend.model.discount.service.IDiscountService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
-import hcmute.kltn.Backend.model.hotel.dto.entity.Hotel;
 import hcmute.kltn.Backend.model.hotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
@@ -27,6 +31,7 @@ import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
 import hcmute.kltn.Backend.model.order.dto.entity.Order;
+import hcmute.kltn.Backend.model.order.dto.extend.Discount;
 import hcmute.kltn.Backend.model.order.dto.extend.HotelDetail;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
 import hcmute.kltn.Backend.model.order.dto.extend.Payment;
@@ -34,8 +39,6 @@ import hcmute.kltn.Backend.model.order.dto.extend.VOTourDetail;
 import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
-import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
@@ -55,6 +58,8 @@ public class OrderService implements IOrderService{
 	private IHotelService iHotelService;
 	@Autowired
 	private ITourService iTourService;
+	@Autowired
+	private IDiscountService iDiscountService;
 	
 	private String getOrderStatus(String orderStatus) {
 		int index = Integer.valueOf(orderStatus);
@@ -276,6 +281,17 @@ public class OrderService implements IOrderService{
 		}
 		return orderDTOList;
 	}
+	
+	private void defaultSort(List<Order> orderList) {
+		Collections.sort(orderList, new Comparator<Order>() {
+            @Override
+            public int compare(Order order1, Order order2) {
+            	int result = order2.getLastModifiedAt().compareTo(order1.getLastModifiedAt());
+
+                return result;
+            }
+        });
+	}
 
 	@Override
 	public OrderDTO createOrder(OrderCreate orderCreate) {
@@ -336,8 +352,33 @@ public class OrderService implements IOrderService{
 		
 		// get guider information
 		
-		order.setOrderDetail(orderDetail);
 		order.setTotalPrice(totalPrice);
+		
+		// update discount
+		Discount discount = new Discount();
+		discount.setDiscountTour(null);
+		discount.setDiscountTourValue(0);
+		discount.setDiscountCode(null);
+		discount.setDiscountCodeValue(0);
+		// discount tour
+		if (tourDTO.getDiscount().getIsDiscount() == true) {
+			int actualDiscountValue = totalPrice * tourDTO.getDiscount().getDiscountValue() / 100;
+			totalPrice = totalPrice - actualDiscountValue;
+			discount.setDiscountTour(tourDTO.getTourId());
+			discount.setDiscountTourValue(actualDiscountValue);
+		}
+		// discount add
+		if (orderCreate.getDiscountCode() != null && !orderCreate.getDiscountCode().equals("")) {
+			int actualDiscountValue = iDiscountService.getActualDiscountValue(orderCreate.getDiscountCode(), totalPrice);
+			
+			totalPrice = totalPrice - actualDiscountValue;
+			discount.setDiscountCode(orderCreate.getDiscountCode());
+			discount.setDiscountCodeValue(actualDiscountValue);
+		}
+
+		order.setDiscount(discount);
+		order.setOrderDetail(orderDetail);
+		order.setFinalPrice(totalPrice);
 		order.setOrderStatus(getOrderStatus("1"));
 		
 		// create order
@@ -377,7 +418,21 @@ public class OrderService implements IOrderService{
 
 	@Override
 	public List<OrderDTO> getAllOrder() {
-		List<Order> orderList = getAll();
+		List<Order> orderList = new ArrayList<>(getAll());
+		defaultSort(orderList);
+		
+		Account currentAccount = iAccountDetailService.getCurrentAccount();
+		if (currentAccount.getRole().equals("CUSTOMER")) {
+			List<Order> orderListClone = new ArrayList<>(getAll());
+			for (Order itemOrder : orderListClone) {
+				if (!itemOrder.getCreatedBy().equals(currentAccount.getAccountId())) {
+					orderList.remove(itemOrder);
+					if (orderList.size() <= 0) {
+						break;
+					}
+				}
+			}
+		}
 
 		return getOrderDTOList(orderList);
 	}
@@ -439,9 +494,18 @@ public class OrderService implements IOrderService{
 			order.setPayment(paymentList);
 		}
 		
+		if (order.getDiscount().getDiscountCode() != null && !order.getDiscount().getDiscountCode().equals("")) {
+			// update number of code used in discount
+			DiscountDTO discountDTO = new DiscountDTO();
+			discountDTO = iDiscountService.getDiscountByCode(order.getDiscount().getDiscountCode());
+			if (discountDTO.getIsQuantityLimit() == true) {
+				iDiscountService.usedDiscount(order.getDiscount().getDiscountCode());
+			}
+		}
+		
 		// update order
 		Order orderNew = new Order();
-		orderNew = update(order);
+		orderNew = orderRepository.save(order);
 		
 		return getOrderDTO(orderNew);
 	}

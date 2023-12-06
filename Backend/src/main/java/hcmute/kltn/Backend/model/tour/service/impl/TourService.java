@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.tour.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -636,11 +637,12 @@ public class TourService implements ITourService{
 				discountNew.setUpdateIsDiscount(dateNow);
 				
 				try {
-					LocalDate startDate = discountNew.getStartDate();
-					LocalDate endDate = discountNew.getEndDate();
+					MonthDay startDate = MonthDay.from(discountNew.getStartDate());
+					MonthDay endDate = MonthDay.from(discountNew.getEndDate());
+					MonthDay currentDate = MonthDay.from(dateNow);
 					
-					if ((startDate.isBefore(dateNow) || startDate.equals(dateNow))
-							&& (endDate.isAfter(dateNow) || endDate.equals(dateNow))
+					if ((startDate.isBefore(currentDate) || startDate.equals(currentDate))
+							&& (endDate.isAfter(currentDate) || endDate.equals(currentDate))
 							) {
 						if (itemTour.getDiscount().getAuto() == true) {
 							discountNew.setIsDiscount(true);
@@ -686,11 +688,12 @@ public class TourService implements ITourService{
 			discountNew.setUpdateIsDiscount(dateNow);
 			
 			try {
-				LocalDate startDate = discountNew.getStartDate();
-				LocalDate endDate = discountNew.getEndDate();
+				MonthDay startDate = MonthDay.from(discountNew.getStartDate());
+				MonthDay endDate = MonthDay.from(discountNew.getEndDate());
+				MonthDay currentDate = MonthDay.from(dateNow);
 				
-				if ((startDate.isBefore(dateNow) || startDate.equals(dateNow))
-						&& (endDate.isAfter(dateNow) || endDate.equals(dateNow))
+				if ((startDate.isBefore(currentDate) || startDate.equals(currentDate))
+						&& (endDate.isAfter(currentDate) || endDate.equals(currentDate))
 						) {
 					if (itemTour.getDiscount().getAuto() == true) {
 						discountNew.setIsDiscount(true);

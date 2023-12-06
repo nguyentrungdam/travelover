@@ -13,4 +13,7 @@ public interface IDiscountService {
 	public DiscountDTO getDiscountByCode(String discountCode);
 	public List<DiscountDTO> getAllDiscount();
 	public List<DiscountDTO> searchDiscount(String keyword);
+	
+	public int getActualDiscountValue(String discountCode,int totalPrice);
+	public void usedDiscount(String discountCode);
 }

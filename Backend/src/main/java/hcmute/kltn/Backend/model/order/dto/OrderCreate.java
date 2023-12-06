@@ -27,7 +27,8 @@ public class OrderCreate {
 	private List<String> personIdList;
 	private int numberOfChildren; // not null
 	private int numberOfAdult; // not null
-	private Discount discount;
+	private String discountCode;
 	private CustomerInformation customerInformation; // not null
 	private String note;
+//	private int finalPrice;
 }
