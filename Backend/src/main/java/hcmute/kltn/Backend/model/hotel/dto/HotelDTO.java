@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.extend.Contact;
 import hcmute.kltn.Backend.model.base.extend.Image;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class HotelDTO {
+public class HotelDTO extends BaseEntity{
 	private String hotelId;
 	@JsonProperty("eHotelId")
 	private String eHotelId;

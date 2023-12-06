@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.order.dto.extend.CustomerInformation;
 import hcmute.kltn.Backend.model.order.dto.extend.Discount;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDTO {
+public class OrderDTO extends BaseEntity{
 	private String orderId;
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate startDate; // not null

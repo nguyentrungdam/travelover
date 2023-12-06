@@ -10,5 +10,8 @@ import lombok.NoArgsConstructor;
 public class VOTourDetail {
 	private String tourTitle;
 	private String thumbnailUrl;
-	private int price;
+	private int numberOfDay; 
+	private int numberOfNight; 
+	private int priceOfAdult; 
+	private int priceOfChildren; 
 }

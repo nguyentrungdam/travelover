@@ -2,8 +2,8 @@ package hcmute.kltn.Backend.model.tour.dto;
 
 import java.util.List;
 
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
-import hcmute.kltn.Backend.model.base.extend.Image;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.Reviewer;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TourDTO {
+public class TourDTO extends BaseEntity{
 	private String tourId;
 	private String tourTitle; // not null, unique
 	private String thumbnailUrl; 

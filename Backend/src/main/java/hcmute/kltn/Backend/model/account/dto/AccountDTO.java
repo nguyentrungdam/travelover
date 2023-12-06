@@ -3,6 +3,7 @@ package hcmute.kltn.Backend.model.account.dto;
 import java.util.List;
 
 import hcmute.kltn.Backend.model.account.dto.extend.Notification;
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDTO {
+public class AccountDTO extends BaseEntity{
 	private String accountId;
 	private String firstName;
 	private String lastName;

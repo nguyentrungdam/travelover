@@ -296,13 +296,16 @@ public class OrderService implements IOrderService{
 		VOTourDetail vOTourDetail = new VOTourDetail();
 		vOTourDetail.setTourTitle(tourDTO.getTourTitle());
 		vOTourDetail.setThumbnailUrl(tourDTO.getThumbnailUrl());
-//		vOTourDetail.setPrice(tourDTO.getPrice());
-		/////////////////////////////////////////////////////////////////////////
+		vOTourDetail.setNumberOfDay(tourDTO.getNumberOfDay());
+		vOTourDetail.setNumberOfNight(tourDTO.getNumberOfNight());
+		vOTourDetail.setPriceOfAdult(tourDTO.getPriceOfAdult());
+		vOTourDetail.setPriceOfChildren(tourDTO.getPriceOfChildren());
 		
 		orderDetail.setTourDetail(vOTourDetail);
 		
 		// update total price
-		totalPrice += vOTourDetail.getPrice();
+		totalPrice += vOTourDetail.getPriceOfAdult() * orderCreate.getNumberOfAdult();
+		totalPrice += vOTourDetail.getPriceOfChildren() * orderCreate.getNumberOfChildren();
 		
 		// update endDate
 		LocalDate endDate = order.getStartDate().plusDays((long) (tourDTO.getNumberOfDay() - 1));
@@ -324,7 +327,7 @@ public class OrderService implements IOrderService{
 			hotelDetailList.add(hotelDetail);
 			
 			// update total price
-			totalPrice += hotelDetail.getPrice();
+			totalPrice += hotelDetail.getPrice() * vOTourDetail.getNumberOfDay();
 		}
 		
 		orderDetail.setHotelDetail(hotelDetailList);

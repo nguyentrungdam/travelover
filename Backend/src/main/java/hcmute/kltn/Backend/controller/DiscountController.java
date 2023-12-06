@@ -1,0 +1,145 @@
+package hcmute.kltn.Backend.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import hcmute.kltn.Backend.model.base.response.dto.Response;
+import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
+import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+import hcmute.kltn.Backend.model.discount.dto.DiscountCreate;
+import hcmute.kltn.Backend.model.discount.dto.DiscountDTO;
+import hcmute.kltn.Backend.model.discount.dto.DiscountUpdate;
+import hcmute.kltn.Backend.model.discount.service.IDiscountService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping(path = "/api/v1/discounts")
+@Tag(name = "Discounts", description = "APIs for managing discounts\n\n"
+		+ "06/12/2023\n\n"
+		+ "Thêm tính năng tạo mã khuyến mãi:\n\n"
+		+ "- Nhập các thông tin được yêu cầu, hệ thống sẽ tự động tạo mã\n"
+		+ "- Hình ảnh gọi qua api image và lấu url")
+@SecurityRequirement(name = "Bearer Authentication")
+public class DiscountController {
+	@Autowired
+	private IResponseObjectService iResponseObjectService;
+	@Autowired
+	private IDiscountService iDiscountService;
+	
+	private final String createDiscountDescription = "Các field bắt buộc phải nhập:\n\n"
+			+ "- 'discountTitle': '' \n"
+			+ "- 'discountValue': '' (giá trị giảm giá, đơn vị là %, chỉ cần nhập số)\n"
+			+ "- 'startDate': ''\n"
+			+ "- 'endDate': ''\n"
+			+ "- 'minOrder': '' (giá trị đơn hàng tối thiểu)\n"
+			+ "- 'maxDiscount': '' (giảm giá tối đa)\n"
+			+ "- 'isQuantityLimit': '' (giới hạn số lượng)\n"
+			+ "- 'numberOfCode': '' (nhập nếu isQuantityLimit = true)\n";
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	@Operation(summary = "Create discount - ADMIN / STAFF", description = createDiscountDescription)
+	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
+	ResponseEntity<ResponseObject> createDiscount(
+			@RequestBody DiscountCreate discountCreate) {
+		DiscountDTO discountDTO = iDiscountService.createDiscount(discountCreate);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Create Discount successfully");
+				setData(discountDTO);
+			}
+		});
+	}
+	
+	private final String updateDiscountDescription = "Các field bắt buộc phải nhập:\n\n"
+			+ "- 'discountTitle': '' \n"
+			+ "- 'discountValue': '' (giá trị giảm giá, đơn vị là %, chỉ cần nhập số)\n"
+			+ "- 'startDate': ''\n"
+			+ "- 'endDate': ''\n"
+			+ "- 'minOrder': '' (giá trị đơn hàng tối thiểu)\n"
+			+ "- 'maxDiscount': '' (giảm giá tối đa)\n"
+			+ "- 'isQuantityLimit': '' (giới hạn số lượng)\n"
+			+ "- 'numberOfCode': '' (nhập nếu isQuantityLimit = true)\n";
+	@RequestMapping(value = "/update", method = RequestMethod.PUT)
+	@Operation(summary = "Update Discount - ADMIN / STAFF", description = updateDiscountDescription)
+	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
+	ResponseEntity<ResponseObject> updateDiscount(
+			@RequestBody DiscountUpdate discountUpdate) {
+		DiscountDTO discountDTO = iDiscountService.updateDiscount(discountUpdate);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Update Discount successfully");
+				setData(discountDTO);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/detail", method = RequestMethod.GET)
+	@Operation(summary = "Get detail discount - ADMIN / STAFF")
+	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
+	ResponseEntity<ResponseObject> getDetailDiscount(
+			@RequestParam String discountId) {
+		DiscountDTO discountDTO = iDiscountService.getDetailDiscount(discountId);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get Detail Discount successfully");
+				setData(discountDTO);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@Operation(summary = "Get all discount - ADMIN / STAFF")
+	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
+	ResponseEntity<ResponseObject> getAlllDiscount() {
+		List<DiscountDTO> discountDTOList = iDiscountService.getAllDiscount();
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get All Discount successfully");
+				setData(discountDTOList);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@Operation(summary = "Search discount by keyword - ADMIN / STAFF")
+	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
+	ResponseEntity<ResponseObject> searchDiscount(
+			@RequestParam String keyword) {
+		List<DiscountDTO> discountDTOList = iDiscountService.searchDiscount(keyword);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search Discount successfully");
+				setData(discountDTOList);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/get", method = RequestMethod.GET)
+	@Operation(summary = "Get discount by discountCode")
+	ResponseEntity<ResponseObject> getDiscountByCode(
+			@RequestParam String discountCode) {
+		DiscountDTO discountDTO = iDiscountService.getDiscountByCode(discountCode);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get Discount successfully");
+				setData(discountDTO);
+			}
+		});
+	}
+}

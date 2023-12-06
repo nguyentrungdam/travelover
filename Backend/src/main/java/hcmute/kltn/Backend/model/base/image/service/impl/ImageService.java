@@ -210,21 +210,16 @@ public class ImageService implements IImageService{
 	}
 	
 	private void deleteNotCheck(String imageId) {
-		// get image file
-		File imageFile = new File("");
-		
 		File dir = new File(uploadDir);
 		File[] fileList = dir.listFiles();
 		String fileFullName = new String();
 
         for (File itemFile : fileList) {
         	if (itemFile.getName().startsWith(imageId)) {
-        		imageFile = itemFile;
+        		itemFile.delete();
+        		break;
         	}
         }
-
-		// delete image file
-		imageFile.delete();
 	}
 	
 	private String getIdByUrl(String imageUrl) {

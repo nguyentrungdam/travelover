@@ -95,6 +95,17 @@ public class DataLoader implements CommandLineRunner {
 					+ "CollectionName = Tour, Prefix = TR, Description = Hotel collection");
 		} 
 		
+		GeneratorSequenceDTO genGenSeqDiscount = new GeneratorSequenceDTO();
+		genGenSeqDiscount.setCollectionName("discount");
+		genGenSeqDiscount.setPrefix("DCT");
+		genGenSeqDiscount.setNumber(0);
+		genGenSeqDiscount.setDescription("Discount collection");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqDiscount);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Dícount, Prefix = DCT, Description = Discount collection");
+		} 
+		
 		// GEN DATA FOR ACCOUNT TABLE
 		// FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = SUPER_ADMIN
 		
@@ -110,23 +121,6 @@ public class DataLoader implements CommandLineRunner {
 					+ "FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = ADMIN");
 		} 
 		
-//		List<Notification> notiList2 = new ArrayList();
-//		Notification noti2 = new Notification();
-//		AccountDTO user2 = new AccountDTO();
-//		user2.setFirstName("test");
-//		user2.setLastName("test");
-//		user2.setEmail("test@gmail.com");
-//		user2.setPassword("123456");
-//		user2.setRole("ADMIN");
-//		noti2.setTitle("Login success");
-//		noti2.setLink("google.com");
-//		notiList2.add(noti2);
-//		user2.setNotification(notiList2);
-//		initCheck = iAccountService.initData(user2);
-//		if (initCheck) {
-//			logger.info("Success to gen data for Account table: "
-//					+ "FirstName = test, LastName = test, Email = test@gmail.com, Password = 123456, Role = ADMIN");
-//		}
 
     	String linkServer = "http://localhost:" + portServer + "/swagger-ui/index.html";
 		
