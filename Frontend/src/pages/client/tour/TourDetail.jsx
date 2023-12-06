@@ -17,6 +17,7 @@ import { searchTour } from "../../../slices/tourSlice";
 import {
   FormatLine,
   formatCurrencyWithoutD,
+  saveToLocalStorage,
   validateOriginalDate,
 } from "../../../utils/validate";
 
@@ -32,8 +33,10 @@ const TourDetail = () => {
   const province = state ? state.province : "";
   const startDate = state ? state.startDate : "";
   const numberOfDay = state ? state.numberOfDay : "";
-  const numberOfPeople = state ? state.numberOfPeople : 1;
-  console.log(tourId, province, startDate, numberOfDay, numberOfPeople);
+  const numberOfAdult = state ? state.numberOfAdult : 1;
+  const numberOfChildren = state ? state.numberOfChildren : 1;
+  const numberOfRoom = state ? state.numberOfRoom : 1;
+
   const [activeDay, setActiveDay] = useState(null);
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -43,7 +46,9 @@ const TourDetail = () => {
         province,
         startDate,
         numberOfDay,
-        numberOfPeople,
+        numberOfAdult,
+        numberOfChildren,
+        numberOfRoom,
         pageSize: 1,
         pageNumber: 1,
       })
@@ -53,12 +58,20 @@ const TourDetail = () => {
   const handleOrder = (tourId) => {
     navigate(`/tours/tour-booking/${tourId}`, {
       state: {
-        province,
+        province: province || location.state.province,
         startDate,
         numberOfDay,
-        numberOfPeople,
+        numberOfAdult,
+        numberOfChildren,
+        numberOfRoom,
       },
     });
+    saveToLocalStorage("province", province || location.state.province);
+    saveToLocalStorage("startDate", startDate);
+    saveToLocalStorage("numberOfDay", numberOfDay);
+    saveToLocalStorage("numberOfAdult", numberOfAdult);
+    saveToLocalStorage("numberOfChildren", numberOfChildren);
+    saveToLocalStorage("numberOfRoom", numberOfRoom);
   };
 
   const handleOpenOverlay = (i) => {
@@ -212,12 +225,35 @@ const TourDetail = () => {
                       <th className="l2">Giá </th>
                     </tr>
                     <tr>
-                      <td>Giá tour</td>
+                      <td>Người lớn</td>
                       <td className="t-price">
-                        {formatCurrencyWithoutD(tours[0]?.tour?.price)}₫
+                        {numberOfAdult}*
+                        {formatCurrencyWithoutD(tours[0]?.tour?.priceOfAdult)}₫
+                        ={" "}
+                        {formatCurrencyWithoutD(
+                          tours[0]?.tour?.priceOfAdult * numberOfAdult
+                        )}
+                        ₫
                       </td>
                     </tr>
-                    <tr>
+                    {numberOfChildren > 0 ? (
+                      <tr>
+                        <td>Trẻ em</td>
+                        <td className="t-price">
+                          {numberOfChildren}*
+                          {formatCurrencyWithoutD(
+                            tours[0]?.tour?.priceOfChildren
+                          )}
+                          ₫ ={" "}
+                          {formatCurrencyWithoutD(
+                            tours[0]?.tour?.priceOfAdult * numberOfChildren
+                          )}
+                          ₫
+                        </td>
+                      </tr>
+                    ) : null}
+
+                    {/* <tr>
                       <td>Khách sạn:</td>
                     </tr>
                     {tours[0]?.hotel?.room.map((room, i) => (
@@ -227,7 +263,7 @@ const TourDetail = () => {
                           {formatCurrencyWithoutD(room.price)}₫
                         </td>
                       </tr>
-                    ))}
+                    ))} */}
 
                     <tr className="total1">
                       <td>Tổng cộng</td>

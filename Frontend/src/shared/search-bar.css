@@ -32,7 +32,7 @@
 
 .search__icon {
   font-size: 1.6rem;
-  padding: 0.5rem;
+  padding: 0.6rem;
   background: var(--secondary-color);
   color: #fff;
   border-radius: 10px 5px 10px 5px;
@@ -86,7 +86,7 @@
   padding: 10px 0px;
   border-radius: 5px;
   bottom: -25px;
-  width: 845px;
+  width: 1050px;
 }
 
 .headerIcon {
@@ -100,12 +100,15 @@
   position: relative;
 }
 .headerSearchItem1 {
-  padding-right: 2.4rem;
+  padding-right: 1.4rem;
 }
 
 .headerSearch-location {
   position: relative;
   padding-left: 10px;
+}
+.w280 {
+  width: 292px;
 }
 .headerSearch-location h5,
 .headerSearch-date h5 {

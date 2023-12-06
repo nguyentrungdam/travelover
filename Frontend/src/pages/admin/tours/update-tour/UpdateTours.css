@@ -10,3 +10,9 @@
   background-color: #fff;
   color: black;
 }
+.discountValue {
+  position: absolute;
+  user-select: none;
+  top: 34px;
+  left: 40px;
+}

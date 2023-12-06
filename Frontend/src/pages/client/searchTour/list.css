@@ -227,6 +227,26 @@ strong {
   display: flex;
   justify-content: space-between;
 }
+.tour-item__image-inner__top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  user-select: none;
+  height: 1.5rem;
+  width: 60px;
+  padding: 0 0.15625rem 0 0.53125rem;
+  margin-left: 0.76875rem;
+  font-size: 1.1rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: #ec3814;
+  white-space: nowrap;
+  background-color: rgb(233, 249, 141);
+}
+.sale-svg {
+  left: -1.05438rem;
+  position: absolute;
+}
 .tour-item__image-inner__bottom__category {
   background: #fff;
   border-radius: 2px 2px 0 0;
@@ -271,7 +291,10 @@ strong {
   color: #2d4271;
 }
 .tour-item__price--old {
-  color: #2d4271;
+  color: #68738c;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: 1px #878787 line-through;
 }
 .tour-item__price--current {
   display: flex;
@@ -282,7 +305,7 @@ strong {
 .tour-item__price--current__number {
   font-weight: 700;
   color: #fd5056;
-  font-size: 18px;
+  font-size: 20px;
 }
 .btnOptionTour {
   width: 100%;

@@ -23,11 +23,18 @@ const AddTours = () => {
     tourDescription: "",
     tourDetail: "",
     startDate: "",
-    price: 0,
     endDate: "",
+    priceOfAdult: 0,
+    priceOfChildren: 0,
     suitablePerson: "",
     termAndCondition: "",
     image: ["", "", "", "", "", ""],
+    //discount
+    startDateDiscount: "",
+    endDateDiscount: "",
+    discountValue: 0,
+    auto: true,
+    isDiscount: true,
   });
   const [selectedLocation, setSelectedLocation] = useState({
     province: "",
@@ -73,11 +80,18 @@ const AddTours = () => {
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "startDate" || name === "endDate") {
+    if (
+      name === "startDate" ||
+      name === "endDate" ||
+      name === "startDateDiscount" ||
+      name === "endDateDiscount"
+    ) {
       if (value.length === 5) {
         const [day, month] = value.split("-");
         const today = new Date();
-        const newDate = new Date(today.getFullYear(), month - 1, day);
+        const newDate = new Date(today.getFullYear(), month - 1, +day);
+        const offset = today.getTimezoneOffset();
+        newDate.setMinutes(newDate.getMinutes() - offset);
         const formattedDate = newDate.toISOString().split("T")[0];
         setFormData({
           ...formData,
@@ -109,9 +123,10 @@ const AddTours = () => {
     formDataObject.append("tourDetail", formData.tourDetail);
     formDataObject.append("suitablePerson", formData.suitablePerson);
     formDataObject.append("termAndCondition", formData.termAndCondition);
-    formDataObject.append("price", formData.price);
+    formDataObject.append("priceOfAdult", formData.priceOfAdult);
+    formDataObject.append("priceOfChildren", formData.priceOfChildren);
 
-    // Thêm địa chỉ
+    //Thêm địa chỉ
     formDataObject.append("address[province]", selectedLocation.province);
     formDataObject.append("address[district]", selectedLocation.district);
     formDataObject.append("address[commune]", selectedLocation.commune);
@@ -119,6 +134,12 @@ const AddTours = () => {
     formDataObject.append("reasonableTime[startDate]", formData.startDate);
     formDataObject.append("reasonableTime[endDate]", formData.endDate);
 
+    //discount
+    formDataObject.append("discount[startDate]", formData.startDateDiscount);
+    formDataObject.append("discount[endDate]", formData.endDateDiscount);
+    formDataObject.append("discount[discountValue]", formData.discountValue);
+    formDataObject.append("discount[auto]", formData.auto);
+    formDataObject.append("discount[isDiscount]", formData.isDiscount);
     // Gửi formDataObject lên API hoặc xử lý dữ liệu tại đây
     for (const [name, value] of formDataObject.entries()) {
       console.log(name, ":", value);
@@ -163,7 +184,21 @@ const AddTours = () => {
       closeModal();
     }
   };
-
+  const handleCheckboxChange = (e) => {
+    if (e.target.name === "discount") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        auto: false,
+        isDiscount: !prevFormData.isDiscount,
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        auto: !prevFormData.auto,
+      }));
+    }
+  };
+  console.log(formData);
   return (
     <>
       <div className="info">
@@ -236,7 +271,7 @@ const AddTours = () => {
                       rows="4"
                     />
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-4 ">
                     <label className="small mb-1">Suitable Person</label>
                     <input
                       name="suitablePerson"
@@ -245,14 +280,28 @@ const AddTours = () => {
                       placeholder="Enter a suitable person..."
                       onChange={handleChange}
                     />
-                    <label className="small ">Price</label>
-                    <input
-                      name="price"
-                      className="form-control"
-                      type="text"
-                      placeholder="Enter price..."
-                      onChange={handleChange}
-                    />
+                    <div className="d-flex gap-1 mt-2">
+                      <div className="">
+                        <label className="small ">Price of adult</label>
+                        <input
+                          name="priceOfAdult"
+                          className="form-control"
+                          type="text"
+                          placeholder="Enter price..."
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="">
+                        <label className="small ">Price of children</label>
+                        <input
+                          name="priceOfChildren"
+                          className="form-control"
+                          type="text"
+                          placeholder="Enter price..."
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="row gx-3 mb-3 ">
@@ -293,6 +342,65 @@ const AddTours = () => {
                     />
                   </div>
                 </div>
+                {/* Discount */}
+                <div className="col-md-3 d-flex align-items-center">
+                  <label className="small mb-1 me-2">Discount: </label>
+                  <input
+                    name="discount"
+                    className="checkbox-tour"
+                    type="checkbox"
+                    checked={formData.isDiscount}
+                    onChange={handleCheckboxChange}
+                  />
+                </div>
+                {formData.isDiscount ? (
+                  <>
+                    <div className="row gx-3 mb-3 ">
+                      <div className="col-md-4 d-flex align-items-center w-27">
+                        <label className="small mb-1">Discount date:</label>
+                        <input
+                          maxLength={5}
+                          name="startDateDiscount"
+                          className="form-control w-50 ms-2"
+                          placeholder="Ex: 15-05"
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="col-md-4 d-flex  align-items-center w-27">
+                        <label className="small mb-1 me-2">to</label>
+                        <input
+                          maxLength={5}
+                          name="endDateDiscount"
+                          className="form-control w-50 ms-2"
+                          placeholder="Ex: 15-07"
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="row gx-3 mb-3">
+                      <div className="col-md-4">
+                        <label className="small mb-1">Discount value</label>
+                        <input
+                          name="discountValue"
+                          className="form-control"
+                          type="text"
+                          placeholder="Enter a discount value..."
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="col-md-3">
+                        <label className="small mb-1">Auto update</label>
+                        <input
+                          name="auto"
+                          className="checkbox-tour"
+                          type="checkbox"
+                          checked={formData.auto}
+                          onChange={handleCheckboxChange}
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : null}
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 ">
                     <label className="small mb-1">Policies and terms</label>

@@ -36,15 +36,18 @@ const List = () => {
   );
   const [startDate, setStartDate] = useState(location.state.startDate);
   const [numberOfDay, setNumberOfDay] = useState(location.state.numberOfDay);
-  const [numberOfPeople, setNumberOfPeople] = useState(
-    location.state.numberOfPeople
+  const [numberOfAdult, setNumberOfAdult] = useState(
+    location.state.numberOfAdult
   );
+  const [numberOfChildren, setNumberOfChildren] = useState(
+    location.state.numberOfChildren
+  );
+  const [numberOfRoom, setNumberOfRoom] = useState(location.state.numberOfRoom);
   const [selectedDate, setSelectedDate] = useState(location.state.selectedDate);
   const [isHeaderVisible, setHeaderVisible] = useState(true);
   const [orderBy, setOrderBy] = useState("price");
   const [orderDirection, setOrderDirection] = useState("asc");
-  const [isChecked1, setIsChecked1] = useState(false);
-  const [isChecked2, setIsChecked2] = useState(false);
+
   // Phân trang
   const [nextPage, setNextPage] = useState(1);
   const [pageCount, setPageCount] = useState(0);
@@ -60,7 +63,7 @@ const List = () => {
     setNextPage(event.selected + 1);
     window.scrollTo(0, 0);
   };
-  // console.log(tours);
+  console.log(tours);
 
   useEffect(() => {
     setProvince(location.state.selectedLocation.province);
@@ -70,15 +73,20 @@ const List = () => {
         province,
         startDate,
         numberOfDay,
-        numberOfPeople,
+        numberOfAdult,
+        numberOfChildren,
+        numberOfRoom,
         pageSize: 9,
         pageNumber: 1,
+        minPrice: "",
+        maxPrice: "",
+        ratingFilter: "",
         sortBy: "price",
         order: "asc",
       })
     ).unwrap();
+    setCountData(res?.totalData);
     console.log(res);
-    setCountData(res.data?.totalData);
     const handleScroll = () => {
       if (window.scrollY > 200) {
         setHeaderVisible(false);
@@ -109,7 +117,9 @@ const List = () => {
           province,
           startDate,
           numberOfDay,
-          numberOfPeople,
+          numberOfAdult,
+          numberOfChildren,
+          numberOfRoom,
           pageSize: itemsPerPage,
           pageNumber: nextPage,
           minPrice: `${minPrice}`,
@@ -118,7 +128,8 @@ const List = () => {
           order: orderDirection,
         })
       ).unwrap();
-      setCountData(res.data?.totalData);
+      console.log(res?.data?.totalData);
+      setCountData(res?.data?.totalData);
     };
     fetchData();
   }, [
@@ -126,7 +137,9 @@ const List = () => {
     province,
     startDate,
     numberOfDay,
-    numberOfPeople,
+    numberOfAdult,
+    numberOfChildren,
+    numberOfRoom,
     nextPage,
     minPrice,
     maxPrice,
@@ -141,20 +154,26 @@ const List = () => {
     setSelectedDate(date);
     setStartDate(formattedDisplayDate);
   };
-  const handleOption = (operation) => {
-    if (operation === "decrease" && numberOfPeople > 1) {
-      setNumberOfPeople(numberOfPeople - 1);
+  const handleOption = (category, operation) => {
+    if (operation === "decrease") {
+      if (category === "adults" && numberOfAdult > 1) {
+        setNumberOfAdult(numberOfAdult - 1);
+      } else if (category === "children" && numberOfChildren > 0) {
+        setNumberOfChildren(numberOfChildren - 1);
+      } else if (category === "rooms" && numberOfRoom > 1) {
+        setNumberOfRoom(numberOfRoom - 1);
+      }
     } else if (operation === "increase") {
-      setNumberOfPeople(numberOfPeople + 1);
+      if (category === "adults") {
+        setNumberOfAdult(numberOfAdult + 1);
+      } else if (category === "children") {
+        setNumberOfChildren(numberOfChildren + 1);
+      } else if (category === "rooms" && numberOfRoom < numberOfAdult) {
+        setNumberOfRoom(numberOfRoom + 1);
+      }
     }
   };
-  const handleCheckboxChange = (checkboxNumber) => {
-    if (checkboxNumber === 1) {
-      setIsChecked1(!isChecked1);
-    } else if (checkboxNumber === 2) {
-      setIsChecked2(!isChecked2);
-    }
-  };
+
   const handleViewDetailOrPayNow = (tourId, number) => {
     if (number === 1) {
       navigate(`/tours/tour-detail/${tourId}`, {
@@ -162,7 +181,9 @@ const List = () => {
           province: province || location.state.province,
           startDate,
           numberOfDay,
-          numberOfPeople,
+          numberOfAdult,
+          numberOfChildren,
+          numberOfRoom,
         },
       });
     } else {
@@ -171,13 +192,17 @@ const List = () => {
           province: province || location.state.province,
           startDate,
           numberOfDay,
-          numberOfPeople,
+          numberOfAdult,
+          numberOfChildren,
+          numberOfRoom,
         },
       });
       saveToLocalStorage("province", province || location.state.province);
       saveToLocalStorage("startDate", startDate);
       saveToLocalStorage("numberOfDay", numberOfDay);
-      saveToLocalStorage("numberOfPeople", numberOfPeople);
+      saveToLocalStorage("numberOfAdult", numberOfAdult);
+      saveToLocalStorage("numberOfChildren", numberOfChildren);
+      saveToLocalStorage("numberOfRoom", numberOfRoom);
     }
   };
 
@@ -235,25 +260,63 @@ const List = () => {
                   </div>
 
                   <div className="tour-search-result__filter__block mb-2 d-flex gap-1">
-                    <h5 className="s-title me-2">Số người: </h5>
+                    <h5 className="s-title me-2">Người lớn: </h5>
                     <button
-                      disabled={numberOfPeople <= 1}
+                      disabled={numberOfAdult <= 1}
                       className="optionCounterButton"
-                      onClick={() => handleOption("decrease")}
+                      onClick={() => handleOption("adults", "decrease")}
                     >
                       -
                     </button>
                     <span className="optionCounterNumber mx-3 fz17 fw-bold">
-                      {numberOfPeople}
+                      {numberOfAdult}
                     </span>
                     <button
                       className="optionCounterButton"
-                      onClick={() => handleOption("increase")}
+                      onClick={() => handleOption("adults", "increase")}
                     >
                       +
                     </button>
                   </div>
-
+                  <div className="tour-search-result__filter__block mb-2 d-flex gap-1">
+                    <h5 className="s-title me-2">Trẻ em: </h5>
+                    <button
+                      disabled={numberOfChildren < 1}
+                      className="optionCounterButton"
+                      style={{ marginLeft: "24px" }}
+                      onClick={() => handleOption("children", "decrease")}
+                    >
+                      -
+                    </button>
+                    <span className="optionCounterNumber mx-3 fz17 fw-bold">
+                      {numberOfChildren}
+                    </span>
+                    <button
+                      className="optionCounterButton"
+                      onClick={() => handleOption("children", "increase")}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="tour-search-result__filter__block mb-2 d-flex gap-1">
+                    <h5 className="s-title me-2">Số phòng: </h5>
+                    <button
+                      disabled={numberOfRoom <= 1}
+                      className="optionCounterButton"
+                      onClick={() => handleOption("rooms", "decrease")}
+                    >
+                      -
+                    </button>
+                    <span className="optionCounterNumber mx-3 fz17 fw-bold">
+                      {numberOfRoom}
+                    </span>
+                    <button
+                      className="optionCounterButton"
+                      onClick={() => handleOption("rooms", "increase")}
+                    >
+                      +
+                    </button>
+                  </div>
                   <h5 className="s-title">Ngân sách của Quý khách</h5>
                   <div className="ranger-price">
                     <div className="range-text">
@@ -373,6 +436,45 @@ const List = () => {
                               loading="lazy"
                             />
 
+                            {item.tour?.discount.isDiscount ? (
+                              <div className="tour-item__image-inner__top">
+                                <span className=" position-relative">
+                                  <svg
+                                    width="20"
+                                    className="sale-svg "
+                                    height="36"
+                                    viewBox="0 0 10 24"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M9.23077 0H4.23077L0 7.82222L3.5 9.14286V16L10 5.68889L6.53846 4.62222L9.23077 0Z"
+                                      fill="url(#paint0_linear_2216_10611)"
+                                    ></path>
+                                    <defs>
+                                      <linearGradient
+                                        id="paint0_linear_2216_10611"
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="16"
+                                        gradientUnits="userSpaceOnUse"
+                                      >
+                                        <stop stop-color="#ff0000"></stop>
+                                        <stop
+                                          offset="1"
+                                          stop-color="#dde81f"
+                                        ></stop>
+                                      </linearGradient>
+                                    </defs>
+                                  </svg>
+                                  <span className="ms-1">
+                                    -{item.tour?.discount.discountValue}%
+                                  </span>
+                                </span>
+                              </div>
+                            ) : null}
+
                             <div className="tour-item__image-inner__bottom">
                               <span className="tour-item__image-inner__bottom__category">
                                 <img
@@ -414,11 +516,18 @@ const List = () => {
                           </p>
                           <div className="tour-item__price mb-2 w-100">
                             <div className="tour-item__price__wrapper">
-                              <div className="tour-item__price--old"></div>
-                              <div className="tour-item__price--current fix-leftalign">
+                              <div className=" ">
                                 <span className="tour-item__price--current__number pe-2 mb-0">
                                   {formatCurrencyWithoutD(item?.totalPrice)}₫
                                 </span>
+                                {item.tour?.discount.isDiscount ? (
+                                  <span className="tour-item__price--old pe-2 mb-0">
+                                    {formatCurrencyWithoutD(
+                                      item?.totalPriceNotDiscount
+                                    )}
+                                    ₫
+                                  </span>
+                                ) : null}
                               </div>
                               <div className="tour-item__price--current">
                                 <div className="btn-book">

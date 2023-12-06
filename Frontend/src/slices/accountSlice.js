@@ -102,6 +102,7 @@ export const accountSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("fullName");
       localStorage.removeItem("email");
+      localStorage.removeItem("role");
       localStorage.removeItem("phoneNumber");
     },
   },

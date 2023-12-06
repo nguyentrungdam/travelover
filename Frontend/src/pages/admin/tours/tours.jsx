@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import "./tours.css";
 import DataTable from "../../../components/dataTable/DataTable";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,7 +49,7 @@ const ToursList = () => {
           img: item?.thumbnailUrl,
           title: item.tourTitle,
           days: item.numberOfDay,
-          price: formatCurrencyWithoutD(item.price),
+          price: formatCurrencyWithoutD(item.priceOfAdult),
         }))
       : [];
 
@@ -57,7 +57,6 @@ const ToursList = () => {
     dispatch(getAllTours()).unwrap();
   }, []);
 
-  console.log(zhotels);
   return (
     <div className="products">
       <div className="info">

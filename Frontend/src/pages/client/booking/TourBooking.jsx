@@ -40,9 +40,15 @@ const TourBooking = () => {
   const numberOfDay = state
     ? state.numberOfDay
     : getFromLocalStorage("numberOfDay") || "";
-  const numberOfPeople = state
-    ? state.numberOfPeople
-    : getFromLocalStorage("numberOfPeople") || 1;
+  const numberOfAdult = state
+    ? state.numberOfAdult
+    : getFromLocalStorage("numberOfAdult") || 1;
+  const numberOfChildren = state
+    ? state.numberOfChildren
+    : getFromLocalStorage("numberOfChildren") || 1;
+  const numberOfRoom = state
+    ? state.numberOfRoom
+    : getFromLocalStorage("numberOfRoom") || 1;
 
   const [note, setNote] = useState("");
   useEffect(() => {
@@ -53,7 +59,9 @@ const TourBooking = () => {
         province,
         startDate,
         numberOfDay,
-        numberOfPeople,
+        numberOfAdult,
+        numberOfChildren,
+        numberOfRoom,
         pageSize: 1,
         pageNumber: 1,
       })
@@ -62,10 +70,10 @@ const TourBooking = () => {
   console.log(tours);
   // validate date
   const startDateString = new Date(startDate);
-  // const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
-  // const endDateString = new Date(endDate);
-  // const formattedStartDate = formatDateToVietnamese(startDateString);
-  // const formattedEndDate = formatDateToVietnamese(endDateString);
+  const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
+  const endDateString = new Date(endDate);
+  const formattedStartDate = formatDateToVietnamese(startDateString);
+  const formattedEndDate = formatDateToVietnamese(endDateString);
   const [customerInformation, setCustomerInformation] = useState({
     fullName: getFromLocalStorage("fullName") || "",
     email: getFromLocalStorage("email") || "",
@@ -117,9 +125,8 @@ const TourBooking = () => {
           guiderId: "",
           personIdList: [],
           customerInformation,
-          numberOfChildren: 0,
-          numberOfAdult: numberOfPeople,
-          note,
+          numberOfChildren,
+          numberOfAdult,
         })
       ).unwrap();
       console.log(res);
@@ -276,7 +283,8 @@ const TourBooking = () => {
                 <h3>Tóm tắt chuyến đi</h3>
 
                 <p className="package-title">
-                  Tour trọn gói <span> ({numberOfPeople} khách)</span>
+                  Tour trọn gói{" "}
+                  <span> ({numberOfAdult + numberOfChildren} khách)</span>
                 </p>
                 <div className="product">
                   <div className="product-image">
@@ -299,7 +307,7 @@ const TourBooking = () => {
 
                     <div className="start-content">
                       <h4>Bắt đầu chuyến đi</h4>
-                      {/* <p className="time">{formattedStartDate}</p> */}
+                      <p className="time">{formattedStartDate}</p>
                       <p className="from"></p>
                     </div>
                   </div>
@@ -311,7 +319,7 @@ const TourBooking = () => {
 
                     <div className="start-content">
                       <h4>Kết thúc chuyến đi</h4>
-                      {/* <p className="time">{formattedEndDate}</p> */}
+                      <p className="time">{formattedEndDate}</p>
                       <p className="from"></p>
                     </div>
                   </div>
@@ -327,17 +335,17 @@ const TourBooking = () => {
                             icon={faUsers}
                           />
                           <span className="icon-checkout-users ms-1">
-                            {numberOfPeople}
+                            {numberOfAdult + numberOfChildren}
                           </span>
                         </th>
                       </tr>
                       <tr>
                         <td>Giá tour</td>
                         <td className="t-price text-right" id="AdultPrice">
-                          {formatCurrencyWithoutD(tours[0]?.tour?.price)}₫
+                          {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
                         </td>
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <td>Khách sạn:</td>
                       </tr>
                       {tours[0]?.hotel?.room.map((room, i) => (
@@ -347,7 +355,7 @@ const TourBooking = () => {
                             {formatCurrencyWithoutD(room.price)}₫
                           </td>
                         </tr>
-                      ))}
+                      ))} */}
 
                       <tr className="cuppon">
                         <td>Mã giảm giá </td>
@@ -374,7 +382,7 @@ const TourBooking = () => {
                       <tr className="total">
                         <td>Tổng cộng</td>
                         <td className="t-price text-right" id="TotalPrice">
-                          {formatCurrencyWithoutD(tours[0].totalPrice)}₫
+                          {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
                         </td>
                       </tr>
                     </tbody>
