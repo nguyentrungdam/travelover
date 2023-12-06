@@ -44,6 +44,7 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
       onSearch(newState);
     } else {
       navigate("/tours/search-tour", { state: newState });
+      window.location.reload();
     }
   };
   const handleDateChange = (date) => {

@@ -133,8 +133,8 @@ const TourDetail = () => {
               <p className="mb-0">
                 <span className="price-total ">
                   {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫{" "}
-                </span>
-                /khách
+                </span>{" "}
+                (trọn gói)
               </p>
               <button
                 className="bookNow"
