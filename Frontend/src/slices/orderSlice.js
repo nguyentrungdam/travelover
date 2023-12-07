@@ -34,6 +34,17 @@ export const updateOrder = createAsyncThunk(
     }
   }
 );
+export const getOrderDetail = createAsyncThunk(
+  "orders/detail",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const response = await ordersApi.getOrderDetail(orderId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const orderSlice = createSlice({
   name: "order",
   initialState: {
@@ -75,6 +86,17 @@ export const orderSlice = createSlice({
       state.error = action.error;
     },
     [updateOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.order = action.payload.data.data;
+    },
+    [getOrderDetail.pending]: (state) => {
+      state.loading = true;
+    },
+    [getOrderDetail.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [getOrderDetail.fulfilled]: (state, action) => {
       state.loading = false;
       state.order = action.payload.data.data;
     },

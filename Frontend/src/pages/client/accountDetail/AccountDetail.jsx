@@ -14,7 +14,7 @@ const AccountDetail = () => {
   return (
     <div>
       <Header />
-      <div className="container-xl mt-4 container-custom">
+      <div className="container-xl mt-4 container-custom ">
         <nav className="nav nav-borders">
           <span
             className={`nav-link ${
@@ -32,7 +32,7 @@ const AccountDetail = () => {
           >
             Thanh toán
           </span>
-          <span
+          {/* <span
             className={`nav-link ${
               activeTab === "securityPage" ? "active" : ""
             }`}
@@ -47,7 +47,7 @@ const AccountDetail = () => {
             onClick={() => handleTabClick("notificationsPage")}
           >
             Thông báo
-          </span>
+          </span> */}
         </nav>
         <hr className="mt-0 mb-4" />
         {activeTab === "profilePage" && (

@@ -10,3 +10,29 @@
   background-color: #fff;
   color: black;
 }
+.text-cut {
+  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.img-order-detail {
+  width: 200px;
+}
+.wrap-modal-addtour span {
+  color: #2d4271;
+  font-weight: 700;
+}
+.btn-block1 {
+  border: 1px solid #4d4aef;
+  width: 37%;
+  text-align: center;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 5px;
+}
+.btn-block1:hover {
+  transition: transform 200ms ease;
+  transform: scale(1.02);
+  opacity: 0.9;
+}

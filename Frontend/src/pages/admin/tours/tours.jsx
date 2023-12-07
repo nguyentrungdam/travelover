@@ -33,7 +33,14 @@ const columns = [
     field: "isDiscount",
     headerName: "On Sale",
     width: 140,
-    type: "string",
+    type: "boolean",
+    renderCell: (params) => {
+      return params.value ? (
+        <span>&#10004;</span> // Hiển thị biểu tượng tick khi là true
+      ) : (
+        <span>&#10006;</span> // Hiển thị biểu tượng X khi là false
+      );
+    },
   },
   {
     field: "sale",
@@ -60,7 +67,7 @@ const ToursList = () => {
           img: item?.thumbnailUrl,
           title: item.tourTitle,
           days: item.numberOfDay,
-          isDiscount: item.discount.isDiscount,
+          isDiscount: item?.discount?.isDiscount,
           sale: item.discount.discountValue + "%",
           lastModifiedAt: item.lastModifiedAt,
         }))

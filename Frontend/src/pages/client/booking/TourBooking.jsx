@@ -130,6 +130,7 @@ const TourBooking = () => {
           personIdList: [],
           customerInformation,
           numberOfChildren,
+          discountCode,
           numberOfAdult,
         })
       ).unwrap();
@@ -164,6 +165,9 @@ const TourBooking = () => {
       setErrorMessage("Mã giảm giá không áp dụng được vui lòng thử mã khác!");
     }
   };
+  const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
+    return accumulator + currentRoom.price;
+  }, 0);
   return (
     <div>
       <Header />
@@ -184,13 +188,13 @@ const TourBooking = () => {
                   </div>
                 </div>
                 <div className="product-content">
-                  <div className="s-rate">
+                  {/* <div className="s-rate">
                     <span className="s-rate-span">9.98</span>
                     <div className="s-comment">
                       <h4>Rất tốt</h4>
                       <span>649 quan tâm</span>
                     </div>
-                  </div>
+                  </div> */}
 
                   <p className="title" id="title">
                     {tours[0]?.tour?.tourTitle}
@@ -198,17 +202,23 @@ const TourBooking = () => {
                   <div className="entry">
                     <div className="entry-inner">
                       <span>
-                        Thời gian <b> {tours[0]?.tour?.numberOfDay} ngày</b>
+                        Thời gian: <b> {tours[0]?.tour?.numberOfDay} ngày</b>
                       </span>
                       <span>
-                        Điểm đến <b>{tours[0]?.tour?.address?.province}</b>
+                        Điểm đến: <b>{tours[0]?.tour?.address?.province}</b>
+                      </span>
+                      <span>
+                        Khách sạn: <b>{tours[0]?.hotel?.hotelName}</b>
+                      </span>
+                      <span>
+                        Số lượng phòng: <b>{tours[0]?.hotel?.room.length}</b>
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="col-md-8 col-12 left">
+            <div className="col-md-7 col-12 left">
               <h3 style={{ color: "#2d4271" }}>Thông tin liên lạc</h3>
               <div className="customer-contact mb-3">
                 <form
@@ -290,7 +300,7 @@ const TourBooking = () => {
                 </div>
               </div>
             </div>
-            <div className="col-md-4 col-12 right">
+            <div className="col-md-5 col-12 right">
               <div className="group-checkout">
                 <h3>Tóm tắt chuyến đi</h3>
 
@@ -351,24 +361,78 @@ const TourBooking = () => {
                           </span>
                         </th>
                       </tr>
+
                       <tr>
-                        <td>Giá tour</td>
-                        <td className="t-price text-right" id="AdultPrice">
-                          {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
+                        <td>
+                          Người lớn:{" "}
+                          <span className=" text-right ">{numberOfAdult}</span>
+                        </td>
+                        <td className="t-price text-right">
+                          {formatCurrencyWithoutD(
+                            tours[0]?.tour?.priceOfAdult * numberOfAdult
+                          )}
+                          ₫
                         </td>
                       </tr>
-                      {/* <tr>
-                        <td>Khách sạn:</td>
-                      </tr>
-                      {tours[0]?.hotel?.room.map((room, i) => (
-                        <tr key={room.roomId}>
-                          <td className="ps-4 p-0">Phòng {i + 1}</td>
-                          <td className="t-price p-0 text-right">
-                            {formatCurrencyWithoutD(room.price)}₫
+                      {numberOfChildren > 0 ? (
+                        <tr>
+                          <td>
+                            Trẻ em:{" "}
+                            <span className="text-right">
+                              {numberOfChildren}
+                            </span>
+                          </td>
+                          <td className="text-right">
+                            {" "}
+                            {formatCurrencyWithoutD(
+                              tours[0]?.tour?.priceOfChildren * numberOfChildren
+                            )}
+                            ₫
                           </td>
                         </tr>
-                      ))} */}
-
+                      ) : null}
+                      <tr>
+                        <td>
+                          Giá phòng:{" "}
+                          <span className="text-right">
+                            {tours[0]?.tour?.numberOfDay} ngày{" "}
+                            {tours[0]?.tour?.numberOfNight} đêm
+                          </span>
+                        </td>
+                        <td className="text-right">
+                          {formatCurrencyWithoutD(
+                            totalRoom * tours[0]?.tour?.numberOfDay
+                          )}
+                          ₫
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Tổng</td>
+                        <td className="text-right">
+                          {formatCurrencyWithoutD(
+                            tours[0]?.totalPriceNotDiscount
+                          )}
+                          ₫
+                        </td>
+                      </tr>
+                      {tours[0]?.tour?.discount.isDiscount ? (
+                        <tr>
+                          <td>
+                            Giảm giá:{" "}
+                            <span className="text-right">
+                              {tours[0]?.tour?.discount.discountValue}%
+                            </span>
+                          </td>
+                          <td className="text-right">
+                            -
+                            {formatCurrencyWithoutD(
+                              (tours[0]?.tour?.discount.discountValue / 100) *
+                                tours[0]?.totalPriceNotDiscount
+                            )}
+                            ₫
+                          </td>
+                        </tr>
+                      ) : null}
                       <tr className="cuppon position-relative ">
                         <td>Mã giảm giá </td>
                         <td className="cp-form text-right ">
@@ -398,7 +462,7 @@ const TourBooking = () => {
                           </span>
                         )}
                       </tr>
-                      {totalSale ? (
+                      {totalSale && !errorMessage ? (
                         <tr>
                           <td>Giá voucher giảm</td>
                           <td className="t-price text-right" id="AdultPrice">
@@ -412,10 +476,17 @@ const TourBooking = () => {
                       <tr className="total">
                         <td>Tổng cộng</td>
                         <td className="t-price text-right" id="TotalPrice">
-                          {formatCurrencyWithoutD(
-                            tours[0]?.totalPrice - totalSale
-                          )}
-                          ₫
+                          {totalSale && !errorMessage ? (
+                            <span className="tour-item__price--old pe-2 mb-0">
+                              {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
+                            </span>
+                          ) : null}
+                          {totalSale && !errorMessage
+                            ? formatCurrencyWithoutD(
+                                tours[0]?.totalPrice - totalSale
+                              ) + "₫"
+                            : formatCurrencyWithoutD(tours[0]?.totalPrice) +
+                              "₫"}
                         </td>
                       </tr>
                     </tbody>

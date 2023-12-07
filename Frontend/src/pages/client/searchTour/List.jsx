@@ -341,32 +341,31 @@ const List = () => {
                       className="range-slider"
                     />
                   </div>
-                  {/* <h5 className="s-title">Hiển thị những chuyến đi có</h5>
-                  <div className="filter-sale">
-                    <div className="switch-container">
-                      <label className="switch-label">Khuyễn mãi:</label>
-                      <input
-                        type="checkbox"
-                        className="switch-input"
-                        id="switch1"
-                        checked={isChecked1}
-                        onChange={() => handleCheckboxChange(1)}
-                      />
-                      <div className="switch-slider"></div>
+                  <div className="tour-search-result__filter__block mb-2 ">
+                    <h5 className="s-title">Sắp xếp theo:</h5>
+                    <div className="d-flex order-wrap">
+                      <select
+                        className="form-control dropdown Filter"
+                        id="orderBy"
+                        name="orderBy"
+                        onChange={(e) => setOrderBy(e.target.value)}
+                      >
+                        <option value="-1">----Chọn----</option>
+                        <option value="price">Giá</option>
+                        <option value="popular">Độ phổ biến</option>
+                      </select>
+                      <select
+                        className="form-control dropdown Filter ms-2"
+                        id="orderDirection"
+                        name="orderDirection"
+                        onChange={(e) => setOrderDirection(e.target.value)}
+                      >
+                        <option value="-1">----Chọn----</option>
+                        <option value="asc">Thấp -&gt; cao</option>
+                        <option value="desc">Cao -&gt; thấp</option>
+                      </select>
                     </div>
-
-                    <div className="switch-container">
-                      <label className="switch-label">Còn chỗ:</label>
-                      <input
-                        type="checkbox"
-                        className="switch-input left-203"
-                        id="switch2"
-                        checked={isChecked2}
-                        onChange={() => handleCheckboxChange(2)}
-                      />
-                      <div className="switch-slider"></div>
-                    </div>
-                  </div> */}
+                  </div>
                 </div>
               </div>
             </div>
@@ -387,31 +386,6 @@ const List = () => {
                             : tours?.length || countData}
                         </strong>{" "}
                         tours cho Quý khách.
-                      </div>
-                      <div className="order-by-left">
-                        <div className="order-wrap">
-                          <span>Sắp xếp theo</span>
-                          <select
-                            className="form-control dropdown Filter"
-                            id="orderBy"
-                            name="orderBy"
-                            onChange={(e) => setOrderBy(e.target.value)}
-                          >
-                            <option value="-1">----Chọn----</option>
-                            <option value="price">Giá</option>
-                            <option value="popular">Độ phổ biến</option>
-                          </select>
-                          <select
-                            className="form-control dropdown Filter ms-2"
-                            id="orderDirection"
-                            name="orderDirection"
-                            onChange={(e) => setOrderDirection(e.target.value)}
-                          >
-                            <option value="-1">----Chọn----</option>
-                            <option value="asc">Thấp -&gt; cao</option>
-                            <option value="desc">Cao -&gt; thấp</option>
-                          </select>
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -512,6 +486,18 @@ const List = () => {
                             Điểm đến:{" "}
                             <span className="font-weight-bold">
                               {item.tour?.address.province}
+                            </span>
+                          </p>
+                          <p className="tour-item__departure mb-3">
+                            Khách sạn:{" "}
+                            <span className="font-weight-bold">
+                              {item.hotel?.hotelName}
+                            </span>
+                          </p>
+                          <p className="tour-item__departure mb-3">
+                            Số phòng:{" "}
+                            <span className="font-weight-bold">
+                              {item.hotel?.room?.length}
                             </span>
                           </p>
                           <div className="tour-item__price mb-2 w-100">

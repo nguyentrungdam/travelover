@@ -100,3 +100,12 @@ export const getFromLocalStorage = (key) => {
   const storedValue = localStorage.getItem(key);
   return storedValue ? JSON.parse(storedValue) : null;
 };
+
+// việt hóa tiến trình đặt tour
+export const getVietNameseNameOfProcess = (value) => {
+  if (value === "canceled") return "Đã hủy bỏ";
+  else if (value === "pending") return "Chưa giải quyết";
+  else if (value === "confirmed") return "Đã xác nhận";
+  else if (value === "underway") return "Đang tiến hành";
+  else return "Hoàn thành";
+};
