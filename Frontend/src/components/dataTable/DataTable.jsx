@@ -1,4 +1,4 @@
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import "./dataTable.css";
 import { Link } from "react-router-dom";
 
@@ -14,7 +14,7 @@ const DataTable = (props) => {
     field: "action",
     headerName: "Action",
     sortable: false,
-    width: 200,
+    width: props.width80 ? props.width80 : 200,
     renderCell: (params) => {
       return (
         <div className="action">
@@ -54,7 +54,6 @@ const DataTable = (props) => {
             },
           },
         }}
-        // slots={{ toolbar: GridToolbar }}
         slotProps={{
           toolbar: {
             showQuickFilter: true,

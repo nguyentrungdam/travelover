@@ -5,7 +5,7 @@ import Footer from "../../../components/Footer/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarMinus, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { searchTour } from "../../../slices/tourSlice";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { orderTour } from "../../../slices/orderSlice";
 import { axiosInstance } from "../../../apis/axios";
@@ -14,14 +14,15 @@ import {
   formatCurrencyWithoutD,
   formatDateToVietnamese,
   getFromLocalStorage,
-  saveToLocalStorage,
   validateEmail,
   validateVietnameseName,
   validateVietnamesePhoneNumber,
 } from "../../../utils/validate";
+import { getCheckDiscount } from "../../../slices/discountSlice";
 
 const TourBooking = () => {
   const { loading, tours } = useSelector((state) => state.tour);
+  const { totalSale } = useSelector((state) => state.discount);
   const { account } = useSelector((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
@@ -29,6 +30,9 @@ const TourBooking = () => {
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [discountCode, setDiscountCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const { state } = location;
   const province = state
     ? state.province
@@ -132,7 +136,7 @@ const TourBooking = () => {
       console.log(res);
       if (res.data.status === "ok") {
         let orderVNPayData = {
-          amount: res.data.data.totalPrice,
+          amount: res.data.data.finalPrice - totalSale,
           orderType: "tour",
           orderInfo: res.data.data.orderId,
           returnUrl: "http://localhost:3000/thank-you",
@@ -151,7 +155,15 @@ const TourBooking = () => {
       alert(err);
     }
   };
-
+  const handleApplyCoupon = async () => {
+    setErrorMessage("");
+    const actionResult = await dispatch(
+      getCheckDiscount({ discountCode, totalPrice: tours[0]?.totalPrice })
+    );
+    if (getCheckDiscount.rejected.match(actionResult)) {
+      setErrorMessage("Mã giảm giá không áp dụng được vui lòng thử mã khác!");
+    }
+  };
   return (
     <div>
       <Header />
@@ -357,9 +369,9 @@ const TourBooking = () => {
                         </tr>
                       ))} */}
 
-                      <tr className="cuppon">
+                      <tr className="cuppon position-relative ">
                         <td>Mã giảm giá </td>
-                        <td className="cp-form text-right">
+                        <td className="cp-form text-right ">
                           <form action="#">
                             <input
                               className="form-control"
@@ -367,6 +379,8 @@ const TourBooking = () => {
                               name="DiscountCode"
                               placeholder="Thêm mã"
                               required="required"
+                              value={discountCode}
+                              onChange={(e) => setDiscountCode(e.target.value)}
                               type="text"
                             />
                             <input
@@ -374,15 +388,34 @@ const TourBooking = () => {
                               className="btn btn-success"
                               id="btnDiscountCode"
                               value="Áp dụng"
+                              onClick={handleApplyCoupon}
                             />
                           </form>
                         </td>
+                        {errorMessage && (
+                          <span className="error-container2">
+                            {errorMessage}
+                          </span>
+                        )}
                       </tr>
-
+                      {totalSale ? (
+                        <tr>
+                          <td>Giá voucher giảm</td>
+                          <td className="t-price text-right" id="AdultPrice">
+                            -{formatCurrencyWithoutD(totalSale)}₫
+                          </td>
+                        </tr>
+                      ) : null}
+                      <tr>
+                        <td></td>
+                      </tr>
                       <tr className="total">
                         <td>Tổng cộng</td>
                         <td className="t-price text-right" id="TotalPrice">
-                          {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
+                          {formatCurrencyWithoutD(
+                            tours[0]?.totalPrice - totalSale
+                          )}
+                          ₫
                         </td>
                       </tr>
                     </tbody>

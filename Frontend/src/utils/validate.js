@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { REUNICODE } from "../utils/config";
 
 export function validateEmail(email) {
@@ -39,6 +40,15 @@ export function validateOriginalDate(day) {
         })
         .replace(/\//g, "-")
     : "";
+  return formattedDate;
+}
+export function formatDate(inputDate) {
+  // Tạo đối tượng Date từ chuỗi ngày đầu vào
+  const dateObject = new Date(inputDate);
+
+  // Sử dụng hàm format từ thư viện date-fns để định dạng lại chuỗi ngày
+  const formattedDate = format(dateObject, "dd-MM-yyyy");
+
   return formattedDate;
 }
 export function formatDateToVietnamese(dateString) {

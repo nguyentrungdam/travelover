@@ -30,8 +30,8 @@ const columns = [
   {
     field: "status",
     type: "string",
-    headerName: "Order Status",
-    width: 120,
+    headerName: "Tour Booking Process",
+    width: 200,
   },
 ];
 

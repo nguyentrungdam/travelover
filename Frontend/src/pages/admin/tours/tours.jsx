@@ -21,7 +21,7 @@ const columns = [
     field: "title",
     type: "string",
     headerName: "Tour Title",
-    width: 500,
+    width: 300,
   },
   {
     field: "days",
@@ -30,8 +30,20 @@ const columns = [
     width: 120,
   },
   {
-    field: "price",
-    headerName: "Price",
+    field: "isDiscount",
+    headerName: "On Sale",
+    width: 140,
+    type: "string",
+  },
+  {
+    field: "sale",
+    headerName: "Discount Percent",
+    width: 200,
+    type: "string",
+  },
+  {
+    field: "lastModifiedAt",
+    headerName: "Last Modified At",
     width: 160,
     type: "string",
   },
@@ -39,7 +51,6 @@ const columns = [
 
 const ToursList = () => {
   const dispatch = useDispatch();
-  const { zhotels } = useSelector((state) => state.hotelz);
   const { loading, tours } = useSelector((state) => state.tour);
   const transformedData =
     tours && Array.isArray(tours)
@@ -49,14 +60,16 @@ const ToursList = () => {
           img: item?.thumbnailUrl,
           title: item.tourTitle,
           days: item.numberOfDay,
-          price: formatCurrencyWithoutD(item.priceOfAdult),
+          isDiscount: item.discount.isDiscount,
+          sale: item.discount.discountValue + "%",
+          lastModifiedAt: item.lastModifiedAt,
         }))
       : [];
 
   useEffect(() => {
     dispatch(getAllTours()).unwrap();
   }, []);
-
+  console.log(tours);
   return (
     <div className="products">
       <div className="info">

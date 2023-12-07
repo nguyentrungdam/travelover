@@ -416,6 +416,7 @@
   text-transform: uppercase;
   color: #2d4271;
   border-top: 1px solid #e7e7e7;
+  margin-top: 20px;
   padding: 20px 0;
 }
 .checkout-main .detail table .total td.t-price {
@@ -454,5 +455,13 @@
   font-size: 14px;
   font-weight: 500;
   padding: 3px;
+  color: rgb(226, 12, 12);
+}
+.error-container2 {
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  font-size: 14px;
+  font-weight: 500;
   color: rgb(226, 12, 12);
 }
