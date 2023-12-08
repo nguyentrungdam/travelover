@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hóa đơn bán hàng</title>
+    <style>
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+            font-size: 16px;
+            line-height: 24px;
+            font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+            
+      
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th, td {
+            border: none; /* Ẩn đường viền */
+            padding: 8px;
+            text-align: left;
+            font-weight: normal;
+        }
+        
+        .logo {
+			margin-top: 0;
+			width: 200px;
+			height: 200px;
+			display: block; 
+    		margin: auto;
+		}
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+		<div class="logo">
+			<image style="width: 100%;" src="https://static.vecteezy.com/system/resources/previews/000/511/437/original/travel-tourism-logo-isolated-on-white-background-vector.jpg" alt="logo"></image>
+		</div>
+		
+		<p>Xin chào [tên tài khoản].</p>
+		<p>Đơn hàng [id] của bạn đã được đặt thành công ngày [ngày hôm nay].</p>
+		
+        <h3>THÔNG TIN ĐƠN HÀNG</h3>
+        <table>
+            <tr>
+                <th>Mã đơn hàng:</th>
+                <th>[id]</th>
+            </tr>
+            <tr>
+                <th>Ngày đặt hàng:</th>
+                <th>[ngày hôm nay]</th>
+            </tr>
+        </table>
+        
+        <p>Khách hàng</p>
+        <table>
+            <tr>
+                <th>Tên người đặt:</th>
+                <th>[Full name]</th>
+            </tr>
+            <tr>
+                <th>Số điện thoại:</th>
+                <th>[Phone number]</th>
+            </tr>
+            <tr>
+                <th>Số người lớn:</th>
+                <th>[number of adult]</th>
+            </tr>
+            <tr>
+                <th>Số trẻ em:</th>
+                <th>[number of children]</th>
+            </tr>
+        </table>
+        
+        <p>[title tour]</p>
+        <p>[số ngày] ngày, [số đêm] đêm</p>
+        
+        <p>Khách sạn [count room] phòng</p>
+        <table>
+            <tr>
+                <th>Phòng [hotel.room.capacity] người:</th>
+                <th>[hotel.room.price]đ</th>
+            </tr>
+        </table>
+        
+        <table>
+            <tr>
+                <th>Tổng tiền:</th>
+                <th>[total price]đ</th>
+            </tr>
+            <tr>
+                <th>Giảm giá:</th>
+                <th>[discount]đ</th>
+            </tr>
+        </table>
+        
+        <hr>
+        <table>
+            <tr>
+                <th>Tổng thanh toán:</th>
+                <th>[final price]</th>
+            </tr>
+        </table>
+        
+        <p>Payment</p>
+        <p>Đã thanh toán [discount.amount]</p>
+        
+        <br>
+        <p>Trân trọng,</p>
+        <p>Đội ngũ Travelover</p>
+        
+        <br>
+        <p>Bạn có thắc mắc? Liên hệ chúng tôi [tại đây].</p>
+        
+    </div>
+</body>
+</html>

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+import hcmute.kltn.Backend.model.email.service.IEmailService;
 import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayCreate;
@@ -41,6 +42,8 @@ public class PaymentController {
 	private IVNPayService iVNPayService;
 	@Autowired
 	private IOrderService iOrderService;
+	@Autowired
+	private IEmailService iEmailService;
 	
 	@RequestMapping(value = "/vnpay/forward", method = RequestMethod.GET)
     public void processData(HttpServletResponse response, HttpServletRequest request
@@ -56,9 +59,10 @@ public class PaymentController {
 		
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 
-        // update order
+		// check payment status
 		int checkPayment = iVNPayService.checkPayment(request);
 		if (checkPayment == 1) {
+			// update order
 			OrderPaymentUpdate prderPaymentUpdate = new OrderPaymentUpdate();
 			prderPaymentUpdate.setOrderId(orderId);
 			prderPaymentUpdate.setMethod("NVPay");
@@ -67,6 +71,9 @@ public class PaymentController {
 			prderPaymentUpdate.setDate(dateNow);
 			
 			iOrderService.updateOrderPayment(prderPaymentUpdate);
+			
+			// Send email 
+//			iEmailService
 		}
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web

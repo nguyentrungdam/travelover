@@ -34,6 +34,7 @@ import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
+import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
@@ -93,9 +94,9 @@ public class TourService implements ITourService{
 		if(tour.getAddress() == null) {
 			throw new CustomException("Address is not null");
 		}
-		if(tour.getTourDetailList() == null) {
-			throw new CustomException("Tour Detail List Time is not null");
-		}
+//		if(tour.getTourDetailList() == null) {
+//			throw new CustomException("Tour Detail List Time is not null");
+//		}
 		if(tour.getReasonableTime() == null) {
 			throw new CustomException("Reasonable Time is not null");
 		}
@@ -241,7 +242,7 @@ public class TourService implements ITourService{
 		modelMapper.map(tourCreate, tour);
 
 		// set tour detail list
-		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
+//		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 		
 		// check field condition
 		checkFieldCondition(tour);
@@ -290,6 +291,23 @@ public class TourService implements ITourService{
 			}
 		}
 		
+		// check schedule image
+		for (Schedule itemSchedule : tour.getSchedulte()) {
+			for (Schedule itemScheduleUpdate : tourUpdate.getSchedulte()) {
+				// delete old image in schedule
+				if (itemSchedule.getImageUrl().equals(itemScheduleUpdate.getImageUrl()) ) {
+					boolean checkDelete = false;
+					checkDelete = iImageService.deleteImageByUrl(itemSchedule.getImageUrl());
+					if (checkDelete == false) {
+						throw new CustomException("An error occurred during the processing of the old image");
+					}
+					break;
+				}
+			}
+		}
+		// mapping schedule
+		tour.setSchedulte(tourUpdate.getSchedulte());
+		
 		LocalDate updateIsDiscount;
 		try {
 			updateIsDiscount = tour.getDiscount().getUpdateIsDiscount();
@@ -304,7 +322,7 @@ public class TourService implements ITourService{
 		tour.setImage(tourUpdate.getImage());
 		
 		// set tour detail list
-		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
+//		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 		
 		// set Tour.Discount.UpdateIsDiscount
 		Discount discount = new Discount();

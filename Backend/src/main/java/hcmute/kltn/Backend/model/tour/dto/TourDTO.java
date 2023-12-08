@@ -7,6 +7,7 @@ import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.Reviewer;
+import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,7 @@ public class TourDTO extends BaseEntity{
 	private String tourDescription;
 	private int priceOfAdult; // not null
 	private int priceOfChildren; // not null
+	private List<Schedule> schedulte;
 	private String tourDetail;
 	private List<TourDetail> tourDetailList; // not null
 	private ReasonableTime reasonableTime; // not null

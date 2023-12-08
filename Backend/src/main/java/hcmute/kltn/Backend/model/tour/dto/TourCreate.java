@@ -5,7 +5,7 @@ import java.util.List;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
-
+import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +24,7 @@ public class TourCreate {
 	private String tourDescription;
 	private int priceOfAdult; // not null
 	private int priceOfChildren; // not null
+	private List<Schedule> schedulte;
 	private String tourDetail; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;
