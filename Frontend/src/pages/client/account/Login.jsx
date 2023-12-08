@@ -72,14 +72,11 @@ const Login = () => {
       });
     } catch (error) {
       console.log(error);
-      notify(2).then(() => {
-        if (!redirecting) {
-          setRedirecting(true);
-          setTimeout(() => {
-            navigate("/login");
-          }, 1500);
-        }
-      });
+      notify(2);
+      setRedirecting(true);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     }
   };
 

@@ -12,10 +12,8 @@ import TourBooking from "./pages/client/booking/TourBooking";
 import Tours from "./pages/client/tour/Tours";
 import List from "./pages/client/searchTour/List";
 import AccountDetail from "./pages/client/accountDetail/AccountDetail";
-///import admin routes
 import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
 import Users from "./pages/admin/users/Users";
-import User from "./pages/admin/user/User";
 import LayoutAdmin from "./components/LayoutAdmin/LayoutAdmin";
 import ToursList from "./pages/admin/tours/tours";
 import AddTours from "./pages/admin/tours/add-tour/AddTours";
@@ -24,7 +22,12 @@ import Hotels from "./pages/admin/hotels/Hotels";
 import ThankYou from "./pages/client/booking/ThankYou";
 import OrderList from "./pages/admin/orders/orders";
 import Info from "./pages/admin/info/Info";
+import DiscountList from "./pages/admin/discounts/discounts";
+import AddDiscount from "./pages/admin/discounts/add-discount/AddDiscounts";
+import UpdateDiscount from "./pages/admin/discounts/update-discount/UpdateDiscounts";
 import ZHotel from "./pages/enterprise/ZHotel";
+import AddHotel from "./pages/admin/hotels/add-hotel/AddHotel";
+import UpdateHotel from "./pages/admin/hotels/update-hotel/UpdateHotel";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -75,9 +78,12 @@ function App() {
         <Route path="tours-list/:id" element={<UpdateTour />} />
         <Route path="tours-list/add-new" element={<AddTours />} />
         <Route path="hotels" element={<Hotels />} />
-        {/* <Route path="hotels/:id" element={<UpdateTour />} />
-        <Route path="hotels/add-new" element={<AddTours />} /> */}
+        <Route path="hotels/add-new" element={<AddHotel />} />
+        <Route path="hotels/:id" element={<UpdateHotel />} />
         <Route path="orders-list" element={<OrderList />} />
+        <Route path="discounts" element={<DiscountList />} />
+        <Route path="discounts/:id" element={<UpdateDiscount />} />
+        <Route path="discounts/add-new" element={<AddDiscount />} />
       </Route>
 
       {/* enterprise route */}

@@ -12,33 +12,33 @@ export const createHotel = createAsyncThunk(
     }
   }
 );
-export const getAllhotels = createAsyncThunk(
+export const getAllHotel = createAsyncThunk(
   "hotels/list",
   async (rejectWithValue) => {
     try {
-      const response = await hotelsApi.getAllhotels();
+      const response = await hotelsApi.getAllHotel();
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
-export const gethotelDetail = createAsyncThunk(
+export const getHotelDetail = createAsyncThunk(
   "hotels/detail",
   async (hotelId, { rejectWithValue }) => {
     try {
-      const response = await hotelsApi.gethotelDetail(hotelId);
+      const response = await hotelsApi.getHotelDetail(hotelId);
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
-export const updatehotel = createAsyncThunk(
+export const updateHotel = createAsyncThunk(
   "hotels/update",
   async (hotel, { rejectWithValue }) => {
     try {
-      const response = await hotelsApi.updatehotel(hotel);
+      const response = await hotelsApi.updateHotel(hotel);
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -64,43 +64,39 @@ export const hotelSlice = createSlice({
     },
     [createHotel.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.hotel = action.payload.data.data;
     },
-    [updatehotel.pending]: (state) => {
+    [updateHotel.pending]: (state) => {
       state.loading = true;
     },
-    [updatehotel.rejected]: (state, action) => {
+    [updateHotel.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.error;
     },
-    [updatehotel.fulfilled]: (state, action) => {
+    [updateHotel.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.hotel = action.payload.data.data;
     },
-    [getAllhotels.pending]: (state) => {
+    [getAllHotel.pending]: (state) => {
       state.loading = true;
     },
-    [getAllhotels.rejected]: (state, action) => {
+    [getAllHotel.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.error;
     },
-    [getAllhotels.fulfilled]: (state, action) => {
+    [getAllHotel.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.hotels = action.payload.data.data;
     },
-    [gethotelDetail.pending]: (state) => {
+    [getHotelDetail.pending]: (state) => {
       state.loading = true;
     },
-    [gethotelDetail.rejected]: (state, action) => {
+    [getHotelDetail.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.error;
     },
-    [gethotelDetail.fulfilled]: (state, action) => {
+    [getHotelDetail.fulfilled]: (state, action) => {
       state.loading = false;
-      state.isAuthenticated = true;
       state.hotel = action.payload.data.data;
     },
   },

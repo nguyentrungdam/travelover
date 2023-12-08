@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { REUNICODE } from "../utils/config";
 
 export function validateEmail(email) {
@@ -39,6 +40,15 @@ export function validateOriginalDate(day) {
         })
         .replace(/\//g, "-")
     : "";
+  return formattedDate;
+}
+export function formatDate(inputDate) {
+  // Tạo đối tượng Date từ chuỗi ngày đầu vào
+  const dateObject = new Date(inputDate);
+
+  // Sử dụng hàm format từ thư viện date-fns để định dạng lại chuỗi ngày
+  const formattedDate = format(dateObject, "dd-MM-yyyy");
+
   return formattedDate;
 }
 export function formatDateToVietnamese(dateString) {
@@ -89,4 +99,13 @@ export const saveToLocalStorage = (key, value) => {
 export const getFromLocalStorage = (key) => {
   const storedValue = localStorage.getItem(key);
   return storedValue ? JSON.parse(storedValue) : null;
+};
+
+// việt hóa tiến trình đặt tour
+export const getVietNameseNameOfProcess = (value) => {
+  if (value === "canceled") return "Đã hủy bỏ";
+  else if (value === "pending") return "Chưa giải quyết";
+  else if (value === "confirmed") return "Đã xác nhận";
+  else if (value === "underway") return "Đang tiến hành";
+  else return "Hoàn thành";
 };

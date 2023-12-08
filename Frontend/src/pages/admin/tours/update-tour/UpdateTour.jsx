@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getTourDetail, updateTour } from "../../../../slices/tourSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { validateOriginalDate } from "../../../../utils/validate";
 import { axiosMultipart } from "../../../../apis/axios";
 const UpdateTour = () => {
@@ -18,11 +18,7 @@ const UpdateTour = () => {
   useEffect(() => {
     dispatch(getTourDetail(id)).unwrap();
   }, []);
-  //lấy path
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.pathname);
-  console.log(location.pathname);
-
+  console.log(tour);
   const [selectedLocation, setSelectedLocation] = useState({
     province: "",
     district: "",

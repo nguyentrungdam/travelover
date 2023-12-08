@@ -9,7 +9,7 @@ const hotelsApi = {
     const url = "/hotels/update";
     return axios.put(url, hotel);
   },
-  getAllhotel: () => {
+  getAllHotel: () => {
     const url = "/hotels/list";
     return axios.get(url);
   },

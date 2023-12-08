@@ -36,8 +36,9 @@ const TourDetail = () => {
   const numberOfAdult = state ? state.numberOfAdult : 1;
   const numberOfChildren = state ? state.numberOfChildren : 1;
   const numberOfRoom = state ? state.numberOfRoom : 1;
-
+  const [showRoomDetails, setShowRoomDetails] = useState(false);
   const [activeDay, setActiveDay] = useState(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     const res = dispatch(
@@ -94,7 +95,9 @@ const TourDetail = () => {
 
     setSlideNumber(newSlideNumber);
   };
-
+  const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
+    return accumulator + currentRoom.price;
+  }, 0);
   return (
     <div>
       <ScrollToTop />
@@ -161,7 +164,7 @@ const TourDetail = () => {
             ))}
           </div>
           <div className="hotelDetails">
-            <div className="hotelDetailsTexts col-md-7">
+            <div className="hotelDetailsTexts col-md-8">
               <p className="hotelDesc">{tours[0]?.tour?.tourDescription}</p>
               <div className="group-services">
                 <div className="item">
@@ -210,12 +213,33 @@ const TourDetail = () => {
                   />
                   <label>Khách sạn</label>
                   <p>{tours[0]?.hotel?.hotelName} </p>
+                  <p>
+                    Tổng số phòng:{" "}
+                    <button
+                      className="btn-view-room"
+                      onClick={() => setShowRoomDetails(!showRoomDetails)}
+                    >
+                      {tours[0]?.hotel?.room.length}
+                    </button>
+                  </p>
+                  {showRoomDetails && (
+                    <div>
+                      {/* Hiển thị thông tin chi tiết của các phòng */}
+                      {tours[0]?.hotel?.room.map((room, index) => (
+                        <div key={index}>
+                          <p>
+                            Phòng {index + 1} tối đa {room.capacity} người.
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <h5>Chính sách và điều khoản</h5>
               <FormatLine text={tours[0]?.tour?.termAndCondition} />
             </div>
-            <div className="hotelDetailsPrice col-md-5">
+            <div className="hotelDetailsPrice col-md-4">
               <h2>Chi tiết giá tour</h2>
               <div className="table-price">
                 <table>
@@ -225,11 +249,11 @@ const TourDetail = () => {
                       <th className="l2">Giá </th>
                     </tr>
                     <tr>
-                      <td>Người lớn</td>
+                      <td>
+                        Người lớn:{" "}
+                        <span className="t-price">{numberOfAdult}</span>
+                      </td>
                       <td className="t-price">
-                        {numberOfAdult}*
-                        {formatCurrencyWithoutD(tours[0]?.tour?.priceOfAdult)}₫
-                        ={" "}
                         {formatCurrencyWithoutD(
                           tours[0]?.tour?.priceOfAdult * numberOfAdult
                         )}
@@ -238,32 +262,61 @@ const TourDetail = () => {
                     </tr>
                     {numberOfChildren > 0 ? (
                       <tr>
-                        <td>Trẻ em</td>
+                        <td>
+                          Trẻ em:{" "}
+                          <span className="t-price">{numberOfChildren}</span>
+                        </td>
                         <td className="t-price">
-                          {numberOfChildren}*
+                          {" "}
                           {formatCurrencyWithoutD(
-                            tours[0]?.tour?.priceOfChildren
-                          )}
-                          ₫ ={" "}
-                          {formatCurrencyWithoutD(
-                            tours[0]?.tour?.priceOfAdult * numberOfChildren
+                            tours[0]?.tour?.priceOfChildren * numberOfChildren
                           )}
                           ₫
                         </td>
                       </tr>
                     ) : null}
-
-                    {/* <tr>
-                      <td>Khách sạn:</td>
+                    <tr>
+                      <td>
+                        Giá phòng:{" "}
+                        <span className="t-price">
+                          {tours[0]?.tour?.numberOfDay} ngày{" "}
+                          {tours[0]?.tour?.numberOfNight} đêm
+                        </span>
+                      </td>
+                      <td className="t-price">
+                        {formatCurrencyWithoutD(
+                          totalRoom * tours[0]?.tour?.numberOfDay
+                        )}
+                        ₫
+                      </td>
                     </tr>
-                    {tours[0]?.hotel?.room.map((room, i) => (
-                      <tr key={room.roomId}>
-                        <td className="ps-4 p-0">Phòng {i + 1}</td>
-                        <td className="t-price p-0">
-                          {formatCurrencyWithoutD(room.price)}₫
+                    <tr>
+                      <td>Tổng</td>
+                      <td className="t-price">
+                        {formatCurrencyWithoutD(
+                          tours[0]?.totalPriceNotDiscount
+                        )}
+                        ₫
+                      </td>
+                    </tr>
+                    {tours[0]?.tour?.discount.isDiscount ? (
+                      <tr>
+                        <td>
+                          Giảm giá:{" "}
+                          <span className="t-price">
+                            {tours[0]?.tour?.discount.discountValue}%
+                          </span>
+                        </td>
+                        <td className="t-price">
+                          -
+                          {formatCurrencyWithoutD(
+                            (tours[0]?.tour?.discount.discountValue / 100) *
+                              tours[0]?.totalPriceNotDiscount
+                          )}
+                          ₫
                         </td>
                       </tr>
-                    ))} */}
+                    ) : null}
 
                     <tr className="total1">
                       <td>Tổng cộng</td>

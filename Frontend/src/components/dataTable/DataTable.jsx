@@ -1,4 +1,4 @@
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, viVN } from "@mui/x-data-grid";
 import "./dataTable.css";
 import { Link } from "react-router-dom";
 
@@ -12,9 +12,9 @@ const DataTable = (props) => {
 
   const actionColumn = {
     field: "action",
-    headerName: "Action",
+    headerName: props.customerRole ? "Chi tiết" : "Action",
     sortable: false,
-    width: 200,
+    width: props.width80 ? props.width80 : 200,
     renderCell: (params) => {
       return (
         <div className="action">
@@ -32,9 +32,11 @@ const DataTable = (props) => {
               <img src="/view.svg" alt="" />
             </Link>
           )}
-          <div className="delete" onClick={() => handleDelete(params.row.id)}>
-            <img src="/delete.svg" alt="" />
-          </div>
+          {!props.customerRole ? (
+            <div className="delete" onClick={() => handleDelete(params.row.id)}>
+              <img src="/delete.svg" alt="" />
+            </div>
+          ) : null}
         </div>
       );
     },
@@ -43,7 +45,11 @@ const DataTable = (props) => {
   return (
     <div className="dataTable">
       <DataGrid
-        key={props.rows.id}
+        localeText={
+          props.VietNamese
+            ? viVN.components.MuiDataGrid.defaultProps.localeText
+            : ""
+        }
         className="dataGrid"
         rows={props.rows}
         columns={[...props.columns, actionColumn]}
@@ -54,7 +60,6 @@ const DataTable = (props) => {
             },
           },
         }}
-        // slots={{ toolbar: GridToolbar }}
         slotProps={{
           toolbar: {
             showQuickFilter: true,

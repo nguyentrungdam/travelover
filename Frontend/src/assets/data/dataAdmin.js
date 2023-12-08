@@ -45,6 +45,12 @@ export const menu = [
         url: "/orders-list",
         icon: "/order.svg",
       },
+      {
+        id: 5,
+        title: "Discounts",
+        url: "/discounts",
+        icon: "/discount.svg",
+      },
     ],
   },
 ];

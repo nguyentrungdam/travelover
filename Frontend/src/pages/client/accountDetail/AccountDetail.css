@@ -1,10 +1,14 @@
+.vh70 {
+  height: 70vh !important;
+}
 .container-custom {
   margin: 40px 0;
   background-color: #f2f6fc;
   color: #69707a;
 }
-.img-account-profile {
-  height: 10rem;
+.img-account-profile1 {
+  width: 100%;
+  max-width: 200px;
 }
 .rounded-circle {
   border-radius: 50% !important;

@@ -126,7 +126,7 @@ const ProfilePage = () => {
             <div className="card-header">Ảnh Cá Nhân</div>
             <div className="card-body text-center">
               <img
-                className="img-account-profile rounded-circle mb-2"
+                className="img-account-profile1 rounded-circle mb-2"
                 src={
                   userInfo.profilePicture ||
                   account?.data?.avatar ||
@@ -143,7 +143,7 @@ const ProfilePage = () => {
                 ref={fileInputRef}
               />
               <div className="small font-italic text-muted mb-4">
-                JPG hoặc PNG không quá 5 MB
+                JPG hoặc PNG không quá 2 MB
               </div>
               <button
                 className="btn btn-primary"
@@ -189,18 +189,6 @@ const ProfilePage = () => {
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  {/* <div className="col-md-6">
-                    <label className="small mb-1" htmlFor="inputOrgName">
-                      Organization name
-                    </label>
-                    <input
-                      className="form-control"
-                      id="inputOrgName"
-                      type="text"
-                      placeholder="Enter your organization name"
-                      defaultValue="Start Bootstrap"
-                    />
-                  </div> */}
                   <div className="">
                     <label className="small mb-1" htmlFor="inputLocation">
                       Địa chỉ

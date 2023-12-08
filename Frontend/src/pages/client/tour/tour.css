@@ -120,6 +120,20 @@
   cursor: pointer;
   border-radius: 5px;
 }
+.btn-view-room {
+  border: 1px solid #ccc;
+  padding: 4px 12px;
+  background-color: #fff;
+  color: #0071c2;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.btn-view-room:hover {
+  opacity: 0.8;
+  background-color: #0071c2;
+  color: #fff;
+}
 
 .slider {
   position: fixed;
@@ -306,7 +320,7 @@ body.modal-open1 {
   width: 220px;
 }
 .l2 {
-  width: 200px;
+  width: 100px;
 }
 .table-price tr th {
   padding: 10px 0;
