@@ -24,7 +24,7 @@ public class TourCreate {
 	private String tourDescription;
 	private int priceOfAdult; // not null
 	private int priceOfChildren; // not null
-	private List<Schedule> schedulte;
+	private List<Schedule> schedule;
 	private String tourDetail; // not null
 	private ReasonableTime reasonableTime; // not null
 	private String suitablePerson;

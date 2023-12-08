@@ -26,30 +26,62 @@
             text-align: left;
             font-weight: normal;
         }
-        
-        .logo {
+		
+		.item-image {
 			margin-top: 0;
 			width: 200px;
 			height: 200px;
-			display: block; 
-    		margin: auto;
+			color: white;
+		}
+		
+		.block-logo {
+			text-align: center;
+			margin-bottom: 30px;
+		}
+		
+		.logo{
+			width: 200px;
+			height: 200px;
+			color: #436eee;
+			font-weight: bold;
+			font-size: 30px;
+		}
+		
+		.btn {
+			text-align: center;
+		}
+		
+		button {
+			background-color: #436eee;
+			width: 200px;
+			color: #FFFFFF;
+			font-size: 20px;
+			padding: 10px;
+			border-radius: 4px;
+		}
+		
+		button:hover {
+			background-color: #3558be;
 		}
     </style>
 </head>
 <body>
     <div class="invoice-box">
-		<div class="logo">
-			<image style="width: 100%;" src="https://static.vecteezy.com/system/resources/previews/000/511/437/original/travel-tourism-logo-isolated-on-white-background-vector.jpg" alt="logo"></image>
+		<div class="block-logo">
+			<image class="logo" src="https://1static.vecteezy.com/system/resources/previews/000/511/437/original/travel-tourism-logo-isolated-on-white-background-vector.jpg" alt="TRAVELOVER"></image>
 		</div>
 		
 		<p>Xin chào [tên tài khoản].</p>
-		<p>Đơn hàng [id] của bạn đã được đặt thành công ngày [ngày hôm nay].</p>
+		<p>Đơn hàng <span style="color: #436eee;">[id]</span> của bạn đã được đặt thành công ngày [ngày hôm nay].</p>
+		<div class="btn">
+			<button>Chi tiết đơn hàng</button>
+		</div>
 		
         <h3>THÔNG TIN ĐƠN HÀNG</h3>
         <table>
             <tr>
                 <th>Mã đơn hàng:</th>
-                <th>[id]</th>
+                <th><span style="color: #436eee;">[id]</span></th>
             </tr>
             <tr>
                 <th>Ngày đặt hàng:</th>
@@ -77,6 +109,7 @@
             </tr>
         </table>
         
+        <image class="item-image" src="https://static.vecteezy.com/system/resources/previews/000/511/437/original/travel-tourism-logo-isolated-on-white-background-vector.jpg" alt="Tour image"></image>
         <p>[title tour]</p>
         <p>[số ngày] ngày, [số đêm] đêm</p>
         
@@ -105,12 +138,20 @@
                 <th>Tổng thanh toán:</th>
                 <th>[final price]</th>
             </tr>
+            <tr>
+                <th>Đã thanh toán:</th>
+                <th>[discount.amount]</th>
+            </tr>
         </table>
+
+        <hr>
         
-        <p>Payment</p>
-        <p>Đã thanh toán [discount.amount]</p>
-        
+        <h3>BƯỚC TIẾP THEO</h3>
+        <p>Hãy đảm bảo rằng bạn đã chuẩn bị đầy đủ các vật dụng cần thiết cho chuyến du lịch sắp tới.</p>
+        <p>Cảm ơn bạn đã chọn dịch vụ của chúng tôi cho chuyến du lịch sắp tới của bạn. Chúng tôi rất hân hạnh được phục vụ bạn.</p>
+        <p>Chúc bạn có một chuyến du lịch vui vẻ và trọn vẹn.</p>
         <br>
+        
         <p>Trân trọng,</p>
         <p>Đội ngũ Travelover</p>
         

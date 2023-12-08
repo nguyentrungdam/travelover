@@ -292,8 +292,8 @@ public class TourService implements ITourService{
 		}
 		
 		// check schedule image
-		for (Schedule itemSchedule : tour.getSchedulte()) {
-			for (Schedule itemScheduleUpdate : tourUpdate.getSchedulte()) {
+		for (Schedule itemSchedule : tour.getSchedule()) {
+			for (Schedule itemScheduleUpdate : tourUpdate.getSchedule()) {
 				// delete old image in schedule
 				if (itemSchedule.getImageUrl().equals(itemScheduleUpdate.getImageUrl()) ) {
 					boolean checkDelete = false;
@@ -306,7 +306,7 @@ public class TourService implements ITourService{
 			}
 		}
 		// mapping schedule
-		tour.setSchedulte(tourUpdate.getSchedulte());
+		tour.setSchedule(tourUpdate.getSchedule());
 		
 		LocalDate updateIsDiscount;
 		try {
