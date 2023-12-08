@@ -50,7 +50,6 @@ const DataTable = (props) => {
             ? viVN.components.MuiDataGrid.defaultProps.localeText
             : ""
         }
-        key={props.rows.id}
         className="dataGrid"
         rows={props.rows}
         columns={[...props.columns, actionColumn]}

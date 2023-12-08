@@ -5,6 +5,7 @@ import tourReducer from "../slices/tourSlice";
 import orderReducer from "../slices/orderSlice";
 import hotelzReducer from "../slices/zhotelSlice";
 import discountReducer from "../slices/discountSlice";
+import hotelReducer from "../slices/hotelSlice";
 // import productReducer from "../slices/productSlice";
 // import categoryReducer from "../slices/categorySlice";
 // import cartReducer from "../slices/cartSlice";
@@ -45,6 +46,7 @@ const store = configureStore({
     tour: tourReducer,
     order: orderReducer,
     discount: discountReducer,
+    hotel: hotelReducer,
     hotelz: hotelzReducer,
   },
   middleware: (getDefaultMiddleware) =>

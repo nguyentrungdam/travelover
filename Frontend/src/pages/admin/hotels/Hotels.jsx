@@ -1,72 +1,71 @@
 import { useEffect } from "react";
 import "../tours/tours.css";
 import DataTable from "../../../components/dataTable/DataTable";
-import { products } from "../../../assets/data/dataAdmin";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllTours } from "../../../slices/tourSlice";
 import Loading from "../../../components/Loading/Loading";
+import { getAllHotel } from "../../../slices/hotelSlice";
 
 const columns = [
-  { field: "id", headerName: "ID", width: 40, type: "string" },
-  {
-    field: "img",
-    headerName: "Ảnh",
-    width: 70,
-    renderCell: (params) => {
-      return <img src={params.row.img || "/noavatar.png"} alt="" />;
-    },
-  },
+  { field: "stt", headerName: "ID", width: 40, type: "string" },
+  // {
+  //   field: "img",
+  //   headerName: "Ảnh",
+  //   width: 70,
+  //   renderCell: (params) => {
+  //     return <img src={params.row.img || "/noavatar.png"} alt="" />;
+  //   },
+  // },
   {
     field: "title",
     type: "string",
-    headerName: "Tên khách sạn",
+    headerName: "Hotel Name",
     width: 350,
   },
   {
-    field: "phoneNumber",
+    field: "email",
     type: "string",
-    headerName: "Số điện thoại",
-    width: 150,
+    headerName: "Email",
+    width: 200,
   },
   {
     field: "province",
     type: "string",
-    headerName: "Địa chỉ",
-    width: 150,
+    headerName: "Address",
+    width: 200,
   },
   {
     field: "createdAt",
     headerName: "Created At",
-    width: 100,
+    width: 150,
     type: "string",
   },
 ];
 
 const Hotels = () => {
   const dispatch = useDispatch();
-  const { loading, tours } = useSelector((state) => state.tour);
+  const { loading, hotels } = useSelector((state) => state.hotel);
   const transformedData =
-    tours && Array.isArray(tours)
-      ? tours.map((item, index) => ({
-          id: item.tourId.slice(-2),
-          img: item.avatar,
-          title: item.tourTitle,
-          days: item.numberOfDay,
+    hotels && Array.isArray(hotels)
+      ? hotels.map((item, index) => ({
+          stt: index + 1,
+          id: item.hotelId,
+          title: item.hotelName,
+          email: item.contact.email,
+          province: item.address.province,
           createdAt: item.createdAt,
         }))
       : [];
 
   useEffect(() => {
-    dispatch(getAllTours()).unwrap();
+    dispatch(getAllHotel()).unwrap();
   }, []);
 
   return (
-    <div className="products">
+    <div className="products vh-100">
       <div className="info">
-        <h1>Khách Sạn</h1>
-        <a href="/hotels/add-new">Thêm khách sạn mới</a>
+        <h1>Hotels</h1>
+        <a href="/hotels/add-new">Add New Hotel</a>
       </div>
-      {/* TEST THE API */}
 
       {loading ? (
         <Loading isTable />

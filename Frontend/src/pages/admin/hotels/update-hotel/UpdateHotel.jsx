@@ -1,13 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../../tours/add-tour/AddTours.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import LocationSelect from "../../tours/add-tour/LocationSelect";
-import { createHotel } from "../../../../slices/hotelSlice";
+import { getHotelDetail, updateHotel } from "../../../../slices/hotelSlice";
+import { useParams } from "react-router-dom";
 
-const AddHotel = () => {
+const UpdateHotel = () => {
+  const { loading, hotel } = useSelector((state) => state.hotel);
+  const { id } = useParams();
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getHotelDetail(id)).unwrap();
+  }, []);
+  console.log(hotel);
   const [formData, setFormData] = useState({
     hotelName: "",
     hotelDescription: "",
@@ -32,7 +39,6 @@ const AddHotel = () => {
       [name]: value,
     });
   };
-  console.log(formData);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,24 +46,46 @@ const AddHotel = () => {
     const formDataObject = new FormData();
 
     // Thêm các trường dữ liệu vào formDataObject
-    formDataObject.append("eHotelId", formData.eHotelId);
-    formDataObject.append("hotelName", formData.hotelName);
-    formDataObject.append("hotelDescription", formData.hotelDescription);
-    formDataObject.append("contact[phoneNumber]", formData.phoneNumber);
-    formDataObject.append("contact[email]", formData.email);
+    formDataObject.append("eHotelId", hotel?.eHotelId);
+    formDataObject.append("hotelId", id);
+    formDataObject.append("hotelName", formData.hotelName || hotel?.hotelName);
+    formDataObject.append(
+      "hotelDescription",
+      formData.hotelDescription || hotel?.hotelDescription
+    );
+    formDataObject.append(
+      "contact[phoneNumber]",
+      formData.phoneNumber || hotel?.contact?.phoneNumber
+    );
+    formDataObject.append(
+      "contact[email]",
+      formData.email || hotel?.contact?.email
+    );
 
     // Thêm địa chỉ
-    formDataObject.append("address[province]", selectedLocation.province);
-    formDataObject.append("address[district]", selectedLocation.district);
-    formDataObject.append("address[commune]", selectedLocation.commune);
-    formDataObject.append("address[moreLocation]", formData.moreLocation);
+    formDataObject.append(
+      "address[province]",
+      selectedLocation.province || hotel?.address?.province
+    );
+    formDataObject.append(
+      "address[district]",
+      selectedLocation.district || hotel?.address?.district
+    );
+    formDataObject.append(
+      "address[commune]",
+      selectedLocation.commune || hotel?.address?.commune
+    );
+    formDataObject.append(
+      "address[moreLocation]",
+      formData.moreLocation || hotel?.address?.moreLocation
+    );
 
     // Gửi formDataObject lên API hoặc xử lý dữ liệu tại đây
     for (const [name, value] of formDataObject.entries()) {
       console.log(name, ":", value);
     }
     try {
-      const res = await dispatch(createHotel(formDataObject)).unwrap();
+      const res = await dispatch(updateHotel(formDataObject)).unwrap();
       console.log(res);
       if (res.data.status === "ok") {
         notify(1);
@@ -100,15 +128,17 @@ const AddHotel = () => {
                     <label className="small mb-1">Hotel name</label>
                     <input
                       name="hotelName"
+                      defaultValue={hotel?.hotelName}
                       className="form-control"
                       type="text"
-                      placeholder="Name of the hotel..."
+                      placeholder="Name of the hotel?..."
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-4">
                     <label className="small mb-1">eID</label>
                     <input
+                      defaultValue={hotel?.eHotelId}
                       name="eHotelId"
                       className="form-control"
                       type="text"
@@ -126,6 +156,7 @@ const AddHotel = () => {
 
                   <div className="mt-2">
                     <input
+                      defaultValue={hotel?.address?.moreLocation}
                       name="moreLocation"
                       className="form-control"
                       type="text"
@@ -138,6 +169,7 @@ const AddHotel = () => {
                   <div className="col-md-8">
                     <label className="small mb-1">Description</label>
                     <textarea
+                      defaultValue={hotel?.hotelDescription}
                       name="hotelDescription"
                       className="form-control"
                       onChange={handleChange}
@@ -150,6 +182,7 @@ const AddHotel = () => {
                   <div className="col-md-4">
                     <label className="small mb-1">Email</label>
                     <input
+                      defaultValue={hotel?.contact?.email}
                       name="email"
                       className="form-control"
                       type="text"
@@ -160,6 +193,7 @@ const AddHotel = () => {
                   <div className="col-md-4">
                     <label className="small mb-1">Phone number</label>
                     <input
+                      defaultValue={hotel?.contact?.phoneNumber}
                       name="phoneNumber"
                       className="form-control"
                       type="text"
@@ -173,7 +207,7 @@ const AddHotel = () => {
                   type="button"
                   onClick={handleSubmit}
                 >
-                  Create Hotel
+                  Update Hotel
                 </button>
               </form>
             </div>
@@ -185,4 +219,4 @@ const AddHotel = () => {
   );
 };
 
-export default AddHotel;
+export default UpdateHotel;

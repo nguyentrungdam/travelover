@@ -33,12 +33,12 @@ export const menu = [
         url: "/tours-list",
         icon: "/travel-list.svg",
       },
-      // {
-      //   id: 3,
-      //   title: "Hotels",
-      //   url: "/hotels",
-      //   icon: "/hotel.svg",
-      // },
+      {
+        id: 3,
+        title: "Hotels",
+        url: "/hotels",
+        icon: "/hotel.svg",
+      },
       {
         id: 4,
         title: "Orders",
