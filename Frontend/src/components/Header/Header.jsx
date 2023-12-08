@@ -90,6 +90,7 @@ const Header = ({ noneSticky }) => {
       window.location.reload();
     }
   };
+
   return (
     <header className={`header ${isSticky ? "sticky__header" : ""}`}>
       <Container>
