@@ -32,17 +32,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(path = "/api/v1/tours")
 @Tag(name = "Tours", description = "APIs for managing tours\n\n"
-		+ "03/12/2023\n\n"
-		+ "Thêm discount cho tour:\n\n"
-		+ "- startDate và endDate chỉ cần cho nhập ngày và tháng\n"
-		+ "- discountType chỉ để mở rộng sau này, có thể nhập là percent hoặc có thể không nhập gì\n"
-		+ "- discountValue giá trị phần trăm được giảm: ví dụ nhập 10 là giảm 10% khi đặt hàng\n"
-		+ "- auto là để hệ thống tự cập nhập cho biến isDiscount (mỗi ngày 1 lần)\n"
-		+ "- isDiscount để biết tour có đang giảm giá hay không\n"
-		+ "- updateIsDiscount ngày cập nhật biến isDiscount\n\n"
-		+ "Thêm priceOfAdult, priceOfChildren, \n\n"
-		+ "Thêm numberOfAdult, numberOfChildren, numberOfRoom khi search tour\n\n"
-		+ "Thêm totalPriceNotDiscount cho kết quả của search tour")
+		+ "08/12/2023\n\n"
+		+ "Thêm schedule cho tour (dạng list):\n\n"
+		+ "- title \n"
+		+ "- description \n"
+		+ "- imageUrl : gọi api image create để lấy url\n")
 @SecurityRequirement(name = "Bearer Authentication")
 public class TourController {
 	@Autowired
