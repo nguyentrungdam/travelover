@@ -12,14 +12,14 @@ const nav__links = [
     path: "/home",
     display: "Trang Chủ",
   },
-  {
-    path: "/dashboard",
-    display: "Thông Tin",
-  },
-  {
-    path: "/tours",
-    display: "Tour",
-  },
+  // {
+  //   path: "/dashboard",
+  //   display: "Thông Tin",
+  // },
+  // {
+  //   path: "/tours",
+  //   display: "Tour",
+  // },
 ];
 
 const Header = ({ noneSticky }) => {

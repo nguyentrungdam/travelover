@@ -15,17 +15,18 @@ const columns = [
     type: "string",
   },
   {
-    field: "discountCode",
-    type: "string",
-    headerName: "Discount Code",
-    width: 180,
-  },
-  {
     field: "description",
     type: "string",
     headerName: "Description",
     width: 400,
   },
+  {
+    field: "discountCode",
+    type: "string",
+    headerName: "Discount Code",
+    width: 180,
+  },
+
   {
     field: "quantity",
     type: "string",

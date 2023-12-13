@@ -53,7 +53,7 @@
   margin: 10px 0 16px 0; /* Đặt khoảng cách giữa các hàng */
 }
 .img-account-profile {
-  max-width: 100%; /* Ảnh sẽ không vượt quá kích thước của ô */
+  max-width: 200px; /* Ảnh sẽ không vượt quá kích thước của ô */
   height: auto; /* Duy trì tỷ lệ khung hình khi thay đổi kích thước */
 }
 .modal-overlay2 {

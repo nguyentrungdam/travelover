@@ -28,6 +28,7 @@ import UpdateDiscount from "./pages/admin/discounts/update-discount/UpdateDiscou
 import ZHotel from "./pages/enterprise/ZHotel";
 import AddHotel from "./pages/admin/hotels/add-hotel/AddHotel";
 import UpdateHotel from "./pages/admin/hotels/update-hotel/UpdateHotel";
+import TourScheduleForm from "./pages/admin/tours/add-tour/TourScheduleForm";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -77,6 +78,7 @@ function App() {
         <Route path="tours-list" element={<ToursList />} />
         <Route path="tours-list/:id" element={<UpdateTour />} />
         <Route path="tours-list/add-new" element={<AddTours />} />
+        <Route path="tours-list/test-form" element={<TourScheduleForm />} />
         <Route path="hotels" element={<Hotels />} />
         <Route path="hotels/add-new" element={<AddHotel />} />
         <Route path="hotels/:id" element={<UpdateHotel />} />
