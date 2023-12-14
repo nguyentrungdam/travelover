@@ -107,3 +107,25 @@
 .form-check-custom {
   border: var(--bs-border-width) solid #ababab !important;
 }
+.normal-price {
+  font-weight: 600;
+}
+
+.original-price {
+  color: #68738c;
+  text-decoration: line-through;
+  font-size: 0.85em;
+  margin-right: 5px;
+}
+.status-1 {
+  color: #ff0202;
+}
+.status-2 {
+  color: #0206ff;
+}
+.status-3 {
+  color: #00ac5c;
+}
+.status-4 {
+  color: #9f8888;
+}

@@ -18,6 +18,12 @@ const columns = [
     },
   },
   {
+    field: "email",
+    type: "string",
+    headerName: "Email",
+    width: 200,
+  },
+  {
     field: "firstName",
     type: "string",
     headerName: "First Name",
@@ -29,12 +35,7 @@ const columns = [
     headerName: "Last Name",
     width: 150,
   },
-  {
-    field: "email",
-    type: "string",
-    headerName: "Email",
-    width: 200,
-  },
+
   {
     field: "role",
     type: "string",

@@ -35,7 +35,6 @@ const Home = () => {
   return (
     <>
       <Header />
-      {/* ========== HERO SECTION ========== */}
       <section className="padding-top-0">
         <Container>
           <Row>
@@ -77,13 +76,11 @@ const Home = () => {
           </Row>
         </Container>
       </section>
-      {/* ============================================================== */}
-      {/* ==================== HERO SECTION START ====================== */}
       <section className="section-nonepadding">
         <Container>
           <Row>
             <Col lg="3">
-              <h5 className="services__subtitle">Chúng tôi cung cấp gì ?</h5>
+              <h5 className="services__subtitle">Vì sao chọn Travelover ?</h5>
               <h2 className="services__title">
                 Chúng tôi cung cấp các dịch vụ tốt nhất
               </h2>
@@ -93,7 +90,6 @@ const Home = () => {
         </Container>
       </section>
 
-      {/* ========== FEATURED TOUR SECTION START ========== */}
       <section>
         <Container>
           <Row>
@@ -105,10 +101,8 @@ const Home = () => {
           </Row>
         </Container>
       </section>
-      {/* ========== FEATURED TOUR SECTION END =========== */}
 
-      {/* ========== EXPERIENCE SECTION START ============ */}
-      <section>
+      {/* <section>
         <Container>
           <Row>
             <Col lg="6">
@@ -147,10 +141,8 @@ const Home = () => {
             </Col>
           </Row>
         </Container>
-      </section>
-      {/* ========== EXPERIENCE SECTION END ============== */}
+      </section> */}
 
-      {/* ========== GALLERY SECTION START ============== */}
       <section>
         <Container>
           <Row>
@@ -168,10 +160,8 @@ const Home = () => {
           </Row>
         </Container>
       </section>
-      {/* ========== GALLERY SECTION END ================ */}
 
-      {/* ========== TESTIMONIAL SECTION START ================ */}
-      <section>
+      {/* <section>
         <Container>
           <Row>
             <Col lg="12">
@@ -183,10 +173,9 @@ const Home = () => {
             </Col>
           </Row>
         </Container>
-      </section>
-      {/* ========== TESTIMONIAL SECTION END ================== */}
+      </section> */}
       <ChatBot />
-      <NewsLetter />
+      {/* <NewsLetter /> */}
       <ScrollToTop />
       <Footer />
     </>

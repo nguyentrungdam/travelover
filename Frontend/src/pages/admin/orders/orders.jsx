@@ -121,9 +121,12 @@ const OrderList = () => {
     document.body.classList.remove("modal-open");
   };
   const handleSaveStatus = () => {
+    console.log(orderId);
     console.log(selectedStatus);
-    dispatch(updateOrder({ orderId, status: selectedStatus })).unwrap();
-    window.location.reload();
+    dispatch(
+      updateOrder({ orderId: orderId, status: selectedStatus })
+    ).unwrap();
+    // window.location.reload();
   };
   console.log(order);
   return (

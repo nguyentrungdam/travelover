@@ -46,3 +46,6 @@
 .MuiDataGrid-columnHeaderTitleContainer {
   justify-content: center !important;
 }
+.MuiDataGrid-cell:nth-child(3) {
+  justify-content: start !important;
+}

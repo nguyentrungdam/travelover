@@ -26,28 +26,40 @@ const columns = [
   {
     field: "finalPrice",
     headerName: "Giá",
-    width: 150,
+    width: 300,
     type: "string",
-  },
-  {
-    field: "discount",
-    type: "boolean",
-    headerName: "Đang sale",
-    width: 140,
     renderCell: (params) => {
-      return params.value ? (
-        <span>&#10004;</span> // Hiển thị biểu tượng tick khi là true
-      ) : (
-        <span>&#10006;</span> // Hiển thị biểu tượng X khi là false
+      const { finalPrice, totalPrice } = params.row;
+      const isDiscounted = finalPrice < totalPrice;
+
+      return (
+        <div className="normal-price">
+          {isDiscounted ? (
+            <>
+              <span className="original-price">
+                {formatCurrencyWithoutD(totalPrice)}đ
+              </span>
+              <span className="discounted">
+                {formatCurrencyWithoutD(finalPrice)}đ
+              </span>
+            </>
+          ) : (
+            formatCurrencyWithoutD(finalPrice) + "đ"
+          )}
+        </div>
       );
     },
   },
-
   {
     field: "status",
     type: "string",
-    headerName: "Tiến trình đặt tour",
+    headerName: "Trạng thái",
     width: 210,
+    renderCell: (params) => (
+      <div className={`status ${getStatusClass(params.row.status)}`}>
+        {params.row.status}
+      </div>
+    ),
   },
   {
     field: "lastModifiedAt",
@@ -56,14 +68,26 @@ const columns = [
     width: 220,
   },
 ];
+const getStatusClass = (status) => {
+  switch (status) {
+    case "Đã hủy":
+      return "status-1";
+    case "Đang xử lý":
+      return "status-2";
+    case "Đã xác nhận":
+      return "status-2";
+    case "Trong chuyến đi":
+      return "status-3";
+    case "Hoàn thành":
+      return "status-4";
+    default:
+      return ""; // Trường hợp mặc định, không có class nào
+  }
+};
 const Bill = () => {
   const dispatch = useDispatch();
   const { loading, orders, order } = useSelector((state) => state.order);
   const [showModal, setShowModal] = useState(false);
-  const checkDiscount = (discount) => {
-    if (discount > 0) return true;
-    return false;
-  };
 
   const transformedData =
     orders && Array.isArray(orders)
@@ -72,8 +96,8 @@ const Bill = () => {
           id: item?.orderId,
           img: item?.orderDetail.tourDetail.thumbnailUrl,
           title: item?.orderDetail.tourDetail.tourTitle,
-          finalPrice: formatCurrencyWithoutD(item?.finalPrice) + "đ",
-          discount: checkDiscount(item?.discount.discountTourValue),
+          finalPrice: item?.finalPrice,
+          totalPrice: item?.totalPrice,
           status: getVietNameseNameOfProcess(item?.orderStatus),
           lastModifiedAt: item.lastModifiedAt,
         }))

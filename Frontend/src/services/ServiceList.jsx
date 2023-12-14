@@ -4,19 +4,20 @@ import { Col } from "reactstrap";
 
 const servicesData = [
   {
-    imgUrl: "https://cdn-icons-png.flaticon.com/512/2933/2933772.png",
-    title: `Tùy Chọn Khách Sạn`,
-    desc: `Khách hàng dễ dàng tùy chọn khách sạn mình muốn.`,
+    imgUrl: "https://cdn-icons-png.flaticon.com/512/3277/3277639.png",
+    title: `Đặt Tour`,
+    desc: `Tiện lợi và nhanh chóng.`,
   },
   {
-    imgUrl: "https://cdn-icons-png.flaticon.com/512/2385/2385444.png",
-    title: `Tùy Chọn Nhà Hàng`,
-    desc: `Khách hàng dễ dàng tùy chọn nhà hàng mình muốn.`,
+    imgUrl:
+      "https://images.squarespace-cdn.com/content/v1/58f645cae58c62dbeca6bc2c/1614923420749-8DL6X9NGAKQ34PWYSZPM/live-chat.png",
+    title: `Hỗ Trợ`,
+    desc: `Chatbot và nhân viên tư vấn 24/7.`,
   },
   {
     imgUrl: "https://cdn-icons-png.flaticon.com/512/4966/4966633.png",
-    title: "Giá Cả Tốt Nhất",
-    desc: `Giá cả liên tục cập nhật ưu đãi hàng đầu thị trường.`,
+    title: "Giá Cả",
+    desc: `Giá cả ưu đãi hàng đầu thị trường.`,
   },
 ];
 

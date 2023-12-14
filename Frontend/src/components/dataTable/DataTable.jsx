@@ -25,7 +25,11 @@ const DataTable = (props) => {
                 props.handleUpdateOrderStatus(params.row.id, params.row.status)
               }
             >
-              <img src="/view.svg" alt="" />
+              {props.customerRole ? (
+                <img src="/eye.svg" alt="" />
+              ) : (
+                <img src="/view.svg" alt="" />
+              )}
             </div>
           ) : (
             <Link to={`/${props.slug}/${params.row.id}`}>

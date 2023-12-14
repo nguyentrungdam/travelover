@@ -19,7 +19,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import LocationSelect from "../../admin/tours/add-tour/LocationSelect";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCartShopping,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 import { destinations } from "../../../assets/data/dataAdmin";
 import Loading from "../../../components/Loading/Loading";
 import ReactPaginate from "react-paginate";
@@ -109,42 +112,6 @@ const List = () => {
   const minPrice = min * 100000;
   const maxPrice = max * 100000;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await dispatch(
-        searchTour({
-          keyword: "",
-          province,
-          startDate,
-          numberOfDay,
-          numberOfAdult,
-          numberOfChildren,
-          numberOfRoom,
-          pageSize: itemsPerPage,
-          pageNumber: nextPage,
-          minPrice: `${minPrice}`,
-          maxPrice: `${maxPrice}`,
-          sortBy: orderBy,
-          order: orderDirection,
-        })
-      ).unwrap();
-      console.log(res?.data?.totalData);
-      setCountData(res?.data?.totalData);
-    };
-    fetchData();
-  }, [
-    dispatch,
-    province,
-    startDate,
-    numberOfDay,
-    numberOfAdult,
-    numberOfChildren,
-    numberOfRoom,
-    nextPage,
-    minPrice,
-    maxPrice,
-    orderDirection,
-  ]);
   const handleSelectLocation = (location) => {
     setProvince(location.province);
   };
@@ -205,7 +172,29 @@ const List = () => {
       saveToLocalStorage("numberOfRoom", numberOfRoom);
     }
   };
-
+  const handleSearch = () => {
+    const fetchData = async () => {
+      const res = await dispatch(
+        searchTour({
+          keyword: "",
+          province,
+          startDate,
+          numberOfDay,
+          numberOfAdult,
+          numberOfChildren,
+          numberOfRoom,
+          pageSize: itemsPerPage,
+          pageNumber: nextPage,
+          minPrice: `${minPrice}`,
+          maxPrice: `${maxPrice}`,
+          sortBy: orderBy,
+          order: orderDirection,
+        })
+      ).unwrap();
+      setCountData(res?.data?.totalData);
+    };
+    fetchData();
+  };
   return (
     <>
       {isHeaderVisible ? <Header /> : " "}
@@ -341,7 +330,7 @@ const List = () => {
                       className="range-slider"
                     />
                   </div>
-                  <div className="tour-search-result__filter__block mb-2 ">
+                  <div className="tour-search-result__filter__block mb-3 ">
                     <h5 className="s-title">Sắp xếp theo:</h5>
                     <div className="d-flex order-wrap">
                       <select
@@ -350,7 +339,6 @@ const List = () => {
                         name="orderBy"
                         onChange={(e) => setOrderBy(e.target.value)}
                       >
-                        <option value="-1">----Chọn----</option>
                         <option value="price">Giá</option>
                         <option value="popular">Độ phổ biến</option>
                       </select>
@@ -360,11 +348,17 @@ const List = () => {
                         name="orderDirection"
                         onChange={(e) => setOrderDirection(e.target.value)}
                       >
-                        <option value="-1">----Chọn----</option>
                         <option value="asc">Thấp -&gt; cao</option>
                         <option value="desc">Cao -&gt; thấp</option>
                       </select>
                     </div>
+                  </div>
+                  <div className="btn-block1 mx-0" onClick={handleSearch}>
+                    <FontAwesomeIcon
+                      icon={faMagnifyingGlass}
+                      className="me-1"
+                    />
+                    Áp dụng
                   </div>
                 </div>
               </div>
@@ -385,7 +379,7 @@ const List = () => {
                             ? totalData
                             : tours?.length || countData}
                         </strong>{" "}
-                        tours cho Quý khách.
+                        tour cho Quý khách.
                       </div>
                     </div>
                   </div>

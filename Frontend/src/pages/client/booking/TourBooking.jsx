@@ -22,7 +22,6 @@ import { getCheckDiscount } from "../../../slices/discountSlice";
 
 const TourBooking = () => {
   const { loading, tours } = useSelector((state) => state.tour);
-  const { totalSale } = useSelector((state) => state.discount);
   const { account } = useSelector((state) => state.account);
   const location = useLocation();
   const dispatch = useDispatch();
@@ -32,6 +31,7 @@ const TourBooking = () => {
   const [phoneError, setPhoneError] = useState("");
   const [discountCode, setDiscountCode] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [totalSaleOff, setTotalSaleOff] = useState(0);
 
   const { state } = location;
   const province = state
@@ -137,7 +137,7 @@ const TourBooking = () => {
       console.log(res);
       if (res.data.status === "ok") {
         let orderVNPayData = {
-          amount: res.data.data.finalPrice - totalSale,
+          amount: res.data.data.finalPrice,
           orderType: "tour",
           orderInfo: res.data.data.orderId,
           returnUrl: "http://localhost:3000/thank-you",
@@ -161,10 +161,17 @@ const TourBooking = () => {
     const actionResult = await dispatch(
       getCheckDiscount({ discountCode, totalPrice: tours[0]?.totalPrice })
     );
+    setTotalSaleOff(actionResult.payload.data.data);
     if (getCheckDiscount.rejected.match(actionResult)) {
       setErrorMessage("Mã giảm giá không áp dụng được vui lòng thử mã khác!");
     }
   };
+  const handleRemoveCoupon = () => {
+    setDiscountCode(""); // Đặt giá trị của mã giảm giá về rỗng
+    setErrorMessage(""); // Đặt giá trị của errorMessage về rỗng
+    setTotalSaleOff(0);
+  };
+
   const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
     return accumulator + currentRoom.price;
   }, 0);
@@ -462,11 +469,17 @@ const TourBooking = () => {
                           </span>
                         )}
                       </tr>
-                      {totalSale && !errorMessage ? (
+                      {totalSaleOff && !errorMessage ? (
                         <tr>
                           <td>Giá voucher giảm</td>
                           <td className="t-price text-right" id="AdultPrice">
-                            -{formatCurrencyWithoutD(totalSale)}₫
+                            -{formatCurrencyWithoutD(totalSaleOff)}₫{" "}
+                            <button
+                              className="btn btn-danger ms-1"
+                              onClick={handleRemoveCoupon}
+                            >
+                              Bỏ
+                            </button>
                           </td>
                         </tr>
                       ) : null}
@@ -476,14 +489,14 @@ const TourBooking = () => {
                       <tr className="total">
                         <td>Tổng cộng</td>
                         <td className="t-price text-right" id="TotalPrice">
-                          {totalSale && !errorMessage ? (
+                          {totalSaleOff && !errorMessage ? (
                             <span className="tour-item__price--old pe-2 mb-0">
                               {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
                             </span>
                           ) : null}
-                          {totalSale && !errorMessage
+                          {totalSaleOff && !errorMessage
                             ? formatCurrencyWithoutD(
-                                tours[0]?.totalPrice - totalSale
+                                tours[0]?.totalPrice - totalSaleOff
                               ) + "₫"
                             : formatCurrencyWithoutD(tours[0]?.totalPrice) +
                               "₫"}

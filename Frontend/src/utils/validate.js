@@ -103,9 +103,9 @@ export const getFromLocalStorage = (key) => {
 
 // việt hóa tiến trình đặt tour
 export const getVietNameseNameOfProcess = (value) => {
-  if (value === "canceled") return "Đã hủy bỏ";
-  else if (value === "pending") return "Chưa giải quyết";
-  else if (value === "confirmed") return "Đã xác nhận";
-  else if (value === "underway") return "Đang tiến hành";
-  else return "Hoàn thành";
+  if (value === "canceled") return "Đã hủy"; //đỏ
+  else if (value === "pending") return "Đang xử lý"; //xanh biển
+  else if (value === "confirmed") return "Đã xác nhận"; //xanh biển
+  else if (value === "underway") return "Trong chuyến đi"; //xanh lá
+  else return "Hoàn thành"; //mờ
 };

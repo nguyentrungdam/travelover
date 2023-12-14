@@ -9,12 +9,21 @@ import { useParams } from "react-router-dom";
 import { validateOriginalDate } from "../../../../utils/validate";
 import { axiosMultipart } from "../../../../apis/axios";
 const UpdateTour = () => {
+  const { loading, tour } = useSelector((state) => state.tour);
   const fileInputRef = useRef();
+  const fileInputRef2 = useRef();
+  const [tourSchedule, setTourSchedule] = useState({
+    schedule: [],
+  });
+  useEffect(() => {
+    setTourSchedule({
+      schedule: tour.schedule || [],
+    });
+  }, [tour.schedule]);
   const dispatch = useDispatch();
   const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
   const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
-  const { loading, tour } = useSelector((state) => state.tour);
   useEffect(() => {
     dispatch(getTourDetail(id)).unwrap();
   }, []);
@@ -32,7 +41,7 @@ const UpdateTour = () => {
       fileInputRefs.current[index].current.click();
     }
   };
-  // console.log(tour);
+  console.log(tour);
   const handleSelectImage = (e, index) => {
     console.log(index);
     const selectedFile = e.target.files[0];
@@ -108,7 +117,22 @@ const UpdateTour = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     const formDataUpdate = new FormData();
-    // Thêm các trường dữ liệu vào formDataUpdate
+
+    const scheduleArray = tourSchedule.schedule.map((item, index) => ({
+      imageUrl: tour.schedule[index].imageUrl || item.imageUrl,
+      description: item.description,
+      title: item.title,
+    }));
+
+    scheduleArray.forEach((item, index) => {
+      formDataUpdate.append(`schedule[${index}][imageUrl]`, item.imageUrl);
+      formDataUpdate.append(
+        `schedule[${index}][description]`,
+        item.description
+      );
+      formDataUpdate.append(`schedule[${index}][title]`, item.title);
+    });
+
     formDataUpdate.append("tourId", id);
     formDataUpdate.append("tourTitle", formData.tourTitle || tour.tourTitle);
     formDataUpdate.append(
@@ -252,6 +276,65 @@ const UpdateTour = () => {
       }));
     }
   };
+  //! bên dưới là xử lý phần add lịch trình
+  // Xử lý thay đổi mô tả hình ảnh
+  const handleImageDescriptionChange = (index, e, number) => {
+    const newImages = [...tourSchedule.schedule];
+    if (number === 1) {
+      newImages[index] = { ...newImages[index], title: e.target.value };
+    } else {
+      newImages[index] = { ...newImages[index], description: e.target.value };
+    }
+
+    setTourSchedule({
+      ...tourSchedule,
+      schedule: newImages,
+    });
+  };
+
+  // Xử lý xóa hình ảnh
+  const handleRemoveImage = (index) => {
+    const newImages = [...tourSchedule.schedule];
+    newImages.splice(index, 1);
+
+    setTourSchedule({
+      ...tourSchedule,
+      schedule: newImages,
+    });
+  };
+  // Xử lý tải lên hình ảnh
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      const imageFormData = new FormData();
+      imageFormData.append("file", file);
+      // const reader = new FileReader();
+      // reader.onloadend = () => {
+      axiosMultipart
+        .post("/images/create", imageFormData)
+        .then((response) => {
+          const newImage = {
+            imageUrl: response.data.data.url,
+            description: "",
+            title: "",
+          };
+          setTourSchedule((prevSchedule) => ({
+            ...prevSchedule,
+            schedule: [...prevSchedule.schedule, newImage],
+          }));
+        })
+        .catch((error) => {
+          console.error("Lỗi khi gọi API:", error);
+        });
+      // };
+
+      // reader.readAsDataURL(file);
+    }
+  };
+  function handleUploadButtonClick2() {
+    fileInputRef2.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
+  }
   return (
     <>
       <div className="info">
@@ -392,13 +475,69 @@ const UpdateTour = () => {
                     <label className="pt-1 mb-1">
                       Detailed tour description
                     </label>
-                    <textarea
-                      defaultValue={tour.tourDetail}
-                      name="description"
-                      className="form-control"
-                      onChange={handleChange}
-                      rows="4"
-                    />
+                    <form className="schedule">
+                      <div>
+                        <input
+                          className="chooseFile"
+                          type="file"
+                          accept=".jpg,.png"
+                          id="imageUpload"
+                          onChange={handleImageUpload}
+                          style={{ display: "none" }}
+                          ref={fileInputRef2}
+                        />
+
+                        <button
+                          className="btn btn-primary"
+                          type="button"
+                          onClick={handleUploadButtonClick2}
+                        >
+                          Upload Schedule Image
+                        </button>
+                      </div>
+
+                      {tourSchedule.schedule.map((image, index) => (
+                        <div key={index}>
+                          <div className="d-flex align-items-center">
+                            <img
+                              src={image?.imageUrl}
+                              alt={`Image1 ${index + 1}`}
+                              className="img-account-profile mt-2 col-md-3"
+                            />
+                            <div className="d-flex flex-column col-md-9 ms-2">
+                              <div className="">
+                                <label>Title:</label>
+                                <input
+                                  value={image.title}
+                                  className="form-control w99"
+                                  onChange={(e) =>
+                                    handleImageDescriptionChange(index, e, 1)
+                                  }
+                                />
+                              </div>
+                              <div className="">
+                                <label>Description:</label>
+                                <textarea
+                                  value={image.description}
+                                  className="form-control w99"
+                                  rows={2}
+                                  onChange={(e) =>
+                                    handleImageDescriptionChange(index, e, 2)
+                                  }
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                className="btn btn-danger w-15"
+                                onClick={() => handleRemoveImage(index)}
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </form>
                   </div>
                 </div>
                 {/* Discount */}

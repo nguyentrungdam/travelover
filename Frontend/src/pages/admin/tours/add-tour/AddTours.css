@@ -100,3 +100,34 @@ body.modal-open {
   height: 20px;
   display: block;
 }
+.schedule form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.schedule label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.schedule textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.schedule input[type="file"] {
+  margin-bottom: 10px;
+}
+
+.schedule img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+.w99 {
+  width: 98.8% !important;
+}
+.w-15 {
+  width: 15% !important;
+}

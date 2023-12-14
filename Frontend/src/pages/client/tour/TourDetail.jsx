@@ -30,6 +30,7 @@ const TourDetail = () => {
   const [slideNumber, setSlideNumber] = useState(0);
   const [open, setOpen] = useState(false);
   const { state } = location;
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const province = state ? state.province : "";
   const startDate = state ? state.startDate : "";
   const numberOfDay = state ? state.numberOfDay : "";
@@ -98,6 +99,21 @@ const TourDetail = () => {
   const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
     return accumulator + currentRoom.price;
   }, 0);
+  //tách dòng description
+  const maxDescriptionLength = 300;
+  const tourDescription = tours[0]?.tour?.tourDescription;
+  const isLongDescription = tourDescription.length > maxDescriptionLength;
+  const shortDescription = isLongDescription
+    ? tourDescription.slice(0, maxDescriptionLength) + "..."
+    : tourDescription;
+  const splitDescription = (description) => {
+    return description.split(". ").map((line, index) => (
+      <span key={index}>
+        {line}
+        <br />
+      </span>
+    ));
+  };
   return (
     <div>
       <ScrollToTop />
@@ -130,7 +146,7 @@ const TourDetail = () => {
           </div>
         )}
         <div className="hotelWrapper container">
-          <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex justify-content-between align-items-center  sticky-detail-tour">
             <h1 className="hotelTitle col-md-6">{tours[0]?.tour?.tourTitle}</h1>
             <div className="col-md-6 d-flex gap-2  align-items-center justify-content-end">
               <p className="mb-0">
@@ -165,7 +181,23 @@ const TourDetail = () => {
           </div>
           <div className="hotelDetails">
             <div className="hotelDetailsTexts col-md-8">
-              <p className="hotelDesc">{tours[0]?.tour?.tourDescription}</p>
+              <p
+                className={`hotelDesc ${
+                  showFullDescription ? "full-description" : ""
+                }`}
+              >
+                {showFullDescription
+                  ? splitDescription(tours[0]?.tour?.tourDescription)
+                  : shortDescription}
+              </p>
+              {isLongDescription && (
+                <button
+                  className="read-more-button"
+                  onClick={() => setShowFullDescription(!showFullDescription)}
+                >
+                  {showFullDescription ? "Ẩn bớt" : "Xem thêm"}
+                </button>
+              )}
               <div className="group-services">
                 <div className="item">
                   <img
