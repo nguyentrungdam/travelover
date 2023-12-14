@@ -32,11 +32,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(path = "/api/v1/tours")
 @Tag(name = "Tours", description = "APIs for managing tours\n\n"
-		+ "08/12/2023\n\n"
-		+ "Thêm schedule cho tour (dạng list):\n\n"
-		+ "- title \n"
-		+ "- description \n"
-		+ "- imageUrl : gọi api image create để lấy url\n")
+		+ "14/12/2023\n\n"
+		+ "Thêm api list discount tour: danh sách tour đang giảm giá nhiều nhất\n\n"
+		+ "Fix api update với lỗi: khi không nhập schedule thì báo lỗi\n\n"
+		+ "Fix api update với lỗi: với khi không nhập discount thì báo lỗi\n\n"
+		+ "Fix api update với lỗi: khi nhấn update thì tự động xóa hết ảnh")
 @SecurityRequirement(name = "Bearer Authentication")
 public class TourController {
 	@Autowired
@@ -197,5 +197,19 @@ public class TourController {
 		});
 	}
 	
+	private final String getAllDiscountTourDes = "Lấy ra 10 tour giảm giá nhiều nhất cho 1 người lớn và 1 phòng";
+	@RequestMapping(value = "/list-discount-tour", method = RequestMethod.GET)
+	@Operation(summary = "Get 10 discount tour", description = getAllDiscountTourDes)
+	ResponseEntity<ResponseObject> getAllDiscountTour() {
+		iTourService.updateIsDiscount();
+		List<TourSearchRes> tourSearchResList = iTourService.getAllDiscountTour();
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get 10 discount tour successfully");
+				setData(tourSearchResList);
+			}
+		});
+	}
 	
 }

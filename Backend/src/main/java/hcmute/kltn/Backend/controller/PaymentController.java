@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.account.dto.AccountDTO;
+import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+import hcmute.kltn.Backend.model.email.dto.EmailDTO;
 import hcmute.kltn.Backend.model.email.service.IEmailService;
+import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayCreate;
@@ -30,10 +34,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(path = "/api/v1/payments")
 @Tag(name = "Payments", description = "APIs for managing payments\n\n"
-		+ "06/12/2023\n\n"
-		+ "Thêm field khi trả về url:\n\n"
-		+ "- paymentStatus: trạng thái là 1 thì thành công, còn lại là thất bại\n"
-		+ "- orderId: mã đơn hàng để gọi detail order lấy thông tin của đơn hàng đã đặt")
+		+ "14/12/2023\n\n"
+		+ "Khi thanh toán thành công sẽ có email gửi đến email của account tạo đơn hàng đó: "
+		+ "check xem đã gửi mail với các thông tin đúng chưa, còn nút với link trong mail thì FE xây dựng trang riêng rồi bỏ vào sau")
 @SecurityRequirement(name = "Bearer Authentication")
 public class PaymentController {
 	@Autowired
@@ -44,6 +47,8 @@ public class PaymentController {
 	private IOrderService iOrderService;
 	@Autowired
 	private IEmailService iEmailService;
+	@Autowired
+	private IAccountService iAccountService;
 	
 	@RequestMapping(value = "/vnpay/forward", method = RequestMethod.GET)
     public void processData(HttpServletResponse response, HttpServletRequest request
@@ -73,7 +78,13 @@ public class PaymentController {
 			iOrderService.updateOrderPayment(prderPaymentUpdate);
 			
 			// Send email 
-//			iEmailService
+			OrderDTO orderDTO = new OrderDTO();
+			orderDTO = iOrderService.getDetailOrder(orderId);
+			AccountDTO accountDTO = new AccountDTO();
+			accountDTO = iAccountService.getDetailAccount(orderDTO.getCreatedBy());
+			EmailDTO emailDTO = iEmailService.getInfoOrderSuccess(orderDTO, accountDTO.getAccountId());
+			emailDTO.setTo(accountDTO.getEmail());
+			iEmailService.sendMail(emailDTO);
 		}
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web

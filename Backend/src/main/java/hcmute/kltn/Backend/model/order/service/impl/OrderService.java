@@ -455,10 +455,16 @@ public class OrderService implements IOrderService{
 			throw new CustomException("Order status does not exist");
 		}
 		order.setOrderStatus(orderStatus);
+		
+		// set last modify
+		LocalDate today = LocalDateUtil.getDateNow();
+		Account account = iAccountDetailService.getCurrentAccount();
+		order.setLastModifiedBy(account.getAccountId());
+		order.setLastModifiedAt(today);
 
 		// update order
 		Order orderNew = new Order();
-		orderNew = update(order);
+		orderNew = orderRepository.save(order);
 		
 		return getOrderDTO(orderNew);
 	}

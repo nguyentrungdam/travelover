@@ -292,10 +292,25 @@ public class TourService implements ITourService{
 		}
 		
 		// check schedule image
-		for (Schedule itemSchedule : tour.getSchedule()) {
-			for (Schedule itemScheduleUpdate : tourUpdate.getSchedule()) {
-				// delete old image in schedule
-				if (itemSchedule.getImageUrl().equals(itemScheduleUpdate.getImageUrl()) ) {
+		if (tour.getSchedule() != null) {
+			for (Schedule itemSchedule : tour.getSchedule()) {
+				if (tourUpdate.getSchedule() != null) {
+					boolean checkImageExists = false;
+					for (Schedule itemScheduleUpdate : tourUpdate.getSchedule()) {
+						// delete old image in schedule
+						if (itemSchedule.getImageUrl().equals(itemScheduleUpdate.getImageUrl()) ) {
+							checkImageExists = true;
+						}
+					}
+					if (checkImageExists == false) {
+						boolean checkDelete = false;
+						checkDelete = iImageService.deleteImageByUrl(itemSchedule.getImageUrl());
+						if (checkDelete == false) {
+							throw new CustomException("An error occurred during the processing of the old image");
+						}
+						break;
+					}
+				} else {
 					boolean checkDelete = false;
 					checkDelete = iImageService.deleteImageByUrl(itemSchedule.getImageUrl());
 					if (checkDelete == false) {
@@ -308,11 +323,9 @@ public class TourService implements ITourService{
 		// mapping schedule
 		tour.setSchedule(tourUpdate.getSchedule());
 		
-		LocalDate updateIsDiscount;
-		try {
+		LocalDate updateIsDiscount = null;
+		if (tour.getDiscount() != null) {
 			updateIsDiscount = tour.getDiscount().getUpdateIsDiscount();
-		} catch (Exception e) {
-			updateIsDiscount = null;
 		}
 		
 		// mapping tour
@@ -325,10 +338,13 @@ public class TourService implements ITourService{
 //		tour.setTourDetailList(deteilToList(tour.getTourDetail()));
 		
 		// set Tour.Discount.UpdateIsDiscount
-		Discount discount = new Discount();
-		discount = tourUpdate.getDiscount();
-		discount.setUpdateIsDiscount(updateIsDiscount);
-		tour.setDiscount(discount);
+		
+		if (tourUpdate.getDiscount() != null) {
+			Discount discount = new Discount();
+			discount = tourUpdate.getDiscount();
+			discount.setUpdateIsDiscount(updateIsDiscount);
+			tour.setDiscount(discount);
+		}
 		
 		// update tour
 		Tour tourNew = new Tour();
@@ -729,5 +745,125 @@ public class TourService implements ITourService{
 		}
 		
 		System.out.println("Update isDiscount successfully");
+	}
+
+	@Override
+	public List<TourSearchRes> getAllDiscountTour() {
+		// get all tour
+		List<Tour> tourList = new ArrayList<>(getAll());
+		List<Tour> tourListClone = new ArrayList<>();
+		
+		// get tour is discount
+		tourListClone.addAll(tourList);
+		for (Tour itemTour : tourListClone) {
+			if (itemTour.getDiscount() == null) {
+				tourList.remove(itemTour);
+				if (tourList.size() <= 0) {
+					break;
+				}
+			}else if (itemTour.getDiscount().getIsDiscount() == false) {
+				tourList.remove(itemTour);
+				if (tourList.size() <= 0) {
+					break;
+				}
+			}
+		}
+		
+		// sort list tour by discount value
+		Collections.sort(tourList, new Comparator<Tour>() {
+            @Override
+            public int compare(Tour tour1, Tour tour2) {
+            	int result = Integer.compare(tour1.getDiscount().getDiscountValue(), tour2.getDiscount().getDiscountValue());
+                return result;
+            }
+        });
+		System.out.println("Tour getAllDiscountTour tourList: " + tourList);
+		
+		// search with 1 people
+		List<TourSearchRes> tourSearchResList = new ArrayList<>();
+		LocalDate today = LocalDateUtil.getDateNow();
+		LocalDate tomorrow = today.plusDays(1);
+		for(Tour itemTour : tourList) {
+			int totalPrice = 0;
+			TourSearchRes tourSearchRes = new TourSearchRes();
+			tourSearchRes.setTour(itemTour);
+			totalPrice += itemTour.getPriceOfAdult();
+			
+			// search hotel
+			HotelSearch hotelSearch = new HotelSearch();
+			if (itemTour.getAddress() != null) {
+				hotelSearch.setProvince(itemTour.getAddress().getProvince());
+				hotelSearch.setDistrict(itemTour.getAddress().getDistrict());
+			}
+			List<hcmute.kltn.Backend.model.hotel.dto.HotelDTO> hotelDTOList = iHotelService.searchHotel(hotelSearch);
+			
+			// search room in hotel
+			for(hcmute.kltn.Backend.model.hotel.dto.HotelDTO itemHotel : hotelDTOList) {
+				RoomSearch roomSearch = new RoomSearch();
+				roomSearch.setEHotelId(itemHotel.getEHotelId());
+				roomSearch.setStartDate(tomorrow);
+				roomSearch.setEndDate(tomorrow.plusDays(itemTour.getNumberOfDay()));
+				roomSearch.setNumberOfAdult(1);
+				roomSearch.setNumberOfRoom(1);
+				
+				List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = new ArrayList<>();
+				try {
+					roomList = iHotelService.searchRoom(roomSearch);
+				} catch (Exception e) {
+					
+				}
+				
+				if(roomList.size() > 0) {
+					// mapping hotel
+					Hotel hotel = new Hotel();
+					modelMapper.map(itemHotel, hotel);
+					
+					// mapping room
+					List<Room> roomListRes = new ArrayList<>();
+					for(hcmute.kltn.Backend.model.hotel.dto.extend.Room itemRoom : roomList) {
+						Room room = new Room();
+						modelMapper.map(itemRoom, room);
+						roomListRes.add(room);
+						totalPrice += room.getPrice() * itemTour.getNumberOfDay();
+					}
+
+					hotel.setRoom(roomListRes);
+					
+					tourSearchRes.setHotel(hotel);
+
+					break;
+				}
+			}
+			int totalPriceNotDiscount = totalPrice;
+			if (itemTour.getDiscount().getIsDiscount() == true) {
+				totalPrice = totalPriceNotDiscount * (100 - itemTour.getDiscount().getDiscountValue()) / 100;
+			}
+			
+			tourSearchRes.setTotalPriceNotDiscount(totalPriceNotDiscount);
+			tourSearchRes.setTotalPrice(totalPrice);
+			
+			if (tourSearchRes.getHotel() != null) {
+				tourSearchResList.add(tourSearchRes);
+			}
+			
+		}
+		
+		// get 10 item from tour list
+		if (tourSearchResList.size() > 10) {
+			List<TourSearchRes> tourSearchResListClone = new ArrayList<>();
+			tourSearchResListClone.addAll(tourSearchResList);
+			tourListClone.addAll(tourList);
+			for (TourSearchRes itemTourSearchRes : tourSearchResListClone) {
+				int index = tourSearchResList.indexOf(itemTourSearchRes);
+				if (index >= 10) {
+					tourSearchResList.remove(itemTourSearchRes);
+					if (tourSearchResList.size() <= 0) {
+						break;
+					}
+				}
+			}
+		}
+
+		return tourSearchResList;
 	}
 }

@@ -26,9 +26,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(path = "/api/v1/orders")
 @Tag(name = "Orders", description = "APIs for managing orders\n\n"
-		+ "06/12/2023\n\n"
-		+ "Update api create order: cho nhập mã khuyến mãi\n\n"
-		+ "Api list nếu role là customer sẽ chỉ trả về các order do customer tạo")
+		+ "14/12/2023\n\n"
+		+ "Fix api update status với lỗi: nhấn update là báo lỗi")
 @SecurityRequirement(name = "Bearer Authentication")
 public class OrderController {
 	@Autowired

@@ -20,6 +20,8 @@ public interface ITourService {
 	public List<TourSearchRes> searchTour(TourSearch tourSearch);
 	public List<TourSearchRes> searchFilter(TourFilter tourFilter, List<TourSearchRes> tourSearchResList);
 	public List<TourSearchRes> searchSort(TourSort tourSort, List<TourSearchRes> tourSearchResList);
+	public List<TourSearchRes> getAllDiscountTour();
+//	public List<TourSearchRes> getAllTourHot();
 	
 	public void updateIsDiscount();
 	public void updateIsDiscountNoCheck();
