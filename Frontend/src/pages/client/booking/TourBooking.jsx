@@ -34,25 +34,12 @@ const TourBooking = () => {
   const [totalSaleOff, setTotalSaleOff] = useState(0);
 
   const { state } = location;
-  const province = state
-    ? state.province
-    : getFromLocalStorage("province") || "";
-  const startDateFromLocalStorage = getFromLocalStorage("startDate");
-  const startDate = state
-    ? state.startDate
-    : new Date(startDateFromLocalStorage) || "";
-  const numberOfDay = state
-    ? state.numberOfDay
-    : getFromLocalStorage("numberOfDay") || "";
-  const numberOfAdult = state
-    ? state.numberOfAdult
-    : getFromLocalStorage("numberOfAdult") || 1;
-  const numberOfChildren = state
-    ? state.numberOfChildren
-    : getFromLocalStorage("numberOfChildren") || 1;
-  const numberOfRoom = state
-    ? state.numberOfRoom
-    : getFromLocalStorage("numberOfRoom") || 1;
+  const province = state.province;
+  const startDate = state.startDate;
+  const numberOfDay = state.numberOfDay;
+  const numberOfAdult = state.numberOfAdult;
+  const numberOfChildren = state.numberOfChildren;
+  const numberOfRoom = state.numberOfRoom;
 
   const [note, setNote] = useState("");
   useEffect(() => {

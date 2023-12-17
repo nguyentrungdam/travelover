@@ -8,7 +8,7 @@ import {
   getOrderDetail,
   updateOrder,
 } from "../../../slices/orderSlice";
-import { formatCurrencyWithoutD } from "../../../utils/validate";
+import { formatCurrencyWithoutD, formatDate } from "../../../utils/validate";
 import { useNavigate } from "react-router-dom";
 
 const columns = [
@@ -33,36 +33,42 @@ const columns = [
     width: 150,
     type: "string",
   },
-  {
-    field: "discount",
-    type: "boolean",
-    headerName: "On Sale",
-    width: 100,
-    renderCell: (params) => {
-      return params.value ? (
-        <span>&#10004;</span> // Hiển thị biểu tượng tick khi là true
-      ) : (
-        <span>&#10006;</span> // Hiển thị biểu tượng X khi là false
-      );
-    },
-  },
+  // {
+  //   field: "discount",
+  //   type: "boolean",
+  //   headerName: "On Sale",
+  //   width: 100,
+  //   renderCell: (params) => {
+  //     return params.value ? (
+  //       <span>&#10004;</span> // Hiển thị biểu tượng tick khi là true
+  //     ) : (
+  //       <span>&#10006;</span> // Hiển thị biểu tượng X khi là false
+  //     );
+  //   },
+  // },
   {
     field: "name",
     type: "string",
     headerName: "Customer Name",
-    width: 180,
+    width: 220,
   },
   {
     field: "status",
     type: "string",
-    headerName: "Tour Booking Process",
-    width: 200,
+    headerName: "Status",
+    width: 160,
+  },
+  {
+    field: "createAt",
+    type: "string",
+    headerName: "Create At",
+    width: 150,
   },
   {
     field: "lastModifiedAt",
     type: "string",
-    headerName: "Create At",
-    width: 200,
+    headerName: "Last Modified ",
+    width: 180,
   },
 ];
 
@@ -73,10 +79,10 @@ const OrderList = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [orderId, setOrderId] = useState("");
-  const checkDiscount = (discount) => {
-    if (discount > 0) return true;
-    return false;
-  };
+  // const checkDiscount = (discount) => {
+  //   if (discount > 0) return true;
+  //   return false;
+  // };
 
   const transformedData =
     orders && Array.isArray(orders)
@@ -86,10 +92,11 @@ const OrderList = () => {
           img: item?.orderDetail.tourDetail.thumbnailUrl,
           title: item?.orderDetail.tourDetail.tourTitle,
           finalPrice: formatCurrencyWithoutD(item?.finalPrice) + "đ",
-          discount: checkDiscount(item?.discount.discountTourValue),
+          // discount: checkDiscount(item?.discount.discountTourValue),
           name: item?.customerInformation.fullName,
           status: item?.orderStatus,
-          lastModifiedAt: item.lastModifiedAt,
+          createAt: formatDate(item?.createdAt),
+          lastModifiedAt: formatDate(item?.lastModifiedAt),
         }))
       : [];
   console.log(orders);
@@ -120,14 +127,19 @@ const OrderList = () => {
     navigate(`/tours-list/${tourId}`);
     document.body.classList.remove("modal-open");
   };
-  const handleSaveStatus = () => {
+  const handleSaveStatus = async () => {
     console.log(orderId);
     console.log(selectedStatus);
-    dispatch(
-      updateOrder({ orderId: orderId, status: selectedStatus })
-    ).unwrap();
-    // window.location.reload();
+    try {
+      await dispatch(
+        updateOrder({ orderId: orderId, status: selectedStatus })
+      ).unwrap();
+      window.location.reload();
+    } catch (error) {
+      alert("Lỗi khi cập nhật trạng thái đơn hàng:", error);
+    }
   };
+
   console.log(order);
   return (
     <div className="products vh-100">

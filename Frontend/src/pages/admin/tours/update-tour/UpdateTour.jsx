@@ -6,11 +6,12 @@ import { getTourDetail, updateTour } from "../../../../slices/tourSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { useParams } from "react-router-dom";
-import { validateOriginalDate } from "../../../../utils/validate";
+import { formatDate, validateOriginalDate } from "../../../../utils/validate";
 import { axiosMultipart } from "../../../../apis/axios";
 const UpdateTour = () => {
   const { loading, tour } = useSelector((state) => state.tour);
   const fileInputRef = useRef();
+  const [showImages, setShowImages] = useState(true);
   const fileInputRef2 = useRef();
   const [tourSchedule, setTourSchedule] = useState({
     schedule: [],
@@ -24,10 +25,60 @@ const UpdateTour = () => {
   const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
   const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
+  const [formData, setFormData] = useState({
+    tourTitle: "",
+    thumbnailUrl: "",
+    profilePicture: "",
+    numberOfDay: 0,
+    numberOfNight: 0,
+    moreLocation: "",
+    tourDescription: "",
+    tourDetail: "",
+    startDate: "",
+    priceOfAdult: 0,
+    priceOfChildren: 0,
+    endDate: "",
+    suitablePerson: "",
+    termAndCondition: "",
+    image: ["", "", "", "", "", ""],
+    //discount
+    startDateDiscount: "",
+    endDateDiscount: "",
+    discountValue: 0,
+    auto: tour?.discount?.auto,
+    isDiscount: tour?.discount?.isDiscount,
+  });
   useEffect(() => {
     dispatch(getTourDetail(id)).unwrap();
   }, []);
-  console.log(tour);
+  //!xử lý check box
+  useEffect(() => {
+    setTourSchedule({
+      schedule: tour.schedule || [],
+    });
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      isDiscount: tour?.discount?.isDiscount,
+      auto: tour?.discount?.auto,
+    }));
+  }, [tour.schedule, tour?.discount?.isDiscount, tour?.discount?.auto]);
+  const [isTourLoaded, setIsTourLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!isTourLoaded && tour) {
+      setTourSchedule({
+        schedule: tour.schedule || [],
+      });
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        isDiscount: tour?.discount?.isDiscount,
+        auto: tour?.discount?.auto,
+      }));
+      setIsTourLoaded(true);
+    }
+  }, [isTourLoaded, tour]);
+  //kết thúc xử lý checkbox
   const [selectedLocation, setSelectedLocation] = useState({
     province: "",
     district: "",
@@ -41,7 +92,6 @@ const UpdateTour = () => {
       fileInputRefs.current[index].current.click();
     }
   };
-  console.log(tour);
   const handleSelectImage = (e, index) => {
     console.log(index);
     const selectedFile = e.target.files[0];
@@ -69,38 +119,11 @@ const UpdateTour = () => {
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
-  const [formData, setFormData] = useState({
-    tourTitle: "",
-    thumbnailUrl: "",
-    profilePicture: "",
-    numberOfDay: 0,
-    numberOfNight: 0,
-    moreLocation: "",
-    tourDescription: "",
-    tourDetail: "",
-    startDate: "",
-    priceOfAdult: 0,
-    priceOfChildren: 0,
-    endDate: "",
-    suitablePerson: "",
-    termAndCondition: "",
-    image: ["", "", "", "", "", ""],
-    //discount
-    startDateDiscount: "",
-    endDateDiscount: "",
-    discountValue: 0,
-    auto: true,
-    isDiscount: true,
-  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const updatedFormData = { ...formData }; // Tạo một bản sao của formData
-    if (
-      name === "startDate" ||
-      name === "endDate" ||
-      name === "startDateDiscount" ||
-      name === "endDateDiscount"
-    ) {
+    const updatedFormData = { ...formData };
+    if (name === "startDate" || name === "endDate") {
       const inputDate = e.target.value;
       const regex = /^(\d{2})-(\d{2})$/;
       if (regex.test(inputDate)) {
@@ -109,19 +132,27 @@ const UpdateTour = () => {
         const formattedDate = `${currentYear}-${month}-${day}`;
         updatedFormData[name] = formattedDate;
       }
+    } else if (name === "startDateDiscount" || name === "endDateDiscount") {
+      const inputDate = e.target.value;
+      const regex = /^(\d{2})-(\d{2})-(\d{4})$/;
+      if (regex.test(inputDate)) {
+        const [day, month, year] = inputDate.split("-");
+        const formattedDate = `${year}-${month}-${day}`;
+        updatedFormData[name] = formattedDate;
+      }
     } else {
       updatedFormData[name] = value;
     }
     setFormData(updatedFormData);
   };
+  console.log(tour);
   const handleUpdate = async (e) => {
     e.preventDefault();
     const formDataUpdate = new FormData();
-
-    const scheduleArray = tourSchedule.schedule.map((item, index) => ({
-      imageUrl: tour.schedule[index].imageUrl || item.imageUrl,
-      description: item.description,
-      title: item.title,
+    const scheduleArray = (tourSchedule?.schedule || []).map((item, index) => ({
+      imageUrl: (tour?.schedule?.[index] || {}).imageUrl || item?.imageUrl,
+      description: item?.description,
+      title: item?.title,
     }));
 
     scheduleArray.forEach((item, index) => {
@@ -200,25 +231,19 @@ const UpdateTour = () => {
     //discount
     formDataUpdate.append(
       "discount[startDate]",
-      formData.startDateDiscount || tour.discount.startDate
+      formData?.startDateDiscount || tour?.discount?.startDate
     );
     formDataUpdate.append(
       "discount[endDate]",
-      formData.endDateDiscount || tour.discount.endDate
+      formData?.endDateDiscount || tour?.discount?.endDate
     );
     formDataUpdate.append(
       "discount[discountValue]",
-      formData.discountValue || tour.discount.discountValue
+      formData?.discountValue || tour?.discount?.discountValue
     );
-    formDataUpdate.append(
-      "discount[auto]",
-      formData.auto || tour.discount.auto
-    );
-    formDataUpdate.append(
-      "discount[isDiscount]",
-      formData.isDiscount || tour.discount.isDiscount
-    );
-    formDataUpdate.append("discount[updateIsDiscount]", "2023-12-04");
+    formDataUpdate.append("discount[auto]", formData?.auto);
+    formDataUpdate.append("discount[isDiscount]", formData?.isDiscount);
+    // formDataUpdate.append("discount[updateIsDiscount]", "2023-12-04");
     for (const [name, value] of formDataUpdate.entries()) {
       console.log(name, ":", value);
     }
@@ -262,11 +287,11 @@ const UpdateTour = () => {
       closeModal();
     }
   };
+
   const handleCheckboxChange = (e) => {
     if (e.target.name === "discount") {
       setFormData((prevFormData) => ({
         ...prevFormData,
-        auto: false,
         isDiscount: !prevFormData.isDiscount,
       }));
     } else {
@@ -276,6 +301,7 @@ const UpdateTour = () => {
       }));
     }
   };
+
   //! bên dưới là xử lý phần add lịch trình
   // Xử lý thay đổi mô tả hình ảnh
   const handleImageDescriptionChange = (index, e, number) => {
@@ -494,49 +520,57 @@ const UpdateTour = () => {
                         >
                           Upload Schedule Image
                         </button>
+                        <button
+                          className="btn-block1 w17"
+                          type="button"
+                          onClick={() => setShowImages(!showImages)}
+                        >
+                          {showImages ? "Hide Schedule" : "Show Schedule"}
+                        </button>
                       </div>
 
-                      {tourSchedule.schedule.map((image, index) => (
-                        <div key={index}>
-                          <div className="d-flex align-items-center">
-                            <img
-                              src={image?.imageUrl}
-                              alt={`Image1 ${index + 1}`}
-                              className="img-account-profile mt-2 col-md-3"
-                            />
-                            <div className="d-flex flex-column col-md-9 ms-2">
-                              <div className="">
-                                <label>Title:</label>
-                                <input
-                                  value={image.title}
-                                  className="form-control w99"
-                                  onChange={(e) =>
-                                    handleImageDescriptionChange(index, e, 1)
-                                  }
-                                />
+                      {showImages &&
+                        tourSchedule.schedule.map((image, index) => (
+                          <div key={index}>
+                            <div className="d-flex align-items-center">
+                              <img
+                                src={image?.imageUrl}
+                                alt={`Image1 ${index + 1}`}
+                                className="img-account-profile mt-2 col-md-3"
+                              />
+                              <div className="d-flex flex-column col-md-9 ms-2">
+                                <div className="">
+                                  <label>Title:</label>
+                                  <input
+                                    value={image.title}
+                                    className="form-control w99"
+                                    onChange={(e) =>
+                                      handleImageDescriptionChange(index, e, 1)
+                                    }
+                                  />
+                                </div>
+                                <div className="">
+                                  <label>Description:</label>
+                                  <textarea
+                                    value={image.description}
+                                    className="form-control w99"
+                                    rows={2}
+                                    onChange={(e) =>
+                                      handleImageDescriptionChange(index, e, 2)
+                                    }
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  className="btn btn-danger w-15"
+                                  onClick={() => handleRemoveImage(index)}
+                                >
+                                  Remove
+                                </button>
                               </div>
-                              <div className="">
-                                <label>Description:</label>
-                                <textarea
-                                  value={image.description}
-                                  className="form-control w99"
-                                  rows={2}
-                                  onChange={(e) =>
-                                    handleImageDescriptionChange(index, e, 2)
-                                  }
-                                />
-                              </div>
-                              <button
-                                type="button"
-                                className="btn btn-danger w-15"
-                                onClick={() => handleRemoveImage(index)}
-                              >
-                                Remove
-                              </button>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </form>
                   </div>
                 </div>
@@ -544,7 +578,6 @@ const UpdateTour = () => {
                 <div className="col-md-3 d-flex align-items-center">
                   <label className="small mb-1 me-2">Discount: </label>
                   <input
-                    defaultValue={tour.discount?.isDiscount}
                     name="discount"
                     className="checkbox-tour"
                     type="checkbox"
@@ -552,29 +585,25 @@ const UpdateTour = () => {
                     onChange={handleCheckboxChange}
                   />
                 </div>
-                {formData.isDiscount ? (
+                {formData?.isDiscount ? (
                   <>
                     <div className="row gx-3 mb-3 ">
-                      <div className="col-md-4 d-flex align-items-center w-27">
+                      <div className="col-md-4 d-flex align-items-center w29">
                         <label className="small mb-1">Discount date:</label>
                         <input
-                          defaultValue={validateOriginalDate(
-                            tour.discount?.startDate
-                          )}
-                          maxLength={5}
+                          defaultValue={formatDate(tour.discount?.startDate)}
+                          maxLength={10}
                           name="startDateDiscount"
                           className="form-control w-50 ms-2"
                           placeholder="Ex: 15-05"
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="col-md-4 d-flex  align-items-center w-27">
+                      <div className="col-md-4 d-flex  align-items-center w29">
                         <label className="small mb-1 me-2">to</label>
                         <input
-                          maxLength={5}
-                          defaultValue={validateOriginalDate(
-                            tour.discount?.endDate
-                          )}
+                          maxLength={10}
+                          defaultValue={formatDate(tour.discount?.endDate)}
                           name="endDateDiscount"
                           className="form-control w-50 ms-2"
                           placeholder="Ex: 15-07"
@@ -598,7 +627,6 @@ const UpdateTour = () => {
                         <label className="small mb-1">Auto update</label>
                         <input
                           name="auto"
-                          defaultValue={tour.discount?.auto}
                           className="checkbox-tour"
                           type="checkbox"
                           checked={formData.auto}

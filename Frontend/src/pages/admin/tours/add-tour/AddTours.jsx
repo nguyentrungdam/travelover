@@ -83,12 +83,7 @@ const AddTours = () => {
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (
-      name === "startDate" ||
-      name === "endDate" ||
-      name === "startDateDiscount" ||
-      name === "endDateDiscount"
-    ) {
+    if (name === "startDate" || name === "endDate") {
       if (value.length === 5) {
         const [day, month] = value.split("-");
         const today = new Date();
@@ -96,6 +91,15 @@ const AddTours = () => {
         const offset = today.getTimezoneOffset();
         newDate.setMinutes(newDate.getMinutes() - offset);
         const formattedDate = newDate.toISOString().split("T")[0];
+        setFormData({
+          ...formData,
+          [name]: formattedDate,
+        });
+      }
+    } else if (name === "startDateDiscount" || name === "endDateDiscount") {
+      if (value.length === 10) {
+        const [day, month, year] = value.split("-");
+        const formattedDate = `${year}-${month}-${day}`;
         setFormData({
           ...formData,
           [name]: formattedDate,
@@ -276,7 +280,7 @@ const AddTours = () => {
       reader.readAsDataURL(file);
     }
   };
-
+  console.log(formData);
   return (
     <>
       <div className="info">
@@ -490,20 +494,20 @@ const AddTours = () => {
                 {formData.isDiscount ? (
                   <>
                     <div className="row gx-3 mb-3 ">
-                      <div className="col-md-4 d-flex align-items-center w-27">
+                      <div className="col-md-4 d-flex align-items-center w29">
                         <label className="small mb-1">Discount date:</label>
                         <input
-                          maxLength={5}
+                          maxLength={10}
                           name="startDateDiscount"
                           className="form-control w-50 ms-2"
                           placeholder="Ex: 15-05"
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="col-md-4 d-flex  align-items-center w-27">
+                      <div className="col-md-4 d-flex  align-items-center w29">
                         <label className="small mb-1 me-2">to</label>
                         <input
-                          maxLength={5}
+                          maxLength={10}
                           name="endDateDiscount"
                           className="form-control w-50 ms-2"
                           placeholder="Ex: 15-07"

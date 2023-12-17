@@ -22,7 +22,7 @@ import ChatBot from "../../../components/chatbot/ChatBot";
 
 const Home = () => {
   const { account } = useSelector((state) => state.account);
-
+  console.log(account);
   useEffect(() => {
     saveToLocalStorage(
       "fullName",
@@ -95,7 +95,9 @@ const Home = () => {
           <Row>
             <Col lg="12" className="mb-5">
               <Subtitle subtitle={"Tour"} />
-              <h2 className="featured__tour-title">Các tour của chúng tôi</h2>
+              <h2 className="featured__tour-title">
+                Các tour <span className="hot-tour-home">HOT</span> chúng tôi
+              </h2>
             </Col>
             <FeaturedTourList />
           </Row>
