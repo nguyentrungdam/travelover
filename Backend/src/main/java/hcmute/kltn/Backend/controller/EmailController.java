@@ -21,13 +21,20 @@ import hcmute.kltn.Backend.model.email.dto.testOrderSuccess;
 import hcmute.kltn.Backend.model.email.service.IEmailService;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/emails")
-@Tag(name = "Emails", description = "APIs for managing emails")
+@Tag(
+		name = "Emails", 
+		description = "APIs for managing emails",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1pxGuvT681MvXo612nlV6ECX8FdzEf5Up/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class EmailController {
 	@Autowired 

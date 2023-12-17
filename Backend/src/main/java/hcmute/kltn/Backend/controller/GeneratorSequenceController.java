@@ -17,14 +17,20 @@ import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceCreate;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/generator-sequences")
-@Tag(name = "Generator Sequence", description = "APIs for managing Generator Sequence - FOR DEV")
+@Tag(
+		name = "Generator Sequence", 
+		description = "APIs for managing Generator Sequence - FOR DEV",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1Rxu-cFJjDVtz8Wegkhk4W2MIzzpqJhVM/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class GeneratorSequenceController {
 	@Autowired

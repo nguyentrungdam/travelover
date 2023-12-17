@@ -23,6 +23,11 @@ import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceSer
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
+import hcmute.kltn.Backend.model.province.dto.LocationDTO;
+import hcmute.kltn.Backend.model.province.dto.ProvinceDTO;
+import hcmute.kltn.Backend.model.province.dto.entity.Province;
+import hcmute.kltn.Backend.model.province.service.IProvinceService;
+import hcmute.kltn.Backend.model.tour.dto.Place;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
@@ -56,6 +61,8 @@ public class TourService implements ITourService{
 	private IHotelService iHotelService;
 	@Autowired
 	private IImageService iImageService;
+	@Autowired
+	private IProvinceService iProvinceService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -777,7 +784,6 @@ public class TourService implements ITourService{
                 return result;
             }
         });
-		System.out.println("Tour getAllDiscountTour tourList: " + tourList);
 		
 		// search with 1 people
 		List<TourSearchRes> tourSearchResList = new ArrayList<>();

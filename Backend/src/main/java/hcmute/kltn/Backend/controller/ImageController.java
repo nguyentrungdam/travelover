@@ -24,14 +24,20 @@ import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/images")
-@Tag(name = "Images TEST", description = "APIs for managing images")
+@Tag(
+		name = "Images TEST", 
+		description = "APIs for managing images",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1I-WwINoVR1vnfv-1H3rs5sw4uvDPsTWc/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class ImageController {
 	@Autowired

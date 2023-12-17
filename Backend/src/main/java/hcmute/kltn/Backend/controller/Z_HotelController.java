@@ -24,9 +24,10 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/ehotels")

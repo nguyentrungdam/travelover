@@ -20,14 +20,20 @@ import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.HotelUpdate;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/hotels")
-@Tag(name = "Hotels", description = "APIs for managing hotels")
+@Tag(
+		name = "Hotels", 
+		description = "APIs for managing hotels",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1luZ6dxUn-_lnFdEqee2fSk0vFVKPrvtg/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class HotelController {
 	@Autowired

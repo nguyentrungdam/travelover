@@ -5,6 +5,13 @@ import java.util.HashMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import hcmute.kltn.Backend.model.base.externalAPI.dto.Header;
+import hcmute.kltn.Backend.model.base.externalAPI.dto.ApiCallResponse;
+
 public interface IExternalAPIService {
-	public ResponseEntity<String> getCall(String url, HashMap<String, String> params);
+	public ApiCallResponse get(String url, HashMap<String, String> header, HashMap<String, String> param);
+	public Object getJsonObject(String json);
 }

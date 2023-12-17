@@ -131,32 +131,6 @@ public class OrderService implements IOrderService{
 		
 		return orderNew;
 	}
-
-//	private Order create(OrderDTO orderDTO) {
-//		// check field condition
-//		checkFieldCondition(orderDTO);
-//		
-//		// mapping
-//		Order order = new Order();
-//		modelMapper.map(orderDTO, order);
-//		
-//		// set default value
-//		String orderId = iGeneratorSequenceService.genId(getCollectionName());
-//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
-//		LocalDate dateNow = LocalDateUtil.getDateNow();
-//		order.setOrderId(orderId);
-//		order.setOrderStatus(getOrderStatus("1"));
-//		order.setStatus(true);
-//		order.setCreatedBy(accountId);
-//		order.setCreatedAt(dateNow);
-//		order.setLastModifiedBy(accountId);
-//		order.setLastModifiedAt(dateNow);
-//		
-//		// create order
-//		order = orderRepository.save(order);
-//		
-//		return order;
-//	}
     
     private Order update(Order order) {
 		// check exists
@@ -179,38 +153,6 @@ public class OrderService implements IOrderService{
 
 		return orderNew;
 	}
-
-//	private Order update(OrderDTO orderDTO) {
-//		// check exists
-//		if(!orderRepository.existsById(orderDTO.getOrderId())) {
-//			throw new CustomException("Cannot find order");
-//		}
-//		
-//		// check field condition
-//		checkFieldCondition(orderDTO);
-//		
-//		// get order from db
-//		Order order = orderRepository.findById(orderDTO.getOrderId()).get();
-//		
-//		// mapping
-//		modelMapper.map(orderDTO, order);
-//		
-//		// set default value
-//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
-//		LocalDate dateNow = LocalDateUtil.getDateNow();
-//		String orderStatus = getOrderStatus(orderDTO.getOrderStatus());
-//		if (orderStatus == null) {
-//			throw new CustomException("Order status does not exist");
-//		}
-//		order.setOrderStatus(orderStatus);
-//		order.setLastModifiedBy(accountId);
-//		order.setLastModifiedAt(dateNow);
-//		
-//		// update order
-//		order = orderRepository.save(order);
-//
-//		return order;
-//	}
 
 	private Order getDetail(String orderId) {
 		// check exists
@@ -449,11 +391,37 @@ public class OrderService implements IOrderService{
 		// get order from database
 		Order order = new Order();
 		order = getDetail(orderStatusUpdate.getOrderId());
-		
+
 		String orderStatus = getOrderStatus(orderStatusUpdate.getStatus());
 		if (orderStatus == null) {
 			throw new CustomException("Order status does not exist");
 		}
+		
+		// check cancel status
+		if (order.getOrderStatus().equals("canceled")) {
+			throw new CustomException("Can't update status for canceled orders");
+		}
+		// check follow status
+		int orderStatusOld = 0;
+		if (!orderStatus.equals("canceled")) {
+			for (EOrderStatus value : EOrderStatus.values()) {
+				if (order.getOrderStatus().equals(String.valueOf(value))) {
+					break;
+				}
+				orderStatusOld += 1;
+			}
+			int orderStatusNew = 0;
+			for (EOrderStatus value : EOrderStatus.values()) {
+				if (orderStatus.equals(String.valueOf(value))) {
+					break;
+				}
+				orderStatusNew += 1;
+			}
+			if (orderStatusNew <= orderStatusOld) {
+				throw new CustomException("Order status update failed, the new status must be greater than the current status");
+			}
+		}
+		
 		order.setOrderStatus(orderStatus);
 		
 		// set last modify

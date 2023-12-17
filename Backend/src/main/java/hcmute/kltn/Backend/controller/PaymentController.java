@@ -26,17 +26,23 @@ import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayCreate;
 import hcmute.kltn.Backend.model.payment.vnpay.service.IVNPayService;
 import hcmute.kltn.Backend.util.LocalDateUtil;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/payments")
-@Tag(name = "Payments", description = "APIs for managing payments\n\n"
+@Tag(
+		name = "Payments", 
+		description = "APIs for managing payments\n\n"
 		+ "14/12/2023\n\n"
 		+ "Khi thanh toán thành công sẽ có email gửi đến email của account tạo đơn hàng đó: "
-		+ "check xem đã gửi mail với các thông tin đúng chưa, còn nút với link trong mail thì FE xây dựng trang riêng rồi bỏ vào sau")
+		+ "check xem đã gửi mail với các thông tin đúng chưa, còn nút với link trong mail thì FE xây dựng trang riêng rồi bỏ vào sau",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1aCMrABRUkr3Cdg_s_bIsH_-ZcJz3YskL/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class PaymentController {
 	@Autowired

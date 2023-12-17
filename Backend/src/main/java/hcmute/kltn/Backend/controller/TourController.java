@@ -1,5 +1,6 @@
 package hcmute.kltn.Backend.controller;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +25,25 @@ import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
 import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/tours")
-@Tag(name = "Tours", description = "APIs for managing tours\n\n"
+@Tag(
+		name = "Tours", 
+		description = "APIs for managing tours\n\n"
 		+ "14/12/2023\n\n"
 		+ "Thêm api list discount tour: danh sách tour đang giảm giá nhiều nhất\n\n"
 		+ "Fix api update với lỗi: khi không nhập schedule thì báo lỗi\n\n"
 		+ "Fix api update với lỗi: với khi không nhập discount thì báo lỗi\n\n"
-		+ "Fix api update với lỗi: khi nhấn update thì tự động xóa hết ảnh")
+		+ "Fix api update với lỗi: khi nhấn update thì tự động xóa hết ảnh",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class TourController {
 	@Autowired
@@ -84,7 +91,7 @@ public class TourController {
 		
 		return iResponseObjectService.success(new Response() {
 			{
-				setMessage("Update tour successfulle");
+				setMessage("Update tour successfully");
 				setData(tourDTO);
 			}
 		});
@@ -211,5 +218,4 @@ public class TourController {
 			}
 		});
 	}
-	
 }

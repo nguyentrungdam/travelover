@@ -18,16 +18,23 @@ import hcmute.kltn.Backend.model.order.dto.OrderCreate;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
-
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/orders")
-@Tag(name = "Orders", description = "APIs for managing orders\n\n"
-		+ "14/12/2023\n\n"
-		+ "Fix api update status với lỗi: nhấn update là báo lỗi")
+@Tag(
+		name = "Orders", 
+		description = "APIs for managing orders\n\n"
+		+ "17/12/2023\n\n"
+		+ "Cập nhật luồng: khi cập nhật trạng thái của order chỉ được cập nhật theo trình tự tiến tới, "
+		+ "không được lùi, order đã hủy sẽ không thể cập nhật trạng thái",
+		externalDocs = @ExternalDocumentation(
+				description = "Update Api History", 
+				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
+		)
 @SecurityRequirement(name = "Bearer Authentication")
 public class OrderController {
 	@Autowired
