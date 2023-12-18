@@ -35,10 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/payments")
 @Tag(
 		name = "Payments", 
-		description = "APIs for managing payments\n\n"
-		+ "14/12/2023\n\n"
-		+ "Khi thanh toán thành công sẽ có email gửi đến email của account tạo đơn hàng đó: "
-		+ "check xem đã gửi mail với các thông tin đúng chưa, còn nút với link trong mail thì FE xây dựng trang riêng rồi bỏ vào sau",
+		description = "APIs for managing payments",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1aCMrABRUkr3Cdg_s_bIsH_-ZcJz3YskL/view?usp=sharing")

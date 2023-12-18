@@ -33,10 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/location")
 @Tag(
 		name = "Provinces", 
-		description = "APIs for managing provinces\n\n"
-				+ "17/12/2023\n\n"
-				+ "Tạo api location (gọi api auto-update để lấy dữ liệu ban đầu)\n\n"
-				+ "API địa điểm hot ở đây: để hiển thị ở trang chủ",
+		description = "APIs for managing provinces",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1xGhB6RBMA6YNQbcNBDPcLuASCuVy3fQ_/view?usp=sharing")

@@ -17,6 +17,7 @@ import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
@@ -26,6 +27,7 @@ import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,11 +37,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Tours", 
 		description = "APIs for managing tours\n\n"
-		+ "14/12/2023\n\n"
-		+ "Thêm api list discount tour: danh sách tour đang giảm giá nhiều nhất\n\n"
-		+ "Fix api update với lỗi: khi không nhập schedule thì báo lỗi\n\n"
-		+ "Fix api update với lỗi: với khi không nhập discount thì báo lỗi\n\n"
-		+ "Fix api update với lỗi: khi nhấn update thì tự động xóa hết ảnh",
+		+ "18/12/2023\n\n"
+		+ "Cập nhật api list-discount-tour chỉ còn lấy ra 8 tour\n\n"
+		+ "Thêm api update/status dùng để disable và enable tour\n\n"
+		+ "Thêm api list/search cho admin",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")
@@ -204,17 +205,63 @@ public class TourController {
 		});
 	}
 	
-	private final String getAllDiscountTourDes = "Lấy ra 10 tour giảm giá nhiều nhất cho 1 người lớn và 1 phòng";
+	private final String getAllDiscountTourDes = "Lấy ra 8 tour giảm giá nhiều nhất cho 1 người lớn và 1 phòng";
 	@RequestMapping(value = "/list-discount-tour", method = RequestMethod.GET)
-	@Operation(summary = "Get 10 discount tour", description = getAllDiscountTourDes)
+	@Operation(summary = "Get 8 discount tour", description = getAllDiscountTourDes)
 	ResponseEntity<ResponseObject> getAllDiscountTour() {
 		iTourService.updateIsDiscount();
 		List<TourSearchRes> tourSearchResList = iTourService.getAllDiscountTour();
+
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Get 8 discount tour successfully");
+				setData(tourSearchResList);
+			}
+		});
+	}
+	
+	private final String updateStatusDesc = "Tính năng xóa tour:\n\n"
+			+ "- status = true -> enable\n\n"
+			+ "- status = false -> disable";
+	@RequestMapping(value = "/status/update", method = RequestMethod.PUT)
+	@Operation(summary = "Update tour status - ADMIN / STAFF", description = updateStatusDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> updateStatus(
+			@RequestBody StatusUpdate statusUpdate) {
+		iTourService.updateIsDiscount();
+		TourDTO tourDTO = iTourService.updateStatus(statusUpdate);
 		
 		return iResponseObjectService.success(new Response() {
 			{
-				setMessage("Get 10 discount tour successfully");
-				setData(tourSearchResList);
+				setMessage("Update tour status successfully");
+				setData(tourDTO);
+			}
+		});
+	}
+	
+	private final String listSearchDesc = "Search tour bằng keyword, search trên bảng tour "
+			+ "(chỉ search với tour, không liên quan đến các bảng khác)\n\n"
+			+ "- tourFilter: nhập dạng 'tên field': 'giá trị' (thêm bao nhiêu field tùy ý, "
+			+ "khi filter sẽ tìm đúng tên field và xem giá trị từ tour có chứa giá trị nhập vào)\n\n"
+			+ "- - 'numberOfDay': '1',\n\n"
+			+ "- - 'numberOfNight': '2'\n\n"
+			+ "- tourSort: nhập tên field và kiểu sort có 2 kiểu là asc hoặc desc (chỉ sort theo 1 cột)";
+	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
+	@Operation(summary = "Search tour for admin page - ADMIN / STAFF", description = listSearchDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> listTourSearch(
+			@RequestParam(required = false) String keyword,
+			@RequestParam HashMap<String, String> tourFilter,
+			@ModelAttribute TourSort tourSort) {
+		iTourService.updateIsDiscount();
+		List<TourDTO> tourDTOList = iTourService.listTourSearch(keyword);
+		List<TourDTO> tourDTOFilterList = iTourService.listTourFilter(tourFilter, tourDTOList);
+		List<TourDTO> tourDTOSortList = iTourService.listTourSort(tourSort, tourDTOFilterList);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search tour for admin page successfully");
+				setData(tourDTOSortList);
 			}
 		});
 	}

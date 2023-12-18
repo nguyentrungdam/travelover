@@ -28,9 +28,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Orders", 
 		description = "APIs for managing orders\n\n"
-		+ "17/12/2023\n\n"
-		+ "Cập nhật luồng: khi cập nhật trạng thái của order chỉ được cập nhật theo trình tự tiến tới, "
-		+ "không được lùi, order đã hủy sẽ không thể cập nhật trạng thái",
+		+ "18/12/2023\n\n"
+		+ "Cập nhật luồng: khi cập nhật trạng thái tour là finished, field numberOfOrdered sẽ cộng thêm 1 "
+		+ "(đây là số đơn đã đặt trên 1 tour)",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")

@@ -401,6 +401,10 @@ public class OrderService implements IOrderService{
 		if (order.getOrderStatus().equals("canceled")) {
 			throw new CustomException("Can't update status for canceled orders");
 		}
+		// check finished status
+				if (order.getOrderStatus().equals("finished")) {
+					throw new CustomException("Can't update status for finished orders");
+				}
 		// check follow status
 		int orderStatusOld = 0;
 		if (!orderStatus.equals("canceled")) {
@@ -422,6 +426,11 @@ public class OrderService implements IOrderService{
 			}
 		}
 		
+		// update tour numberOfOrdered
+		if (orderStatus.equals("finished")) {
+			iTourService.updateNumberOfOrdered(order.getOrderDetail().getTourId());
+		}
+
 		order.setOrderStatus(orderStatus);
 		
 		// set last modify

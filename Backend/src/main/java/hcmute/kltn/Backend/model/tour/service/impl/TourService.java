@@ -6,6 +6,7 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
@@ -28,6 +30,7 @@ import hcmute.kltn.Backend.model.province.dto.ProvinceDTO;
 import hcmute.kltn.Backend.model.province.dto.entity.Province;
 import hcmute.kltn.Backend.model.province.service.IProvinceService;
 import hcmute.kltn.Backend.model.tour.dto.Place;
+import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
@@ -38,12 +41,14 @@ import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
+import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
 import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.util.LocalDateUtil;
+import hcmute.kltn.Backend.util.StringUtil;
 
 @Service
 public class TourService implements ITourService{
@@ -61,8 +66,6 @@ public class TourService implements ITourService{
 	private IHotelService iHotelService;
 	@Autowired
 	private IImageService iImageService;
-	@Autowired
-	private IProvinceService iProvinceService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -226,6 +229,59 @@ public class TourService implements ITourService{
 		return tourList;
 	}
 	
+	private List<Tour> search2(String keyword) {
+		// init tour List
+		List<Tour> tourList = new ArrayList<>();
+		tourList = tourRepository.findAll();
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+
+		if (keyword != null && !keyword.isEmpty()) {
+			if (tourList != null) {
+				List<Tour> tourListClone = new ArrayList<>();
+				tourListClone.addAll(tourList);
+				for (Tour itemTour : tourListClone) {
+					String keywordNew = StringUtil.getNormalAlphabet(keyword);
+					String fieldNew = StringUtil.getNormalAlphabet(getAllValue(itemTour));
+					
+					System.out.println("\nfieldNew = " + fieldNew + " ");
+					
+					if (!fieldNew.contains(keywordNew)) {
+						tourList.remove(itemTour);
+						if (tourList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		return tourList;
+	}
+	
+	private String getAllValue(Tour tour) {
+		String result = new String();
+		for (Field itemField : Tour.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				boolean isList = itemField.getType().isAssignableFrom(List.class);
+				boolean isAddress = itemField.getType().isAssignableFrom(Address.class);
+				boolean isReasonableTime = itemField.getType().isAssignableFrom(ReasonableTime.class);
+				boolean isDiscount = itemField.getType().isAssignableFrom(Discount.class);
+				Object object = itemField.get(tour);
+				if (object != null && !isList && !isAddress && !isReasonableTime && !isDiscount) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+
+		return result;
+	}
+	
 	private TourDTO getTourDTO(Tour tour) {
 		// mapping tourDTO
 		TourDTO tourDTONew = new TourDTO();
@@ -385,8 +441,21 @@ public class TourService implements ITourService{
 		
 		if(tourSearch.getKeyword() != null) {
 			tourList = search(tourSearch.getKeyword());
+			
+			// filter with status = true
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for (Tour itemTour : tourListClone) {
+				if (itemTour.getStatus() == false) {
+					tourList.remove(itemTour);
+					if (tourList.size() <= 0) {
+						break;
+					}
+				}
+			}
+			
 		} else {
-			tourList = getAll();
+			tourList = tourRepository.findAllByStatus(true);
 		}
 		
 		// search with province
@@ -757,7 +826,9 @@ public class TourService implements ITourService{
 	@Override
 	public List<TourSearchRes> getAllDiscountTour() {
 		// get all tour
-		List<Tour> tourList = new ArrayList<>(getAll());
+		List<Tour> tourList = new ArrayList<>();
+		tourList = tourRepository.findAllByStatus(true);
+		
 		List<Tour> tourListClone = new ArrayList<>();
 		
 		// get tour is discount
@@ -851,17 +922,16 @@ public class TourService implements ITourService{
 			if (tourSearchRes.getHotel() != null) {
 				tourSearchResList.add(tourSearchRes);
 			}
-			
 		}
-		
-		// get 10 item from tour list
-		if (tourSearchResList.size() > 10) {
+
+		// get 8 item from tour list
+		if (tourSearchResList.size() > 8) {
 			List<TourSearchRes> tourSearchResListClone = new ArrayList<>();
 			tourSearchResListClone.addAll(tourSearchResList);
 			tourListClone.addAll(tourList);
 			for (TourSearchRes itemTourSearchRes : tourSearchResListClone) {
 				int index = tourSearchResList.indexOf(itemTourSearchRes);
-				if (index >= 10) {
+				if (index >= 8) {
 					tourSearchResList.remove(itemTourSearchRes);
 					if (tourSearchResList.size() <= 0) {
 						break;
@@ -870,6 +940,113 @@ public class TourService implements ITourService{
 			}
 		}
 
+		
 		return tourSearchResList;
+	}
+
+	@Override
+	public TourDTO updateStatus(StatusUpdate statusUpdate) {
+		Tour tour = new Tour();
+		tour = getDetail(statusUpdate.getTourId());
+		
+		// check current status
+		if (tour.getStatus() == statusUpdate.getStatus()) {
+			return getTourDTO(tour);
+		}
+		
+		tour.setStatus(statusUpdate.getStatus());
+		
+		Tour tourNew = new Tour();
+		tourNew = update(tour);
+		
+		return getTourDTO(tourNew);
+	}
+
+	@Override
+	public void updateNumberOfOrdered(String tourId) {
+		Tour tour = new Tour();
+		tour = getDetail(tourId);
+		
+		int numberOfOrdered = tour.getNumberOfOrdered();
+		tour.setNumberOfOrdered(numberOfOrdered + 1);
+		
+		tourRepository.save(tour);
+	}
+
+	@Override
+	public List<TourDTO> listTourSearch(String keyword) {
+		List<Tour> tourList = new ArrayList<>();
+		tourList = search2(keyword);
+		
+		return getTourDTOList(tourList);
+	}
+	
+	@Override
+	public List<TourDTO> listTourSort(TourSort tourSort, List<TourDTO> tourDTOList) {
+		Collections.sort(tourDTOList, new Comparator<TourDTO>() {
+            @Override
+            public int compare(TourDTO tourDTO1, TourDTO tourDTO2) {
+            	int result = 0;
+            	
+        		for (Field itemField : TourDTO.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+    				if (tourSort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(tourDTO1));
+		            		String string2 = String.valueOf(itemField.get(tourDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		if (tourSort.getOrder().equals("asc")) {
+
+            	} else if (tourSort.getOrder().equals("desc")) {
+            		result = -result;
+            	} else {
+            		result = 0;
+            	}
+            	
+            	return result;
+            }
+        });
+		
+		return tourDTOList;
+	}
+
+	@Override
+	public List<TourDTO> listTourFilter(HashMap<String, String> tourFilter, List<TourDTO> tourDTOList) {
+		List<TourDTO> tourDTOListClone = new ArrayList<>();
+		tourDTOListClone.addAll(tourDTOList);
+		for (TourDTO itemTourDTO : tourDTOListClone) {
+			tourFilter.forEach((fieldName, fieldValue) -> {
+				for (Field itemField : TourDTO.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemTourDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								tourDTOList.remove(itemTourDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+			});
+			if (tourDTOList.size() <= 0) {
+				break;
+			}
+		}
+		
+		return tourDTOList;
 	}
 }
