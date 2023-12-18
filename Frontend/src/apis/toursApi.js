@@ -9,6 +9,10 @@ const toursApi = {
     const url = "/tours/update";
     return axios.put(url, tour);
   },
+  updateTourStatus: (tour) => {
+    const url = "/tours/status/update";
+    return axios.put(url, tour);
+  },
   getAllTours: () => {
     const url = "/tours/list";
     return axios.get(url);

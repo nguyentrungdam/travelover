@@ -56,6 +56,17 @@ export const updateTour = createAsyncThunk(
     }
   }
 );
+export const updateTourStatus = createAsyncThunk(
+  "tours/status/update",
+  async (tour, { rejectWithValue }) => {
+    try {
+      const response = await toursApi.updateTourStatus(tour);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const searchTour = createAsyncThunk(
   "tours/search",
   async (tour, { rejectWithValue }) => {
@@ -144,6 +155,17 @@ export const tourSlice = createSlice({
     [getToursDiscount.fulfilled]: (state, action) => {
       state.loading = false;
       state.tours = action.payload.data.data;
+    },
+    [updateTourStatus.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateTourStatus.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [updateTourStatus.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.tour = action.payload.data.data;
     },
   },
 });

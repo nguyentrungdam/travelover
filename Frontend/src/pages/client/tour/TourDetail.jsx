@@ -5,6 +5,7 @@ import {
   faCircleArrowRight,
   faCircleXmark,
   faLocationDot,
+  faTicket,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import Header from "../../../components/Header/Header";
@@ -166,6 +167,10 @@ const TourDetail = () => {
           <div className="hotelAddress">
             <FontAwesomeIcon icon={faLocationDot} />
             <span className="fz-14">{tours[0]?.tour?.address.province}</span>
+          </div>
+          <div className="hotelAddress">
+            <FontAwesomeIcon icon={faTicket} />
+            <span className="fz-14">{tours[0]?.tour?.tourId}</span>
           </div>
           <div className="hotelImages">
             {tours[0]?.tour?.image.map((photo, i) => (

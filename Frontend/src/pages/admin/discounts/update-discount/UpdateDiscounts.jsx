@@ -8,7 +8,11 @@ import {
   updateDiscount,
 } from "../../../../slices/discountSlice";
 import { useParams } from "react-router-dom";
-import { validateOriginalDate } from "../../../../utils/validate";
+import {
+  convertDateFormat,
+  formatDate,
+  validateOriginalDate,
+} from "../../../../utils/validate";
 
 const UpdateDiscount = () => {
   const dispatch = useDispatch();
@@ -34,11 +38,10 @@ const UpdateDiscount = () => {
     const updatedFormData = { ...formData }; // Tạo một bản sao của formData
     if (name === "startDate" || name === "endDate") {
       const inputDate = e.target.value;
-      const regex = /^(\d{2})-(\d{2})$/;
+      const regex = /^(\d{2})-(\d{2})-(\d{4})$/;
       if (regex.test(inputDate)) {
-        const [day, month] = inputDate.split("-");
-        const currentYear = new Date().getFullYear();
-        const formattedDate = `${currentYear}-${month}-${day}`;
+        const [day, month, year] = inputDate.split("-");
+        const formattedDate = `${year}-${month}-${day}`;
         updatedFormData[name] = formattedDate;
       }
     } else {
@@ -99,7 +102,7 @@ const UpdateDiscount = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Cập nhật discount thành công ! 👌", {
+      toast.success("Cập nhật discount thành công!👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
@@ -161,8 +164,9 @@ const UpdateDiscount = () => {
                       Discount date
                     </label>
                     <input
-                      maxLength={5}
-                      defaultValue={validateOriginalDate(discount?.startDate)}
+                      maxLength={10}
+                      // defaultValue={discount.startDate}
+                      defaultValue={formatDate(discount?.startDate)}
                       name="startDate"
                       className="form-control w-75"
                       placeholder="Ex: 15-05"
@@ -170,8 +174,9 @@ const UpdateDiscount = () => {
                     />
                     <label className="small mb-1 ms-3 me-1">to</label>
                     <input
-                      defaultValue={validateOriginalDate(discount?.endDate)}
-                      maxLength={5}
+                      defaultValue={formatDate(discount?.endDate)}
+                      // defaultValue={discount.endDate}
+                      maxLength={10}
                       name="endDate"
                       className="form-control ms-2  w-75"
                       placeholder="Ex: 15-07"

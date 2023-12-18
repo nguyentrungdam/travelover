@@ -10,7 +10,8 @@ import {
 } from "../../../slices/orderSlice";
 import { formatCurrencyWithoutD, formatDate } from "../../../utils/validate";
 import { useNavigate } from "react-router-dom";
-
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const columns = [
   { field: "stt", headerName: "ID", width: 40, type: "string" },
   {
@@ -103,7 +104,9 @@ const OrderList = () => {
   useEffect(() => {
     dispatch(getAllOrders()).unwrap();
   }, []);
-
+  useEffect(() => {
+    dispatch(getAllOrders()).unwrap();
+  }, [order.orderStatus]);
   console.log(orders);
   const handleUpdateOrderStatus = (orderId) => {
     setOrderId(orderId);
@@ -134,12 +137,30 @@ const OrderList = () => {
       await dispatch(
         updateOrder({ orderId: orderId, status: selectedStatus })
       ).unwrap();
-      window.location.reload();
+      notify(1);
     } catch (error) {
-      alert("Lỗi khi cập nhật trạng thái đơn hàng:", error);
+      notify(2);
     }
   };
-
+  const notify = (prop) => {
+    return new Promise((resolve) => {
+      if (prop === 1) {
+        toast.success("Cập nhật thành công! 👌", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
+      } else {
+        toast.error("Không thể cập nhật, vui lòng thử lại!", {
+          position: toast.POSITION.TOP_RIGHT,
+          pauseOnHover: true,
+          autoClose: 1000,
+          onClose: resolve,
+        });
+      }
+    });
+  };
   console.log(order);
   return (
     <div className="products vh-100">
@@ -147,6 +168,7 @@ const OrderList = () => {
         <h1>Orders</h1>
       </div>
       {/* TEST THE API */}
+      <ToastContainer />
 
       {loading ? (
         <Loading isTable />

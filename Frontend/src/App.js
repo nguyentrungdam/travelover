@@ -9,7 +9,6 @@ import Login from "./pages/client/account/Login";
 import Register from "./pages/client/account/Register";
 import TourDetail from "./pages/client/tour/TourDetail";
 import TourBooking from "./pages/client/booking/TourBooking";
-import Tours from "./pages/client/tour/Tours";
 import List from "./pages/client/searchTour/List";
 import AccountDetail from "./pages/client/accountDetail/AccountDetail";
 import AdminDashboard from "./pages/admin/dashboard/AdminDashboard";
@@ -29,6 +28,8 @@ import ZHotel from "./pages/enterprise/ZHotel";
 import AddHotel from "./pages/admin/hotels/add-hotel/AddHotel";
 import UpdateHotel from "./pages/admin/hotels/update-hotel/UpdateHotel";
 import TourScheduleForm from "./pages/admin/tours/add-tour/TourScheduleForm";
+import Introduce from "./pages/client/introduce/Introduce";
+import TourGuide from "./pages/client/tourGuide/TourGuide";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -60,7 +61,6 @@ function App() {
       {/* client route */}
       <Route path="/" element={<Navigate to="/home" />} key="home" />
       <Route path="/home" element={<Home />} key="home" />
-      <Route path="/tours" element={<Tours />} key="tours" />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<AccountDetail />} />
@@ -68,6 +68,8 @@ function App() {
       <Route path="/tours/tour-detail/:tourId" element={<TourDetail />} />
       <Route path="/tours/tour-booking/:tourId" element={<TourBooking />} />
       <Route path="/thank-you" element={<ThankYou />} />
+      <Route path="/introduce" element={<Introduce />} />
+      <Route path="/tour-guide" element={<TourGuide />} />
       <Route path="/*" element={<Page404 />} />
 
       {/* admin route */}
