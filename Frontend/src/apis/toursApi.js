@@ -13,6 +13,10 @@ const toursApi = {
     const url = "/tours/list";
     return axios.get(url);
   },
+  getToursDiscount: () => {
+    const url = "/tours/list-discount-tour";
+    return axios.get(url);
+  },
   getTourDetail: (tourID) => {
     const url = `/tours/detail?tourId=${tourID}`;
     return axios.get(url);

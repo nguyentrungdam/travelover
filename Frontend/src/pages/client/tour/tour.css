@@ -355,5 +355,5 @@ body.modal-open1 {
   background-color: #fff;
   top: 0;
   position: sticky;
-  z-index: 1020;
+  z-index: 700;
 }

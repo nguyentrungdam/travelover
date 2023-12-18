@@ -68,7 +68,7 @@ const ToursList = () => {
           title: item.tourTitle,
           days: item.numberOfDay,
           isDiscount: item?.discount?.isDiscount,
-          sale: item.discount.discountValue + "%",
+          sale: item?.discount?.discountValue + "%",
           lastModifiedAt: item.lastModifiedAt,
         }))
       : [];
@@ -78,7 +78,7 @@ const ToursList = () => {
   }, []);
   console.log(tours);
   return (
-    <div className="products">
+    <div className="products vh-100">
       <div className="info">
         <h1>Tours</h1>
 

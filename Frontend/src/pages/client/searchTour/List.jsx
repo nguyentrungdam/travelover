@@ -164,12 +164,6 @@ const List = () => {
           numberOfRoom,
         },
       });
-      saveToLocalStorage("province", province || location.state.province);
-      saveToLocalStorage("startDate", startDate);
-      saveToLocalStorage("numberOfDay", numberOfDay);
-      saveToLocalStorage("numberOfAdult", numberOfAdult);
-      saveToLocalStorage("numberOfChildren", numberOfChildren);
-      saveToLocalStorage("numberOfRoom", numberOfRoom);
     }
   };
   const handleSearch = () => {

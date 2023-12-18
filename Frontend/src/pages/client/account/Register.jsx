@@ -23,12 +23,12 @@ const Register = () => {
   });
   const [passwordMismatchError, setPasswordMismatchError] = useState("");
 
-  const options = [
-    { value: "", text: "--Bạn là?--" },
-    { value: "CUSTOMER", text: "Khách Hàng" },
-    { value: "ENTERPRISE", text: "Doanh Nghiệp" },
-  ];
-  const [role, setRole] = useState(options[0].value);
+  // const options = [
+  //   { value: "", text: "--Bạn là?--" },
+  //   { value: "CUSTOMER", text: "Khách Hàng" },
+  //   { value: "ENTERPRISE", text: "Doanh Nghiệp" },
+  // ];
+  // const [role, setRole] = useState(options[0].value);
   const inputs = [
     {
       id: 1,
@@ -89,7 +89,7 @@ const Register = () => {
           lastName: values.lastname,
           email: values.email,
           password: values.password,
-          role: role,
+          // role: role,
         })
       ).unwrap();
       console.log(res);
@@ -178,7 +178,7 @@ const Register = () => {
                         {passwordMismatchError}
                       </span>
                     )}
-                    <select
+                    {/* <select
                       className="mt-3 login-select"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
@@ -188,7 +188,7 @@ const Register = () => {
                           {option.text}
                         </option>
                       ))}
-                    </select>
+                    </select> */}
                     <Button
                       className="btn secondary__btn auth__btn mt-3  "
                       type="submit"

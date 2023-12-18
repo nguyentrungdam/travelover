@@ -175,3 +175,10 @@
     font-size: 1.5rem;
   }
 }
+.hot-tour-home {
+  font-weight: bold;
+  background: linear-gradient(to right, #ff0000, #ff8c00); /* Đỏ sang cam */
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
