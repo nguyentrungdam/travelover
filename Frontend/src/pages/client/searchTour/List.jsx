@@ -9,6 +9,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import {
   formatCurrencyWithoutD,
+  formatDate,
   saveToLocalStorage,
   validateOriginalDate,
 } from "../../../utils/validate";
@@ -31,7 +32,6 @@ const List = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { loading, tours, totalData } = useSelector((state) => state.tour);
-  const [countData, setCountData] = useState(0);
   const [province, setProvince] = useState(
     location.state.selectedLocation
       ? location.state.selectedLocation.province
@@ -66,7 +66,7 @@ const List = () => {
     setNextPage(event.selected + 1);
     window.scrollTo(0, 0);
   };
-  console.log(tours);
+  console.log(totalData);
 
   useEffect(() => {
     setProvince(location.state.selectedLocation.province);
@@ -88,8 +88,7 @@ const List = () => {
         order: "asc",
       })
     ).unwrap();
-    setCountData(res?.totalData);
-    console.log(res);
+
     const handleScroll = () => {
       if (window.scrollY > 200) {
         setHeaderVisible(false);
@@ -185,7 +184,6 @@ const List = () => {
           order: orderDirection,
         })
       ).unwrap();
-      setCountData(res?.data?.totalData);
     };
     fetchData();
   };
@@ -371,7 +369,7 @@ const List = () => {
                         <strong>
                           {totalData > 9
                             ? totalData
-                            : tours?.length || countData}
+                            : tours?.length || totalData}
                         </strong>{" "}
                         tour cho Quý khách.
                       </div>
@@ -470,23 +468,36 @@ const List = () => {
                               {item.tour?.suitablePerson}
                             </span>
                           </div>
-                          <p className="tour-item__departure mb-3">
+                          <p className="tour-item__departure mb-2">
+                            Mã tour:{" "}
+                            <span className="font-weight-bold">
+                              {item.tour?.tourId}
+                            </span>
+                          </p>
+                          <p className="tour-item__departure mb-2">
                             Điểm đến:{" "}
                             <span className="font-weight-bold">
                               {item.tour?.address.province}
                             </span>
                           </p>
-                          <p className="tour-item__departure mb-3">
+                          <p className="tour-item__departure mb-2">
                             Khách sạn:{" "}
                             <span className="font-weight-bold">
                               {item.hotel?.hotelName}
                             </span>
                           </p>
-                          <p className="tour-item__departure mb-3">
+                          <p className="tour-item__departure mb-2">
                             Số phòng:{" "}
                             <span className="font-weight-bold">
                               {item.hotel?.room?.length}
                             </span>
+                          </p>{" "}
+                          <p className="tour-item__departure mb-2">
+                            Ngày đi:{" "}
+                            <span className="font-weight-bold">
+                              {formatDate(startDate)}
+                            </span>{" "}
+                            - {item.tour?.numberOfDay} ngày
                           </p>
                           <div className="tour-item__price mb-2 w-100">
                             <div className="tour-item__price__wrapper">
@@ -503,7 +514,7 @@ const List = () => {
                                   </span>
                                 ) : null}
                               </div>
-                              <div className="tour-item__price--current">
+                              <div className="tour-item__price--current mt-2">
                                 <div className="btn-book">
                                   <div
                                     className=" btn-sm btnOptionTour"
@@ -563,7 +574,7 @@ const List = () => {
                     />
                   </div>
                 )}
-                {countData === 0 ? (
+                {totalData === 0 ? (
                   <div className="d-flex justify-content-center flex-column align-items-center pt-5">
                     <img src="/sorry.png" alt="sorry" className="sorry-img" />
                     <h5 className="sorry-text">

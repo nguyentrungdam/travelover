@@ -9,17 +9,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 const nav__links = [
   {
-    path: "/home",
-    display: "Trang Chủ",
+    path: "/introduce",
+    display: "Giới Thiệu",
   },
-  // {
-  //   path: "/dashboard",
-  //   display: "Thông Tin",
-  // },
-  // {
-  //   path: "/tours",
-  //   display: "Tour",
-  // },
+  {
+    path: "/tour-guide",
+    display: "Cẩm Nang Du Lịch",
+  },
 ];
 
 const Header = ({ noneSticky }) => {

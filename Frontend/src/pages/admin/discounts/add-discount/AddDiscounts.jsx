@@ -22,13 +22,9 @@ const AddDiscount = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "startDate" || name === "endDate") {
-      if (value.length === 5) {
-        const [day, month] = value.split("-");
-        const today = new Date();
-        const newDate = new Date(today.getFullYear(), month - 1, +day);
-        const offset = today.getTimezoneOffset();
-        newDate.setMinutes(newDate.getMinutes() - offset);
-        const formattedDate = newDate.toISOString().split("T")[0];
+      if (value.length === 10) {
+        const [day, month, year] = value.split("-");
+        const formattedDate = `${year}-${month}-${day}`;
         setFormData({
           ...formData,
           [name]: formattedDate,
@@ -134,7 +130,7 @@ const AddDiscount = () => {
                       Discount date
                     </label>
                     <input
-                      maxLength={5}
+                      maxLength={10}
                       name="startDate"
                       className="form-control w-75"
                       placeholder="Ex: 15-05"
@@ -142,7 +138,7 @@ const AddDiscount = () => {
                     />
                     <label className="small mb-1 ms-3 me-1">to</label>
                     <input
-                      maxLength={5}
+                      maxLength={10}
                       name="endDate"
                       className="form-control w-75 ms-2"
                       placeholder="Ex: 15-07"

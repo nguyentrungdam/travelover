@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getToursDiscount } from "../../slices/tourSlice";
 import {
   formatCurrencyWithoutD,
+  formatDate,
   validateOriginalDate,
 } from "../../utils/validate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -140,30 +141,36 @@ const FeaturedTourList = () => {
                     <h3 className="card-text tour-item__title mb-1">
                       {item.tour?.tourTitle}
                     </h3>
-                    <div className="tour-item__code">
-                      <div>Đối tượng thích hợp:</div>
+                    <p className="tour-item__departure mb-2">
+                      Mã tour:{" "}
                       <span className="font-weight-bold">
-                        {" "}
-                        {item.tour?.suitablePerson}
+                        {item.tour?.tourId}
                       </span>
-                    </div>
-                    <p className="tour-item__departure mb-3">
+                    </p>
+                    <p className="tour-item__departure mb-2">
                       Điểm đến:{" "}
                       <span className="font-weight-bold">
                         {item.tour?.address.province}
                       </span>
                     </p>
-                    <p className="tour-item__departure mb-3">
+                    <p className="tour-item__departure mb-2">
                       Khách sạn:{" "}
                       <span className="font-weight-bold">
                         {item.hotel?.hotelName}
                       </span>
                     </p>
-                    <p className="tour-item__departure mb-3">
+                    <p className="tour-item__departure mb-2">
                       Số phòng:{" "}
                       <span className="font-weight-bold">
                         {item.hotel?.room?.length}
                       </span>
+                    </p>{" "}
+                    <p className="tour-item__departure mb-2">
+                      Ngày khởi hành:{" "}
+                      <span className="font-weight-bold">
+                        {formatDate(tomorrow)}
+                      </span>{" "}
+                      - {item.tour?.numberOfDay} ngày
                     </p>
                     <div className="tour-item__price mb-2 w-100">
                       <div className="tour-item__price__wrapper">
@@ -180,7 +187,7 @@ const FeaturedTourList = () => {
                             </span>
                           ) : null}
                         </div>
-                        <div className="tour-item__price--current">
+                        <div className="tour-item__price--current mt-2">
                           <div className="btn-book">
                             <div
                               className=" btn-sm btnOptionTour"

@@ -5,10 +5,7 @@ import { Link } from "react-router-dom";
 const DataTable = (props) => {
   // TEST THE API
 
-  const handleDelete = (id) => {
-    //delete the item
-    // mutation.mutate(id)
-  };
+  // const handleEnableOrDisable = (id) => {};
 
   const actionColumn = {
     field: "action",
@@ -21,9 +18,7 @@ const DataTable = (props) => {
           {props.handleUpdateOrderStatus ? (
             <div
               className="update"
-              onClick={() =>
-                props.handleUpdateOrderStatus(params.row.id, params.row.status)
-              }
+              onClick={() => props.handleUpdateOrderStatus(params.row.id)}
             >
               {props.customerRole ? (
                 <img src="/eye.svg" alt="" />
@@ -31,14 +26,24 @@ const DataTable = (props) => {
                 <img src="/view.svg" alt="" />
               )}
             </div>
+          ) : props.tourSwitch ? (
+            <Link to={`/${props.slug}/${params.row.tourId}`}>
+              <img src="/view.svg" alt="" />
+            </Link>
           ) : (
             <Link to={`/${props.slug}/${params.row.id}`}>
               <img src="/view.svg" alt="" />
             </Link>
           )}
-          {!props.customerRole ? (
-            <div className="delete" onClick={() => handleDelete(params.row.id)}>
-              <img src="/delete.svg" alt="" />
+          {!props.customerRole && props.tourSwitch ? (
+            <div
+              className="delete"
+              onClick={() => props.handleEnableOrDisable(params.row.tourId)}
+            >
+              <img
+                src={require("../../assets/images/switchBtn.png")}
+                alt="switch"
+              />
             </div>
           ) : null}
         </div>
