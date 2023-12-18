@@ -32,4 +32,6 @@ public interface ITourService {
 	public void updateNumberOfOrdered(String tourId);
 	public void updateIsDiscount();
 	public void updateIsDiscountNoCheck();
+	
+	public void test();
 }

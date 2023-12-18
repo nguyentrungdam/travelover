@@ -265,4 +265,16 @@ public class TourController {
 			}
 		});
 	}
+//	
+//	@RequestMapping(value = "/test", method = RequestMethod.GET)
+//	@Operation(summary = "Test api")
+//	ResponseEntity<ResponseObject> test() {
+//		iTourService.test();
+//		
+//		return iResponseObjectService.success(new Response() {
+//			{
+//				setMessage("Test api successfully");
+//			}
+//		});
+//	}
 }

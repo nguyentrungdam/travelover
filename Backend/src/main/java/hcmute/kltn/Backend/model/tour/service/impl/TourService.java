@@ -1111,4 +1111,19 @@ public class TourService implements ITourService{
 		
 		return tourDTOList;
 	}
+
+	@Override
+	public void test() {
+		List<Tour> tourList = new ArrayList<>();
+		tourList = tourRepository.findAll();
+		
+		int index = 25;
+		
+		for (Tour itemTour : tourList) {
+			if (!itemTour.getTourId().contains("TR00")) {
+				tourRepository.delete(itemTour);
+			}
+		}
+		
+	}
 }
