@@ -990,6 +990,7 @@ public class TourService implements ITourService{
             	
         		for (Field itemField : TourDTO.class.getDeclaredFields()) {
         			itemField.setAccessible(true);
+        			// field of tour
     				if (tourSort.getSortBy().equals(itemField.getName())) {
     					try {
 		            		String string1 = String.valueOf(itemField.get(tourDTO1));
@@ -1000,6 +1001,33 @@ public class TourService implements ITourService{
 						}
     					
     					break;
+    				}
+    				
+    				// field of discount of tour
+    				if (itemField.getType().isAssignableFrom(Discount.class)) {
+    					try {
+    						Discount discount1 = new Discount();
+        					discount1 = (Discount) itemField.get(tourDTO1);
+        					Discount discount2 = new Discount();
+        					discount2 = (Discount) itemField.get(tourDTO2);
+        					for (Field itemDiscountField : Discount.class.getDeclaredFields()) {
+        						itemDiscountField.setAccessible(true);
+        	        			// field of discount
+        	    				if (tourSort.getSortBy().equals(itemDiscountField.getName())) {
+        	    					try {
+        			            		String string1 = String.valueOf(itemDiscountField.get(discount1));
+        			            		String string2 = String.valueOf(itemDiscountField.get(discount2));
+        			            		result = string1.compareTo(string2);
+        			            	} catch (Exception e) {
+        			            		result = 0;
+        							}
+        	    					
+        	    					break;
+        	    				}
+        	    			}
+    					} catch (Exception e) {
+    						result = 0;
+						}
     				}
     			}
         		
@@ -1026,6 +1054,7 @@ public class TourService implements ITourService{
 			tourFilter.forEach((fieldName, fieldValue) -> {
 				for (Field itemField : TourDTO.class.getDeclaredFields()) {
 					itemField.setAccessible(true);
+					// filter of tour
 					if (itemField.getName().equals(fieldName)) {
 						try {
 							String value = String.valueOf(itemField.get(itemTourDTO));
@@ -1038,6 +1067,39 @@ public class TourService implements ITourService{
 						} catch (Exception e) {
 							
 						}
+					}
+					
+					//filter of discount of tour
+					if (itemField.getType().isAssignableFrom(Discount.class)) {
+						try {
+							Discount discount = new Discount();
+							discount = (Discount) itemField.get(itemTourDTO);
+							for (Field itemDiscountField : Discount.class.getDeclaredFields()) {
+								itemDiscountField.setAccessible(true);
+								// filter of discount
+								if (itemDiscountField.getName().equals(fieldName)) {
+									try {
+										String value = String.valueOf(itemDiscountField.get(discount));
+										String valueNew = StringUtil.getNormalAlphabet(value);
+										String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+										if (!valueNew.contains(fieldValueNew)) {
+											tourDTOList.remove(itemTourDTO);
+											break;
+										}
+									} catch (Exception e) {
+										
+									}
+								}
+								
+								// filter of discount
+								if (itemField.getType().isAssignableFrom(Discount.class)) {
+									
+								}
+							}
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+						
 					}
 				}
 				
