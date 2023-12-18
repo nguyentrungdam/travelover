@@ -27,7 +27,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/discounts")
 @Tag(
 		name = "Discounts", 
-		description = "APIs for managing discounts",
+		description = "APIs for managing discounts\n\n"
+				+ "19/12/2023\n\n"
+				+ "Cập nhập api create cho tự nhập mã hoặc tự tạo\n\n"
+				+ "Cập nhật api update cho nhập mã mới hoặc giữ nguyên giá cũ",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1K0hAFY-8JF1Az9ocQlKalb9W5TT003vN/view?usp=sharing")
@@ -40,6 +43,7 @@ public class DiscountController {
 	private IDiscountService iDiscountService;
 	
 	private final String createDiscountDescription = "Các field bắt buộc phải nhập:\n\n"
+			+ "- 'discountCode': '' (nhập theo ý muốn hoặc bỏ trống để tự tạo)\n"
 			+ "- 'discountTitle': '' \n"
 			+ "- 'discountValue': '' (giá trị giảm giá, đơn vị là %, chỉ cần nhập số)\n"
 			+ "- 'startDate': ''\n"
@@ -64,6 +68,7 @@ public class DiscountController {
 	}
 	
 	private final String updateDiscountDescription = "Các field bắt buộc phải nhập:\n\n"
+			+ "- 'discountCode': '' (nhập theo ý muốn hoặc bỏ trống để dùng mã cũ hoặc nhập mã cũ để dùng mã cũ)\n"
 			+ "- 'discountTitle': '' \n"
 			+ "- 'discountValue': '' (giá trị giảm giá, đơn vị là %, chỉ cần nhập số)\n"
 			+ "- 'startDate': ''\n"

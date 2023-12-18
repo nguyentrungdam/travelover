@@ -27,16 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/orders")
 @Tag(
 		name = "Orders", 
-		description = "APIs for managing orders\n\n"
-		+ "18/12/2023\n\n"
-		+ "Cập nhật luồng: khi cập nhật trạng thái tour là finished, field numberOfOrdered sẽ cộng thêm 1 "
-		+ "(đây là số đơn đã đặt trên 1 tour)\n\n"
-		+ "9:00PM\n\n"
-		+ "Thêm List<Member> trong CustomerInformation để nhập thông tin người đi cùng (người đi cùng sẽ trừ người đại diện "
-		+ " là customer)\n\n"
-		+ "- Chỗ gender cho chọn check box rồi FE kiểm tra và lấy giá trị là Nam hoặc Nữ "
-		+ "(gender cho nhập gì cũng được nên giá trị là Nam hay Nữ lấy từ FE xuống nha)\n\n"
-		+ "Thêm tuổi và giới tính cho CustomerInformation (xem nếu cần thì thêm trên giao diện)",
+		description = "APIs for managing orders\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")

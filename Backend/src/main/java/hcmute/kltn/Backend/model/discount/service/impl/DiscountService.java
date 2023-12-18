@@ -262,9 +262,25 @@ public class DiscountService implements IDiscountService{
 		Discount discount = new Discount();
 		modelMapper.map(discountCreate, discount);
 		
-		// gen discountCode
-		String discountCode = genDiscountCode();
-		discount.setDiscountCode(discountCode);
+		// check discount code
+		if (discount.getDiscountCode() != null && !discount.getDiscountCode().trim().isEmpty()) {
+			if (discount.getDiscountCode().length() < 6 || 20 < discount.getDiscountCode().length()) {
+				throw new CustomException("Discount code must be between 6 and 20 in length");
+			}
+			
+			List<Discount> discountList = new ArrayList<>();
+			discountList.addAll(getAll());
+			for (Discount itemDiscount : discountList) {
+				if (itemDiscount.getDiscountCode().equals(discount.getDiscountCode())) {
+					throw new CustomException("Discount code is already");
+				}
+			}
+			discount.setDiscountCode(discountCreate.getDiscountCode().toUpperCase());
+		} else {
+			// gen discountCode
+			String discountCode = genDiscountCode();
+			discount.setDiscountCode(discountCode);
+		}
 		
 		// check field condition
 		checkFieldCondition(discount);
@@ -281,6 +297,13 @@ public class DiscountService implements IDiscountService{
 		// get discount from database
 		Discount discount = getDetail(discountUpdate.getDiscountId());
 		
+		// check current date
+		LocalDate currentDate = LocalDateUtil.getDateNow();
+		if (!currentDate.isBefore(discount.getStartDate())) {
+			throw new CustomException("Only update discounts before the use date "
+					+ "(the current date must be less than the start date)");
+		}
+		
 		// check image and delete
 		if ((discount.getImageUrl() != null 
 				&& !discount.getImageUrl().equals(""))
@@ -289,6 +312,27 @@ public class DiscountService implements IDiscountService{
 			if (checkDelete == false) {
 				throw new CustomException("An error occurred during the processing of the old image");
 			}
+		}
+		
+		// check discount code
+		if (discountUpdate.getDiscountCode() != null && !discountUpdate.getDiscountCode().trim().isEmpty()) {
+			if (!discountUpdate.getDiscountCode().equals(discount.getDiscountCode())) {
+				if (discountUpdate.getDiscountCode().length() < 6 || 20 < discountUpdate.getDiscountCode().length()) {
+					throw new CustomException("Discount code must be between 6 and 20 in length");
+				}
+				
+				List<Discount> discountList = new ArrayList<>();
+				discountList.addAll(getAll());
+				for (Discount itemDiscount : discountList) {
+					if (itemDiscount.getDiscountCode().equals(discountUpdate.getDiscountCode()) 
+							&& !itemDiscount.getDiscountId().equals(discount.getDiscountId())) {
+						throw new CustomException("Discount code is already");
+					}
+				}
+				discountUpdate.setDiscountCode(discountUpdate.getDiscountCode().toUpperCase());
+			}
+		} else {
+			discountUpdate.setDiscountCode(discount.getDiscountCode());
 		}
 		
 		// mapping discount

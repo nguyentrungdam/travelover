@@ -5,6 +5,7 @@ import java.util.List;
 
 import hcmute.kltn.Backend.model.province.dto.LocationDTO;
 import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
+import hcmute.kltn.Backend.model.tour.dto.TourClone;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
@@ -33,5 +34,6 @@ public interface ITourService {
 	public void updateIsDiscount();
 	public void updateIsDiscountNoCheck();
 	
-	public void test();
+	public void autoUpdateId();
+	public TourDTO cloneTour(TourClone tourClone);
 }

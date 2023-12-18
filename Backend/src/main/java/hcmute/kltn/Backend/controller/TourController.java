@@ -18,6 +18,7 @@ import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
+import hcmute.kltn.Backend.model.tour.dto.TourClone;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
@@ -37,10 +38,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Tours", 
 		description = "APIs for managing tours\n\n"
-		+ "18/12/2023\n\n"
-		+ "Cập nhật api list-discount-tour chỉ còn lấy ra 8 tour\n\n"
-		+ "Thêm api update/status dùng để disable và enable tour\n\n"
-		+ "Thêm api list/search cho admin",
+		+ "19/12/2023\n\n"
+		+ "Thêm api auto-upate-id để cập nhật lại id các tour clone bằng mongodb compass\n\n"
+		+ "Thêm api clone để clone tour bằng id, tour clone có id không bị lỗi",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")
@@ -265,16 +265,34 @@ public class TourController {
 			}
 		});
 	}
-//	
-//	@RequestMapping(value = "/test", method = RequestMethod.GET)
-//	@Operation(summary = "Test api")
-//	ResponseEntity<ResponseObject> test() {
-//		iTourService.test();
-//		
-//		return iResponseObjectService.success(new Response() {
-//			{
-//				setMessage("Test api successfully");
-//			}
-//		});
-//	}
+	
+	private final String autoUpdateIdDesc = "Cập nhật id của các tour clone bị id lum la, không theo chuẩn";
+	@RequestMapping(value = "/auto-update-id", method = RequestMethod.GET)
+	@Operation(summary = "Auto Update Id - ADMIN / STAFF", description = autoUpdateIdDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> autoUpdateId() {
+		iTourService.autoUpdateId();
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Auto Update Id successfully");
+			}
+		});
+	}
+	
+	private final String cloneTourDesc = "Clone tour bằng id, tour clone có id theo chuẩn, không bị lỗi";
+	@RequestMapping(value = "/clone", method = RequestMethod.POST)
+	@Operation(summary = "Clone tour - ADMIN / STAFF", description = autoUpdateIdDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> cloneTour(
+			@RequestBody TourClone tourClone) {
+		TourDTO tourDTO = iTourService.cloneTour(tourClone);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Clone tour successfully");
+				setData(tourDTO);
+			}
+		});
+	}
 }

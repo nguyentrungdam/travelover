@@ -21,6 +21,8 @@ import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
+import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
+import hcmute.kltn.Backend.model.generatorSequence.dto.entity.GeneratorSequence;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
@@ -31,6 +33,7 @@ import hcmute.kltn.Backend.model.province.dto.entity.Province;
 import hcmute.kltn.Backend.model.province.service.IProvinceService;
 import hcmute.kltn.Backend.model.tour.dto.Place;
 import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
+import hcmute.kltn.Backend.model.tour.dto.TourClone;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
@@ -418,7 +421,7 @@ public class TourService implements ITourService{
 
 	@Override
 	public TourDTO getDetailTour(String tourId) {
-		Tour tour  = getDetail(tourId);
+		Tour tour = getDetail(tourId);
 
 		return getTourDTO(tour);
 	}
@@ -1113,17 +1116,84 @@ public class TourService implements ITourService{
 	}
 
 	@Override
-	public void test() {
+	public void autoUpdateId() {
 		List<Tour> tourList = new ArrayList<>();
-		tourList = tourRepository.findAll();
-		
-		int index = 25;
-		
-		for (Tour itemTour : tourList) {
-			if (!itemTour.getTourId().contains("TR00")) {
-				tourRepository.delete(itemTour);
+		tourList.addAll(tourRepository.findAll());
+
+		// update index max into genSeq
+		GeneratorSequenceDTO GenSeqDTO = new GeneratorSequenceDTO();
+		List<GeneratorSequenceDTO> genSeqDTOList = new ArrayList<>();
+		genSeqDTOList.addAll(iGeneratorSequenceService.getAllGenSeq());
+		for (GeneratorSequenceDTO itemGenSeqDTO : genSeqDTOList) {
+			if (itemGenSeqDTO.getCollectionName().equals(getCollectionName())) {
+				// get index max
+				int indexMax = 0;
+				for (Tour itemTour : tourList) {
+					if (itemTour.getTourId().startsWith(itemGenSeqDTO.getPrefix())) {
+						int index = 0;
+						try {
+							index = Integer.valueOf(itemTour.getTourId().substring(2, itemTour.getTourId().length()));
+						} catch (Exception e) {
+							index = -1;
+						}
+						
+						if (indexMax < index) {
+							indexMax = index;
+						}
+					}
+				}
+				// update index max
+				modelMapper.map(itemGenSeqDTO, GenSeqDTO);
+				GenSeqDTO.setNumber(indexMax);
+				iGeneratorSequenceService.updateGenSeq(GenSeqDTO);
 			}
 		}
 		
+		// clone with true id
+		for (Tour itemTour : tourList) {
+			if(!itemTour.getTourId().startsWith(GenSeqDTO.getPrefix())) {
+				Tour tour = new Tour();
+				modelMapper.map(itemTour, tour);
+				String tourId = iGeneratorSequenceService.genId(getCollectionName());
+				tour.setTourId(tourId);
+				tourRepository.save(tour);
+			} else {
+				try {
+					int index = Integer.valueOf(itemTour.getTourId().substring(2, itemTour.getTourId().length()));
+				} catch (Exception e) {
+					Tour tour = new Tour();
+					modelMapper.map(itemTour, tour);
+					String tourId = iGeneratorSequenceService.genId(getCollectionName());
+					tour.setTourId(tourId);
+					tourRepository.save(tour);
+				}
+			}
+		}
+		
+		// remove id old
+		for (Tour itemTour : tourList) {
+			if(!itemTour.getTourId().startsWith(GenSeqDTO.getPrefix())) {
+				tourRepository.delete(itemTour);
+			} else {
+				try {
+					int index = Integer.valueOf(itemTour.getTourId().substring(2, itemTour.getTourId().length()));
+				} catch (Exception e) {
+					tourRepository.delete(itemTour);
+				}
+			}
+		}
+	}
+
+	@Override
+	public TourDTO cloneTour(TourClone tourClone) {
+		System.out.println("tourId = " + tourClone.getTourId());
+		Tour tour = new Tour();
+		tour = getDetail(tourClone.getTourId());
+		
+		String tourIdNew = iGeneratorSequenceService.genId(getCollectionName());
+		tour.setTourId(tourIdNew);
+		tourRepository.save(tour);
+		
+		return getTourDTO(tour);
 	}
 }

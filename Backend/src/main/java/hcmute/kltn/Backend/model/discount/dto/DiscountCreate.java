@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DiscountCreate {
+	private String discountCode; // not null, unique
 	private String discountTitle; 
 	private String description;
 	private String imageUrl;
