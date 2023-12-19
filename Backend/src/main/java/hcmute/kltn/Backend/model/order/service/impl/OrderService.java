@@ -214,6 +214,26 @@ public class OrderService implements IOrderService{
 		return orderList;
 	}
 	
+	private List<Order> hideOrderUnpaid(List<Order> orderList) {
+		List<Order> orderListClone = new ArrayList<>();
+		orderListClone.addAll(orderList);
+		
+		if (orderListClone != null) {
+			for (Order itemOrder : orderListClone) {
+				if (itemOrder.getOrderStatus() != null) {
+					if (itemOrder.getOrderStatus().equals("create")) {
+						orderList.remove(itemOrder);
+						if (orderList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return orderList;
+	}
+	
 	private OrderDTO getOrderDTO(Order order) {
 		OrderDTO orderDTONew = new OrderDTO();
 		modelMapper.map(order, orderDTONew);
@@ -325,7 +345,8 @@ public class OrderService implements IOrderService{
 		order.setDiscount(discount);
 		order.setOrderDetail(orderDetail);
 		order.setFinalPrice(totalPrice);
-		order.setOrderStatus(getOrderStatus("1"));
+		order.setOrderStatus("create");
+//		order.setOrderStatus(getOrderStatus("1"));
 		
 		// create order
 		Order orderNew = new Order();
@@ -358,6 +379,12 @@ public class OrderService implements IOrderService{
 	@Override
 	public OrderDTO getDetailOrder(String orderId) {
 		Order order = getDetail(orderId);
+		
+		if (order.getOrderStatus() != null) {
+			if (order.getOrderStatus().equals("create")) {
+				throw new CustomException("Cannot find order");
+			}
+		}
 
 		return getOrderDTO(order);
 	}
@@ -380,14 +407,14 @@ public class OrderService implements IOrderService{
 			}
 		}
 
-		return getOrderDTOList(orderList);
+		return getOrderDTOList(hideOrderUnpaid(orderList));
 	}
 
 	@Override
 	public List<OrderDTO> searchOrder(String keyword) {
 		List<Order> orderList = search(keyword);
 
-		return getOrderDTOList(orderList);
+		return getOrderDTOList(hideOrderUnpaid(orderList));
 	}
 
 	@Override
@@ -490,10 +517,53 @@ public class OrderService implements IOrderService{
 			}
 		}
 		
+		// update orderStatus
+		order.setOrderStatus(getOrderStatus("1"));
+		
 		// update order
 		Order orderNew = new Order();
 		orderNew = orderRepository.save(order);
 		
 		return getOrderDTO(orderNew);
+	}
+
+	@Override
+	public boolean paymentCheck(String orderId) {
+		Order order = new Order();
+		order = getDetail(orderId);
+		
+		if (order.getPayment() != null) {
+			if (order.getPayment().size() > 0) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	public void deleteUnpaidOrder() {
+		// get current date
+		LocalDate currentDate = LocalDateUtil.getDateNow();
+		
+		// get all order
+		List<Order> orderList = new ArrayList<>();
+		orderList.addAll(getAll());
+		
+		// delete order unPaid
+		if (orderList != null) {
+			for (Order itemOrder : orderList) {
+				if (itemOrder.getOrderStatus() != null) {
+					if (itemOrder.getOrderStatus().equals("create")) {
+						if (itemOrder.getCreatedAt().isBefore(currentDate)) {
+							orderRepository.delete(itemOrder);
+						}
+					}
+				} else {
+					orderRepository.delete(itemOrder);
+				}	
+			}
+		}
+		System.out.println("Delete Unpaid Order Successfully");
 	}
 }

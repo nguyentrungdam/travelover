@@ -17,4 +17,7 @@ public interface IOrderService {
 	public OrderDTO getDetailOrder(String orderId);
 	public List<OrderDTO> getAllOrder();
 	public List<OrderDTO> searchOrder(String keyword);
+	
+	public boolean paymentCheck(String orderId);
+	public void deleteUnpaidOrder();
 } 

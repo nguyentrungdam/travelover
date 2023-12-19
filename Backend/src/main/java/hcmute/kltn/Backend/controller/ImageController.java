@@ -1,8 +1,6 @@
 package hcmute.kltn.Backend.controller;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.model.base.image.dto.Image;
-import hcmute.kltn.Backend.model.base.image.dto.ImageCreate;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -32,8 +28,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(path = "/api/v1/images")
 @Tag(
-		name = "Images TEST", 
-		description = "APIs for managing images",
+		name = "Images", 
+		description = "APIs for managing images\n\n"
+				+ "__19/12/2023__\n\n"
+				+ "__3:45PM__\n\n"
+				+ "Thêm api create miltiple image để up nhiều hình cùng lúc",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1I-WwINoVR1vnfv-1H3rs5sw4uvDPsTWc/view?usp=sharing")
@@ -57,6 +56,25 @@ public class ImageController {
 			{
 				setMessage("Create Image successfully");
 				setData(image);
+			}
+		});
+	}
+	
+	private final String createMultipleImageDesc = "Tải nhiều hình cùng lúc, nếu có lỗi xảy ra sẽ trả về lỗi và không "
+			+ "có hình nào được lưu cả\n\n"
+			+ "Tải file có type = image, size <= 2MB";
+	@RequestMapping(value = "/multiple-create", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Operation(summary = "Create multiple image - LOGIN", description = createMultipleImageDesc)
+	@PreAuthorize("isAuthenticated()")
+	ResponseEntity<ResponseObject> createMultipleImage(
+			@ModelAttribute List<MultipartFile> fileList) {
+		List<String> imageUrlList = new ArrayList<>();
+		imageUrlList.addAll(iImageService.createMultipleImage(fileList));
+
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Create multiple image successfully");
+				setData(imageUrlList);
 			}
 		});
 	}
@@ -88,66 +106,4 @@ public class ImageController {
 			}
 		});
 	}
-	
-//	private final String updateTourDescription = "Yêu cầu: get detail của tour rồi dán các field bắt buộc vào"
-//			+ "Các field bắt buộc phải nhập:\n\n"
-//			+ "- 'tourId': ''\n"
-//			+ "- 'tourTitle': ''\n"
-//			+ "- 'thumbnail': ''\n"
-//			+ "- 'numberOfDay': ''\n"
-//			+ "- 'numberOfNight': ''\n"
-//			+ "- 'provinceOrCity': ''\n"
-//			+ "- 'districtOrCounty': ''\n"
-//			+ "- 'wardOrCommune': ''\n"
-//			+ "- 'contact': ''\n"
-//			+ "- 'price': ''\n\n"
-//			+ "Để xóa hình ảnh thumbnail có sẵn thì xóa luôn field thumbnail";
-//	@RequestMapping(value = "/update/", method = RequestMethod.PUT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//	@Operation(summary = "Update tour - STAFF", description = updateTourDescription)
-//	@PreAuthorize("hasAuthority('ROLE_STAFF')")
-//	@ModelAttribute
-//	ResponseEntity<ResponseObject> updateTour(
-//			@RequestParam(required = false) MultipartFile fileThumbnail,
-//			TourDTO tourDTO) {
-//		Tour tour = iTourService.updateTour(fileThumbnail, tourDTO);
-//		
-//		return iResponseObjectService.success(new Response() {
-//			{
-//				setMessage("Update tour successfulle");
-//				setData(tour);
-//			}
-//		});
-//	}
-//	
-
-//	
-//	@RequestMapping(value = "/list", method = RequestMethod.GET)
-//	@Operation(summary = "Get all tour")
-//	ResponseEntity<ResponseObject> getAllTour() {
-//		List<Tour> list = iTourService.getAll();
-//		
-//		return iResponseObjectService.success(new Response() {
-//			{
-//				setMessage("Get all tour successfully");
-//				setData(list);
-//			}
-//		});
-//	}
-	
-//	@RequestMapping(value = "/test", method = RequestMethod.GET)
-//	@Operation(summary = "Get byte image")
-//	public byte[] test(
-//			@RequestParam String fileName) {
-//		String path = System.getProperty("user.dir") + "/" + "src/main/resources/static/images" +"/" + fileName;
-//		Path pathNew = Paths.get(path);
-//		
-//		byte[] imageByte = null;
-//		try {
-//			imageByte = Files.readAllBytes(pathNew);
-//		} catch (Exception e) {
-//			System.out.println("Read byte image fail");
-//		}
-//		
-//		return imageByte;
-//	}
 }

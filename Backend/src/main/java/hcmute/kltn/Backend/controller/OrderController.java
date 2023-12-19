@@ -27,7 +27,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/orders")
 @Tag(
 		name = "Orders", 
-		description = "APIs for managing orders\n\n",
+		description = "APIs for managing orders\n\n"
+				+ "__19/12/2023__\n\n"
+				+ "__3:45PM__\n\n"
+				+ "Thêm api payment/check để kiểm tra xem đơn hàng đã thanh toán thành công hay chưa",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
@@ -123,6 +126,8 @@ public class OrderController {
 	@Operation(summary = "Get all order - ADMIN / STAFF / CUSTOMER")
 	@PreAuthorize("isAuthenticated()")
 	ResponseEntity<ResponseObject> getAllOrder() {
+		// delete order unpaid
+		iOrderService.deleteUnpaidOrder();
 		List<OrderDTO> orderDTOList = iOrderService.getAllOrder();
 		
 		return iResponseObjectService.success(new Response() {
@@ -144,6 +149,21 @@ public class OrderController {
 			{
 				setMessage("Search order successfully");
 				setData(orderDTOList);
+			}
+		});
+	} 
+	
+	@RequestMapping(value = "/payment/check", method = RequestMethod.GET)
+	@Operation(summary = "Payment check")
+//	@PreAuthorize("isAuthenticated()")
+	ResponseEntity<ResponseObject> paymentCheck(
+			@RequestParam String orderId) {
+		boolean paymentCheck = iOrderService.paymentCheck(orderId);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Payment check successfully");
+				setData(paymentCheck);
 			}
 		});
 	}

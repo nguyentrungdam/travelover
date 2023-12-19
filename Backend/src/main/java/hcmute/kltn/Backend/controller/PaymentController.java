@@ -35,7 +35,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/payments")
 @Tag(
 		name = "Payments", 
-		description = "APIs for managing payments",
+		description = "APIs for managing payments\n\n"
+				+ "__19/12/2023__\n\n"
+				+ "__3:45PM__\n\n"
+				+ "Fix khi gọi tới returnUrl chỉ trả về thêm param orderId (FE gọi api payment/check trong Order để "
+				+ "kiểm tra xem đơn hàng đã thanh toán thành công hay chưa)",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1aCMrABRUkr3Cdg_s_bIsH_-ZcJz3YskL/view?usp=sharing")
@@ -92,9 +96,9 @@ public class PaymentController {
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web
 		String paymentStatus = String.valueOf(checkPayment);
-        response.sendRedirect(redirectUrl 
-        		+ "?paymentStatus=" + paymentStatus
-        		+ "&orderId=" + orderId);
+        response.sendRedirect(redirectUrl + "?orderId=" + orderId);
+//        		+ "?paymentStatus=" + paymentStatus
+//        		+ "&orderId=" + orderId);
     }
 	
 	private final String createVNPayPaymentDesc = "Các field bắt buộc phải nhập (Tạo Order trước để lấy các 2 field bên dưới):\n\n"

@@ -261,4 +261,26 @@ public class ImageService implements IImageService{
 
 		return true;
 	}
+
+	@Override
+	public List<String> createMultipleImage(List<MultipartFile> fileList) {
+		List<String> imegeUrlList = new ArrayList<>();
+		try {
+			for (MultipartFile itemMultipartFile : fileList) {
+				Image image = new Image();
+				image = create(itemMultipartFile);
+				imegeUrlList.add(image.getUrl());
+			}
+		} catch (Exception e) {
+			for (String itemString : imegeUrlList) {
+				String imageId = getIdByUrl(itemString);
+				deleteNotCheck(imageId);
+			}
+			
+			throw new CustomException("An error occurred during the image upload process");
+		}
+		
+		
+		return imegeUrlList;
+	}
 }
