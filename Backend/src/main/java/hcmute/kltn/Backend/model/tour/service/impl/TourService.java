@@ -535,9 +535,11 @@ public class TourService implements ITourService{
 			if(tourSearch.getStartDate() != null && tourSearch.getNumberOfAdult() > 0) {
 				// search hotel
 				HotelSearch hotelSearch = new HotelSearch();
-				hotelSearch.setProvince(tourSearch.getProvince());
-				hotelSearch.setDistrict(tourSearch.getDistrict());
-				hotelSearch.setCommune(tourSearch.getCommune());
+//				hotelSearch.setProvince(tourSearch.getProvince());
+//				hotelSearch.setDistrict(tourSearch.getDistrict());
+//				hotelSearch.setCommune(tourSearch.getCommune());
+				hotelSearch.setProvince(itemTour.getAddress().getProvince());
+				hotelSearch.setDistrict(itemTour.getAddress().getDistrict());
 				List<hcmute.kltn.Backend.model.hotel.dto.HotelDTO> hotelDTOList = iHotelService.searchHotel(hotelSearch);
 				
 				// search room in hotel

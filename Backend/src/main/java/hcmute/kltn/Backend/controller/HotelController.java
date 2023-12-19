@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -29,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/hotels")
 @Tag(
 		name = "Hotels", 
-		description = "APIs for managing hotels",
+		description = "APIs for managing hotels\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1luZ6dxUn-_lnFdEqee2fSk0vFVKPrvtg/view?usp=sharing")
@@ -95,12 +96,15 @@ public class HotelController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@Operation(summary = "Get all hotel - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-	ResponseEntity<ResponseObject> getAllHotel() {
+	ResponseEntity<ResponseObject> getAllHotel(
+			@ModelAttribute Pagination pagination) {
 		List<HotelDTO> hotelDTOList = iHotelService.getAllHotel();
 		
 		return iResObjService.success(new Response() {
 			{
 				setMessage("Get all hotel successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
 				setData(hotelDTOList);
 			}
 		});

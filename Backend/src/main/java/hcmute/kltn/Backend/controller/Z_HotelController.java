@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -102,13 +103,16 @@ public class Z_HotelController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@Operation(tags = {"Z Enterprise Hotels"}, summary = "Get all EHotel - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
-	ResponseEntity<ResponseObject> getAllEHotel() {
+	ResponseEntity<ResponseObject> getAllEHotel(
+			@ModelAttribute Pagination pagination) {
 		
 		List<EHotel> eHotelList = iEHotelService.getAllEHotel();
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get All Enterprise Hotel successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
 				setData(eHotelList);
 			}
 		});

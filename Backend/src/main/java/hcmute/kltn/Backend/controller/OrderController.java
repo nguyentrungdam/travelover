@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -30,7 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 		description = "APIs for managing orders\n\n"
 				+ "__19/12/2023__\n\n"
 				+ "__3:45PM__\n\n"
-				+ "Thêm api payment/check để kiểm tra xem đơn hàng đã thanh toán thành công hay chưa",
+				+ "Thêm api payment/check để kiểm tra xem đơn hàng đã thanh toán thành công hay chưa\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
@@ -125,14 +127,18 @@ public class OrderController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@Operation(summary = "Get all order - ADMIN / STAFF / CUSTOMER")
 	@PreAuthorize("isAuthenticated()")
-	ResponseEntity<ResponseObject> getAllOrder() {
+	ResponseEntity<ResponseObject> getAllOrder(
+			@ModelAttribute Pagination pagination) {
 		// delete order unpaid
 		iOrderService.deleteUnpaidOrder();
+		
 		List<OrderDTO> orderDTOList = iOrderService.getAllOrder();
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all order successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
 				setData(orderDTOList);
 			}
 		});

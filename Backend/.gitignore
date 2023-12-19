@@ -35,3 +35,7 @@ build/
 ### Image folder
 src/main/resources/static/images/*
 !src/main/resources/static/images/README.md
+
+### Image folder
+src/main/resources/static/videos/*
+!src/main/resources/static/videos/README.md

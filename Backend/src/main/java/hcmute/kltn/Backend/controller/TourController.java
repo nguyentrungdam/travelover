@@ -38,9 +38,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Tours", 
 		description = "APIs for managing tours\n\n"
-		+ "19/12/2023\n\n"
+		+ "__19/12/2023__\n\n"
 		+ "Thêm api auto-upate-id để cập nhật lại id các tour clone bằng mongodb compass\n\n"
-		+ "Thêm api clone để clone tour bằng id, tour clone có id không bị lỗi",
+		+ "Thêm api clone để clone tour bằng id, tour clone có id không bị lỗi\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")
@@ -131,15 +131,15 @@ public class TourController {
 	@Operation(summary = "Get all tour - ADMIN / STAFF", description = getAllTourDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> getAllTour(
-			@ModelAttribute Pagination Pagination) {
+			@ModelAttribute Pagination pagination) {
 		iTourService.updateIsDiscount();
 		List<TourDTO> tourDTOList = iTourService.getAllTour();
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all tour successfully");
-				setPageSize(Pagination.getPageSize());
-				setPageNumber(Pagination.getPageNumber());
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
 				setData(tourDTOList);
 			}
 		});

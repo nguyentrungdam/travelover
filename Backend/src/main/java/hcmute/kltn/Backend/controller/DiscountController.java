@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -28,9 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Discounts", 
 		description = "APIs for managing discounts\n\n"
-				+ "19/12/2023\n\n"
+				+ "__19/12/2023__\n\n"
 				+ "Cập nhập api create cho tự nhập mã hoặc tự tạo\n\n"
-				+ "Cập nhật api update cho nhập mã mới hoặc giữ nguyên giá cũ",
+				+ "Cập nhật api update cho nhập mã mới hoặc giữ nguyên giá cũ\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1K0hAFY-8JF1Az9ocQlKalb9W5TT003vN/view?usp=sharing")
@@ -110,12 +112,15 @@ public class DiscountController {
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
 	@Operation(summary = "Get all discount - ADMIN / STAFF")
 	@PreAuthorize("hasAnyRole('ROLE_STAFF')")
-	ResponseEntity<ResponseObject> getAlllDiscount() {
+	ResponseEntity<ResponseObject> getAlllDiscount(
+			@ModelAttribute Pagination pagination) {
 		List<DiscountDTO> discountDTOList = iDiscountService.getAllDiscount();
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get All Discount successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
 				setData(discountDTOList);
 			}
 		});
