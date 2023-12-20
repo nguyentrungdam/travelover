@@ -10,7 +10,6 @@ import { axiosMultipart } from "../../../../apis/axios";
 const AddTours = () => {
   const fileInputRef = useRef();
   const fileInputRef2 = useRef();
-  const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
   const [tourSchedule, setTourSchedule] = useState({
     schedule: [],
   });
@@ -31,7 +30,8 @@ const AddTours = () => {
     priceOfChildren: 0,
     suitablePerson: "",
     termAndCondition: "",
-    image: ["", "", "", "", "", ""],
+    imageList: [],
+    image: [],
     //discount
     startDateDiscount: "",
     endDateDiscount: "",
@@ -44,8 +44,7 @@ const AddTours = () => {
     district: "",
     commune: "",
   });
-  const handleSelectImage = (e, index) => {
-    console.log(index);
+  const handleSelectImage = (e) => {
     const selectedFile = e.target.files[0];
     const formDataClone = { ...formData };
     const imageFormData = new FormData();
@@ -54,13 +53,8 @@ const AddTours = () => {
     axiosMultipart
       .post("/images/create", imageFormData)
       .then((response) => {
-        if (index === -1) {
-          formDataClone.thumbnailUrl = response.data.data.url;
-          formDataClone.profileThumbnail = imageUrl;
-        } else {
-          formDataClone.image[index] = response.data.data.url;
-          formDataClone.profilePicture = imageUrl;
-        }
+        formDataClone.thumbnailUrl = response.data.data.url;
+        formDataClone.profileThumbnail = imageUrl;
         setFormData(formDataClone);
       })
       .catch((error) => {
@@ -68,16 +62,9 @@ const AddTours = () => {
         console.error("Lỗi khi gọi API:", error);
       });
   };
-
   function handleUploadButtonClick() {
     fileInputRef.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
   }
-  const handleUploadButtonClick6 = (index) => () => {
-    if (fileInputRefs.current[index] && fileInputRefs.current[index].current) {
-      fileInputRefs.current[index].current.click();
-    }
-  };
-
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
@@ -112,7 +99,6 @@ const AddTours = () => {
       });
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Tạo đối tượng FormData
@@ -136,7 +122,7 @@ const AddTours = () => {
     // Thêm các trường dữ liệu vào formDataObject
     formDataObject.append("tourTitle", formData.tourTitle);
     formDataObject.append("thumbnailUrl", formData.thumbnailUrl);
-    formData.image.forEach((image, index) => {
+    formData.imageList.forEach((image, index) => {
       formDataObject.append(`image[${index}]`, image);
     });
     formDataObject.append("numberOfDay", formData.numberOfDay);
@@ -179,13 +165,19 @@ const AddTours = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Thêm tour thành công ! 👌", {
+      toast.success("Add tour successful! 👌", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+        pauseOnHover: true,
+      });
+    } else if (prop === 3) {
+      toast.error("Exceeded file limit!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else {
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+      toast.error("Unable to add, please try again!", {
         position: toast.POSITION.TOP_RIGHT,
         pauseOnHover: true,
         autoClose: 1000,
@@ -280,7 +272,100 @@ const AddTours = () => {
       reader.readAsDataURL(file);
     }
   };
-  console.log(formData);
+
+  //! bên dưới là xử lý phần add list image
+  const handleRemoveImageList = (index) => {
+    const newImageList = [...formData.imageList];
+    newImageList.splice(index, 1);
+    setFormData({ ...formData, imageList: newImageList });
+  };
+
+  const fileInputListRef = useRef(
+    Array.from({ length: 20 }, () => React.createRef())
+  );
+
+  const handleOpenFileInput = () => {
+    const firstInput = fileInputListRef.current[0];
+    if (firstInput && firstInput.current) {
+      firstInput.current.click();
+    }
+  };
+
+  const handleFileChange = (index) => {
+    return () => {
+      const currentInput = fileInputListRef.current[index];
+      if (currentInput && currentInput.current) {
+        const newFiles = Array.from(currentInput.current.files).filter(
+          (file) => !!file
+        );
+
+        // Kiểm tra và giới hạn số lượng file
+        const remainingSlots = 20 - formData.imageList.length;
+        const filesToAdd = newFiles.slice(0, remainingSlots);
+        console.log(filesToAdd.length);
+        if (filesToAdd.length === 0) {
+          notify(3);
+          return;
+        }
+        // Xử lý cho tất cả các file được chọn
+        const newImageUrls = filesToAdd.map((file) =>
+          URL.createObjectURL(file)
+        );
+
+        // Cập nhật state với danh sách các URL mới và setFormData
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          imageList: [...prevFormData.imageList, ...newImageUrls],
+          image: [...prevFormData.image, ...filesToAdd], // Thêm dòng này để cập nhật danh sách file
+        }));
+
+        // Xóa giá trị của input để người dùng có thể chọn lại
+        currentInput.current.value = "";
+      }
+    };
+  };
+
+  const handleConfirmUpload = async () => {
+    const allFiles = formData.image.filter((file) => !!file);
+    console.log(allFiles);
+    const formDataClone = { ...formData };
+    const imageFormData = new FormData();
+
+    // Kiểm tra xem có files được chọn không
+    if (allFiles.length === 0) {
+      return;
+    }
+
+    // Lặp qua từng file được chọn và thêm vào FormData
+    for (let i = 0; i < allFiles.length; i++) {
+      const selectedFile = allFiles[i];
+      const imageUrl = URL.createObjectURL(selectedFile);
+
+      // Thêm URL vào mảng imageList trong state
+      formDataClone.imageList.push(imageUrl);
+
+      // Sử dụng append để thêm nhiều files cùng một key
+      imageFormData.append("fileList", selectedFile);
+    }
+
+    // Gọi API để tải lên nhiều hình ảnh
+    try {
+      const response = await axiosMultipart.post(
+        "/images/multiple-create",
+        imageFormData
+      );
+      console.log("API Response:", response);
+
+      //Lấy các URL mới từ server và cập nhật state
+      const newImageUrls = response.data.data.map((data) => data);
+      formDataClone.imageList = newImageUrls;
+      setFormData(formDataClone);
+    } catch (error) {
+      notify(2);
+      console.error("Lỗi khi gọi API:", error);
+    }
+  };
+  console.log(formData.imageList);
   return (
     <>
       <div className="info">
@@ -415,7 +500,7 @@ const AddTours = () => {
                     <label className="pt-1 mb-1">
                       Detailed tour description
                     </label>
-                    <form className="schedule">
+                    <div className="schedule">
                       <div>
                         <input
                           className="chooseFile"
@@ -477,7 +562,7 @@ const AddTours = () => {
                           </div>
                         </div>
                       ))}
-                    </form>
+                    </div>
                   </div>
                 </div>
                 {/* Discount */}
@@ -576,7 +661,7 @@ const AddTours = () => {
                 className="chooseFile"
                 type="file"
                 accept=".jpg,.png"
-                onChange={(e) => handleSelectImage(e, -1)}
+                onChange={(e) => handleSelectImage(e)}
                 style={{ display: "none" }}
                 ref={fileInputRef}
               />
@@ -608,46 +693,60 @@ const AddTours = () => {
       </div>
       {showModal && (
         <div className="modal-overlay2" onClick={handleOverlayClick}>
-          <div className="modal2 col-xl-6">
+          <div className="modal3 col-xl-7">
             <div className="d-flex wrap-modal-addtour">
-              <span className="card-header">Image list</span>
+              <span className="card-header">Image List</span>
               <button className="close-btn2" onClick={closeModal}>
                 X
               </button>
             </div>
-            <div className="  d-flex image-list">
-              {[0, 1, 2, 3, 4, 5].map((index) => (
-                <div key={index} className="mb-2 d-flex flex-column mx-2">
+            {fileInputListRef.current.map((ref, index) => (
+              <input
+                key={`fileInput_${index}`}
+                type="file"
+                onChange={handleFileChange(index)}
+                style={{ display: "none" }}
+                ref={ref}
+                multiple
+              />
+            ))}
+
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleOpenFileInput}
+            >
+              Add Image
+            </button>
+
+            <div className="d-flex flex-wrap ">
+              {formData.imageList.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className="mb-2 d-flex flex-column col-md-3 h200 mt-2"
+                >
                   <img
-                    className="img-account-profile"
-                    src={
-                      formData.image[index]
-                        ? formData.image[index]
-                        : "/noavatar.png"
-                    }
+                    className="img-account-profile h-150 img-radius-0375"
+                    src={imageUrl ? imageUrl : "/noavatar.png"}
                     alt=""
                   />
-                  <input
-                    className="chooseFile"
-                    type="file"
-                    accept=".jpg, .png"
-                    onChange={(e) => handleSelectImage(e, index)}
-                    style={{ display: "none" }}
-                    ref={fileInputRefs.current[index]}
-                  />
-                  <div className="small font-italic text-muted my-2">
-                    JPG or PNG must not exceed 2 MB
-                  </div>
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-danger mt-2 w200"
                     type="button"
-                    onClick={handleUploadButtonClick6(index)}
+                    onClick={() => handleRemoveImageList(index)}
                   >
-                    Upload Image
+                    Remove
                   </button>
                 </div>
               ))}
             </div>
+            <button
+              className="btn btn-primary mt-2"
+              type="button"
+              onClick={handleConfirmUpload}
+            >
+              Confirm Upload Image List
+            </button>
           </div>
         </div>
       )}

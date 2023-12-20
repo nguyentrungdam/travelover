@@ -166,7 +166,7 @@ const FeaturedTourList = () => {
                       </span>
                     </p>{" "}
                     <p className="tour-item__departure mb-2">
-                      Ngày khởi hành:{" "}
+                      Ngày đi:{" "}
                       <span className="font-weight-bold">
                         {formatDate(tomorrow)}
                       </span>{" "}

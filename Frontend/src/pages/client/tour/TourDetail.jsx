@@ -57,6 +57,7 @@ const TourDetail = () => {
       })
     ).unwrap();
   }, []);
+
   console.log(tours);
   const handleOrder = (tourId) => {
     navigate(`/tours/tour-booking/${tourId}`, {
@@ -86,13 +87,16 @@ const TourDetail = () => {
     setOpen(false);
     document.body.classList.remove("modal-open1");
   };
+
   const handleMove = (direction) => {
     let newSlideNumber;
 
     if (direction === "l") {
-      newSlideNumber = slideNumber === 0 ? 5 : slideNumber - 1;
+      newSlideNumber =
+        slideNumber === 0 ? tours[0]?.tour?.image.length - 1 : slideNumber - 1;
     } else {
-      newSlideNumber = slideNumber === 5 ? 0 : slideNumber + 1;
+      newSlideNumber =
+        slideNumber === tours[0]?.tour?.image.length - 1 ? 0 : slideNumber + 1;
     }
 
     setSlideNumber(newSlideNumber);
@@ -103,7 +107,7 @@ const TourDetail = () => {
   //tách dòng description
   const maxDescriptionLength = 300;
   const tourDescription = tours[0]?.tour?.tourDescription;
-  const isLongDescription = tourDescription.length > maxDescriptionLength;
+  const isLongDescription = tourDescription?.length > maxDescriptionLength;
   const shortDescription = isLongDescription
     ? tourDescription.slice(0, maxDescriptionLength) + "..."
     : tourDescription;
@@ -175,12 +179,31 @@ const TourDetail = () => {
           <div className="hotelImages">
             {tours[0]?.tour?.image.map((photo, i) => (
               <div className="hotelImgWrapper" key={i}>
-                <img
-                  onClick={() => handleOpenOverlay(i)}
-                  src={photo}
-                  alt=""
-                  className="hotelImg"
-                />
+                {i < 5 ? (
+                  <img
+                    onClick={() => handleOpenOverlay(i)}
+                    src={photo}
+                    alt=""
+                    className="hotelImg"
+                  />
+                ) : i === 5 ? (
+                  <div className="position-relative">
+                    <img
+                      onClick={() => handleOpenOverlay(i)}
+                      src={photo}
+                      alt=""
+                      className="hotelImg last-photo"
+                    />
+                    <span
+                      className="photoRemain"
+                      onClick={() => handleOpenOverlay(i)}
+                    >
+                      + {tours[0]?.tour?.image.length - 6}
+                    </span>
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             ))}
           </div>

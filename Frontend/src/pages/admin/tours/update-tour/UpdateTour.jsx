@@ -22,7 +22,7 @@ const UpdateTour = () => {
     });
   }, [tour.schedule]);
   const dispatch = useDispatch();
-  const fileInputRefs = useRef([0, 1, 2, 3, 4, 5].map(() => createRef()));
+
   const [showModal, setShowModal] = useState(false);
   const { id } = useParams();
   const [formData, setFormData] = useState({
@@ -40,7 +40,9 @@ const UpdateTour = () => {
     endDate: "",
     suitablePerson: "",
     termAndCondition: "",
-    image: ["", "", "", "", "", ""],
+    image: [],
+    imageList: tour?.image,
+    imageTotal: tour?.image,
     //discount
     startDateDiscount: "",
     endDateDiscount: "",
@@ -51,6 +53,15 @@ const UpdateTour = () => {
   useEffect(() => {
     dispatch(getTourDetail(id)).unwrap();
   }, []);
+  useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      imageList: tour?.image || [],
+      imageTotal: tour?.image || [],
+    }));
+  }, [tour]);
+
+  console.log(formData.imageTotal);
   //!xử lý check box
   useEffect(() => {
     setTourSchedule({
@@ -87,11 +98,7 @@ const UpdateTour = () => {
   function handleUploadButtonClick() {
     fileInputRef.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
   }
-  const handleUploadButtonClick6 = (index) => () => {
-    if (fileInputRefs.current[index] && fileInputRefs.current[index].current) {
-      fileInputRefs.current[index].current.click();
-    }
-  };
+
   const handleSelectImage = (e, index) => {
     console.log(index);
     const selectedFile = e.target.files[0];
@@ -145,7 +152,7 @@ const UpdateTour = () => {
     }
     setFormData(updatedFormData);
   };
-  console.log(tour);
+  // console.log(tour);
   const handleUpdate = async (e) => {
     e.preventDefault();
     const formDataUpdate = new FormData();
@@ -170,7 +177,7 @@ const UpdateTour = () => {
       "thumbnailUrl",
       formData.thumbnailUrl || tour.thumbnailUrl
     );
-    formData.image.forEach((image, index) => {
+    formData.imageTotal.forEach((image, index) => {
       formDataUpdate.append(`image[${index}]`, image || tour.image?.[index]);
     });
     formDataUpdate.append(
@@ -261,13 +268,19 @@ const UpdateTour = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Cập nhật tour thành công ! 👌", {
+      toast.success("Update successful! 👌", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+        pauseOnHover: true,
+      });
+    } else if (prop === 3) {
+      toast.error("Exceeded file limit!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else {
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+      toast.error("Unable to update, please try again!", {
         position: toast.POSITION.TOP_RIGHT,
         pauseOnHover: true,
         autoClose: 1000,
@@ -361,6 +374,98 @@ const UpdateTour = () => {
   function handleUploadButtonClick2() {
     fileInputRef2.current.click(); // Kích hoạt input khi nút "Tải lên ảnh" được nhấn
   }
+  //! bên dưới là xử lý phần add list image
+  const handleRemoveImageList = (index) => {
+    const newImageList = [...formData.imageTotal];
+    newImageList.splice(index, 1);
+    setFormData({ ...formData, imageTotal: newImageList });
+  };
+
+  const fileInputListRef = useRef(
+    Array.from({ length: 20 }, () => React.createRef())
+  );
+
+  const handleOpenFileInput = () => {
+    const firstInput = fileInputListRef.current[0];
+    if (firstInput && firstInput.current) {
+      firstInput.current.click();
+    }
+  };
+
+  const handleFileChange = (index) => {
+    return () => {
+      const currentInput = fileInputListRef.current[index];
+      if (currentInput && currentInput.current) {
+        const newFiles = Array.from(currentInput.current.files).filter(
+          (file) => !!file
+        );
+
+        // Kiểm tra và giới hạn số lượng file tối đa là 20
+        const remainingSlots = 20 - formData.imageTotal.length;
+
+        if (newFiles.length > remainingSlots) {
+          notify(3);
+          return;
+        }
+
+        // Xử lý cho tất cả các file được chọn
+        const newImageUrls = newFiles.map((file) => URL.createObjectURL(file));
+
+        // Cập nhật state với danh sách các URL mới và setFormData
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          imageTotal: [...prevFormData.imageTotal, ...newImageUrls],
+          image: [...prevFormData.image, ...newFiles], // Thêm dòng này để cập nhật danh sách file
+        }));
+
+        // Xóa giá trị của input để người dùng có thể chọn lại
+        currentInput.current.value = "";
+      }
+    };
+  };
+
+  const handleConfirmUpload = async () => {
+    const allFiles = formData.image.filter((file) => !!file);
+    console.log(allFiles);
+    const formDataClone = { ...formData };
+    const imageFormData = new FormData();
+    // Kiểm tra xem có files được chọn không
+    if (allFiles.length === 0) {
+      return;
+    }
+    // Lặp qua từng file được chọn và thêm vào FormData
+    for (let i = 0; i < allFiles.length; i++) {
+      const selectedFile = allFiles[i];
+      const imageUrl = URL.createObjectURL(selectedFile);
+      // Thêm URL vào mảng imageList trong trạng thái
+      formDataClone.imageTotal.push(imageUrl);
+      // Sử dụng append để thêm nhiều files cùng một key
+      imageFormData.append("fileList", selectedFile);
+    }
+    // Gọi API để tải lên nhiều hình ảnh
+    try {
+      const response = await axiosMultipart.post(
+        "/images/multiple-create",
+        imageFormData
+      );
+      console.log("API Response:", response);
+
+      // Lấy các URL mới từ server và cập nhật trạng thái
+      const newImageUrls = response.data.data.map((data) => data);
+      console.log(newImageUrls);
+
+      //Set lại giá trị cho imageTotal để hiển thị
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        imageTotal: [...prevFormData.imageList, ...newImageUrls],
+      }));
+    } catch (error) {
+      notify(2);
+      console.error("Lỗi khi gọi API1:", error);
+    }
+  };
+  console.log(formData.imageTotal);
+
   return (
     <>
       <div className="info">
@@ -704,46 +809,64 @@ const UpdateTour = () => {
       </div>
       {showModal && (
         <div className="modal-overlay2" onClick={handleOverlayClick}>
-          <div className="modal2 col-xl-6">
+          <div className="modal3 col-xl-7">
             <div className="d-flex wrap-modal-addtour">
-              <span className="card-header">Image list</span>
+              <span className="card-header">Image List</span>
               <button className="close-btn2" onClick={closeModal}>
                 X
               </button>
             </div>
-            <div className="  d-flex image-list">
-              {[0, 1, 2, 3, 4, 5].map((index) => (
-                <div key={index} className="mb-2 d-flex flex-column mx-2">
+            {fileInputListRef.current.map((ref, index) => (
+              <input
+                key={`fileInput_${index}`}
+                type="file"
+                onChange={handleFileChange(index)}
+                style={{ display: "none" }}
+                ref={ref}
+                multiple
+              />
+            ))}
+
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleOpenFileInput}
+            >
+              Add Image
+            </button>
+
+            <div className="d-flex flex-wrap ">
+              {formData?.imageTotal.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className="mb-2 d-flex flex-column col-md-3 h200 mt-2"
+                >
                   <img
-                    className="img-account-profile"
+                    className="img-account-profile h-150 img-radius-0375"
                     src={
-                      formData.image[index]
-                        ? formData.image[index]
-                        : tour.image?.[index] ?? "/noavatar.png"
+                      imageUrl
+                        ? imageUrl
+                        : tour.imageTotal?.[index] ?? "/noavatar.png"
                     }
                     alt=""
                   />
-                  <input
-                    className="chooseFile"
-                    type="file"
-                    accept=".jpg, .png"
-                    onChange={(e) => handleSelectImage(e, index)}
-                    style={{ display: "none" }}
-                    ref={fileInputRefs.current[index]}
-                  />
-                  <div className="small font-italic text-muted my-2">
-                    JPG or PNG must not exceed 2 MB
-                  </div>
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-danger mt-2 w200"
                     type="button"
-                    onClick={handleUploadButtonClick6(index)}
+                    onClick={() => handleRemoveImageList(index)}
                   >
-                    Upload Image
+                    Remove
                   </button>
                 </div>
               ))}
             </div>
+            <button
+              className="btn btn-primary mt-2"
+              type="button"
+              onClick={handleConfirmUpload}
+            >
+              Confirm Upload Image List
+            </button>
           </div>
         </div>
       )}

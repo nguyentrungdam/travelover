@@ -57,10 +57,13 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  width: 100%;
+  gap: 10px;
 }
 
 .hotelImgWrapper {
-  width: 33%;
+  box-sizing: border-box;
+  width: calc(33.3% - 11px);
   margin-bottom: 5px;
 }
 
@@ -71,7 +74,17 @@
   object-fit: cover;
   cursor: pointer;
 }
-
+.last-photo {
+  filter: brightness(30%);
+}
+.photoRemain {
+  color: #fff;
+  font-weight: bolder;
+  font-size: 2.2em;
+  position: absolute;
+  top: 44%;
+  right: 44%;
+}
 .hotelDetails {
   display: flex;
   justify-content: space-between;

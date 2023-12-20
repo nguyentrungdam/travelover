@@ -13,6 +13,10 @@ const ordersApi = {
     const url = "/orders/status/update";
     return axios.put(url, tour);
   },
+  getOrderCheck: (orderId) => {
+    const url = `/orders/payment/check?orderId=${orderId}`;
+    return axios.get(url);
+  },
   getOrderDetail: (orderId) => {
     const url = `/orders/detail?orderId=${orderId}`;
     return axios.get(url);

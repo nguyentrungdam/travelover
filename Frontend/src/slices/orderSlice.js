@@ -45,12 +45,24 @@ export const getOrderDetail = createAsyncThunk(
     }
   }
 );
+export const getOrderCheck = createAsyncThunk(
+  "orders/payment/check",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const response = await ordersApi.getOrderCheck(orderId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const orderSlice = createSlice({
   name: "order",
   initialState: {
     totalData: 0,
     orders: [],
     order: {},
+    status: false,
     loading: false,
     error: null,
   },
@@ -99,6 +111,18 @@ export const orderSlice = createSlice({
     [getOrderDetail.fulfilled]: (state, action) => {
       state.loading = false;
       state.order = action.payload.data.data;
+    },
+    [getOrderCheck.pending]: (state) => {
+      state.loading = true;
+    },
+    [getOrderCheck.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [getOrderCheck.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.status = action.payload.data.data;
+      console.log(state.status);
     },
   },
 });
