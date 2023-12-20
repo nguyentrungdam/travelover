@@ -170,6 +170,12 @@ const AddTours = () => {
         autoClose: 1000,
         pauseOnHover: true,
       });
+    } else if (prop === 3) {
+      toast.error("Exceeded file limit!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+        pauseOnHover: true,
+      });
     } else {
       toast.error("Unable to add, please try again!", {
         position: toast.POSITION.TOP_RIGHT,
@@ -293,14 +299,24 @@ const AddTours = () => {
           (file) => !!file
         );
 
+        // Kiểm tra và giới hạn số lượng file
+        const remainingSlots = 20 - formData.imageList.length;
+        const filesToAdd = newFiles.slice(0, remainingSlots);
+        console.log(filesToAdd.length);
+        if (filesToAdd.length === 0) {
+          notify(3);
+          return;
+        }
         // Xử lý cho tất cả các file được chọn
-        const newImageUrls = newFiles.map((file) => URL.createObjectURL(file));
+        const newImageUrls = filesToAdd.map((file) =>
+          URL.createObjectURL(file)
+        );
 
         // Cập nhật state với danh sách các URL mới và setFormData
         setFormData((prevFormData) => ({
           ...prevFormData,
           imageList: [...prevFormData.imageList, ...newImageUrls],
-          image: [...prevFormData.image, ...newFiles], // Thêm dòng này để cập nhật danh sách file
+          image: [...prevFormData.image, ...filesToAdd], // Thêm dòng này để cập nhật danh sách file
         }));
 
         // Xóa giá trị của input để người dùng có thể chọn lại
@@ -677,7 +693,7 @@ const AddTours = () => {
       </div>
       {showModal && (
         <div className="modal-overlay2" onClick={handleOverlayClick}>
-          <div className="modal2 col-xl-7">
+          <div className="modal3 col-xl-7">
             <div className="d-flex wrap-modal-addtour">
               <span className="card-header">Image List</span>
               <button className="close-btn2" onClick={closeModal}>
@@ -691,6 +707,7 @@ const AddTours = () => {
                 onChange={handleFileChange(index)}
                 style={{ display: "none" }}
                 ref={ref}
+                multiple
               />
             ))}
 
@@ -709,7 +726,7 @@ const AddTours = () => {
                   className="mb-2 d-flex flex-column col-md-3 h200 mt-2"
                 >
                   <img
-                    className="img-account-profile h-150"
+                    className="img-account-profile h-150 img-radius-0375"
                     src={imageUrl ? imageUrl : "/noavatar.png"}
                     alt=""
                   />
