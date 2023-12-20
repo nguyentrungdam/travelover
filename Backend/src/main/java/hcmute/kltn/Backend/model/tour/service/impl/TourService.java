@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.tour.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
+import hcmute.kltn.Backend.model.base.video.service.IVideoService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.generatorSequence.dto.entity.GeneratorSequence;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
@@ -50,6 +52,7 @@ import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 import hcmute.kltn.Backend.util.StringUtil;
 
@@ -69,6 +72,8 @@ public class TourService implements ITourService{
 	private IHotelService iHotelService;
 	@Autowired
 	private IImageService iImageService;
+	@Autowired
+	private IVideoService iVideoService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -146,6 +151,11 @@ public class TourService implements ITourService{
 		tour.setLastModifiedBy(accountId);
 		tour.setLastModifiedAt(dateNow);
 		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		tour.setCreatedAt2(currentDate);
+		tour.setLastModifiedAt2(currentDate);
+		
 		// create tour
 		Tour tourNew = new Tour();
 		tourNew = tourRepository.save(tour);
@@ -167,6 +177,10 @@ public class TourService implements ITourService{
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		tour.setLastModifiedBy(accountId);
 		tour.setLastModifiedAt(dateNow);
+		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		tour.setLastModifiedAt2(currentDate);
 		
 		// update tour
 		Tour tourNew = new Tour();
@@ -355,6 +369,13 @@ public class TourService implements ITourService{
 					}
 				}
 			}
+		}
+		
+		// check video and delete
+		if ((tour.getVideoUrl() != null 
+				&& !tour.getVideoUrl().equals(""))
+				&& !tour.getVideoUrl().equals(tourUpdate.getVideoUrl())) {
+			iVideoService.deleteVideoByUrl(tour.getVideoUrl());
 		}
 		
 		// check schedule image

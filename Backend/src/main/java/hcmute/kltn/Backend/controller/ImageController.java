@@ -29,10 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/images")
 @Tag(
 		name = "Images", 
-		description = "APIs for managing images\n\n"
-				+ "__19/12/2023__\n\n"
-				+ "__3:45PM__\n\n"
-				+ "Thêm api create miltiple image để up nhiều hình cùng lúc",
+		description = "APIs for managing images\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1I-WwINoVR1vnfv-1H3rs5sw4uvDPsTWc/view?usp=sharing")

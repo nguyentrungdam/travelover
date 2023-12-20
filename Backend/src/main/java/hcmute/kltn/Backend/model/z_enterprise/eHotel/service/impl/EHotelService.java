@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.z_enterprise.eHotel.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +32,7 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.OrderDetail;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.repository.EHotelRepository;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
@@ -83,6 +85,11 @@ public class EHotelService implements IEHotelService{
 		eHotel.setLastModifiedBy(accountId);
 		eHotel.setLastModifiedAt(dateNow);
 		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		eHotel.setCreatedAt2(currentDate);
+		eHotel.setLastModifiedAt2(currentDate);
+		
 		// create hotel
 		eHotel = eHotelRepository.save(eHotel);
 		
@@ -109,6 +116,10 @@ public class EHotelService implements IEHotelService{
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		eHotel.setLastModifiedBy(accountId);
 		eHotel.setLastModifiedAt(dateNow);
+		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		eHotel.setLastModifiedAt2(currentDate);
 		
 		// update hotel
 		eHotel = eHotelRepository.save(eHotel);

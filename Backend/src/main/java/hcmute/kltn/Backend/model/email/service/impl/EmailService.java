@@ -286,12 +286,8 @@ public class EmailService implements IEmailService{
 	}
 
 	@Override
-	public EmailDTO getInfoOrderSuccess(OrderDTO orderDTO, String accountId) {
+	public EmailDTO getInfoOrderSuccess(OrderDTO orderDTO, String customerName) {
 		String orderId = orderDTO.getOrderId();
-		
-		AccountDTO accountDTO = new AccountDTO();
-		accountDTO = iAccountService.getDetailAccount(accountId);
-		String accountName = accountDTO.getFirstName();
 		
 		String orderDate = orderDTO.getCreatedAt().toString();
 		String fullName = orderDTO.getCustomerInformation().getFullName();
@@ -427,7 +423,7 @@ public class EmailService implements IEmailService{
 				+ "			<p class=\"logo\">TRAVELOVER</p> \r\n"
 				+ "		</div>\r\n"
 				+ "		\r\n"
-				+ "		<p>Xin chào " + accountName + ".</p>\r\n"
+				+ "		<p>Xin chào " + customerName + ".</p>\r\n"
 				+ "		<p>Đơn hàng <span style=\"color: #436eee;\">" + orderId + "</span> của bạn đã được đặt thành công ngày " + orderDate + ".</p>\r\n"
 				+ "		<div class=\"btn\">\r\n"
 				+ "			<a class=\"button\" href=\"https://drive.google.com/file/d/1RpOxkIjgATDdlxbtiVqj4vNprTorZhWK/view?usp=sharing\" style=\"color: #FFFFFF;\">Chi tiết đơn hàng</a>\r\n"

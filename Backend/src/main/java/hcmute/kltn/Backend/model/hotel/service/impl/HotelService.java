@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.hotel.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import hcmute.kltn.Backend.model.hotel.repository.HotelRepository;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
@@ -78,37 +80,17 @@ public class HotelService implements IHotelService{
 		hotel.setLastModifiedBy(accountId);
 		hotel.setLastModifiedAt(dateNow);
 		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		hotel.setCreatedAt2(currentDate);
+		hotel.setLastModifiedAt2(currentDate);
+		
 		// create hotel
 		Hotel hotelNew = new Hotel();
 		hotelNew = hotelRepository.save(hotel);
 
 		return hotelNew;
 	}
-
-//	private Hotel create(HotelDTO hotelDTO) {
-//		// check field condition
-//		checkFieldCondition(hotelDTO);
-//		
-//		// mapping
-//		Hotel hotel = new Hotel();
-//		modelMapper.map(hotelDTO, hotel);
-//		
-//		// set default value
-//		String hotelId = iGeneratorSequenceService.genId(getCollectionName());
-//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
-//		LocalDate dateNow = LocalDateUtil.getDateNow();
-//		hotel.setHotelId(hotelId);
-//		hotel.setStatus(true);
-//		hotel.setCreatedBy(accountId);
-//		hotel.setCreatedAt(dateNow);
-//		hotel.setLastModifiedBy(accountId);
-//		hotel.setLastModifiedAt(dateNow);
-//		
-//		// create hotel
-//		hotel = hotelRepository.save(hotel);
-//
-//		return hotel;
-//	}
 	
 	private Hotel update(Hotel hotel) {
 		// check exists
@@ -124,6 +106,10 @@ public class HotelService implements IHotelService{
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		hotel.setLastModifiedBy(accountId);
 		hotel.setLastModifiedAt(dateNow);
+		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		hotel.setLastModifiedAt2(currentDate);
 		
 		// update hotel
 		Hotel hotelNew = new Hotel();

@@ -35,11 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/payments")
 @Tag(
 		name = "Payments", 
-		description = "APIs for managing payments\n\n"
-				+ "__19/12/2023__\n\n"
-				+ "__3:45PM__\n\n"
-				+ "Fix khi gọi tới returnUrl chỉ trả về thêm param orderId (FE gọi api payment/check trong Order để "
-				+ "kiểm tra xem đơn hàng đã thanh toán thành công hay chưa)",
+		description = "APIs for managing payments\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1aCMrABRUkr3Cdg_s_bIsH_-ZcJz3YskL/view?usp=sharing")
@@ -80,18 +76,25 @@ public class PaymentController {
 			prderPaymentUpdate.setMethod("NVPay");
 			prderPaymentUpdate.setTransactionCode(transactionCode);
 			prderPaymentUpdate.setAmount(amout);
-			prderPaymentUpdate.setDate(dateNow);
 			
 			iOrderService.updateOrderPayment(prderPaymentUpdate);
 			
 			// Send email 
 			OrderDTO orderDTO = new OrderDTO();
 			orderDTO = iOrderService.getDetailOrder(orderId);
+			
 			AccountDTO accountDTO = new AccountDTO();
 			accountDTO = iAccountService.getDetailAccount(orderDTO.getCreatedBy());
-			EmailDTO emailDTO = iEmailService.getInfoOrderSuccess(orderDTO, accountDTO.getAccountId());
+			EmailDTO emailDTO = iEmailService.getInfoOrderSuccess(orderDTO, accountDTO.getFirstName());
 			emailDTO.setTo(accountDTO.getEmail());
 			iEmailService.sendMail(emailDTO);
+			
+			// send second mail if customer mail != account mail
+			if (!orderDTO.getCustomerInformation().getEmail().equals(accountDTO.getEmail())) {
+				EmailDTO emailDTO2 = iEmailService.getInfoOrderSuccess(orderDTO, orderDTO.getCustomerInformation().getFullName());
+				emailDTO2.setTo(orderDTO.getCustomerInformation().getEmail());
+				iEmailService.sendMail(emailDTO2);
+			}
 		}
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web

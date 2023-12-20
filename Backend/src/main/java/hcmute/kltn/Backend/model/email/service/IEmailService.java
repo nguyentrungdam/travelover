@@ -10,5 +10,5 @@ public interface IEmailService {
     public void sendSimpleMailWithAttachment(EmailDTO emailDTO, MultipartFile file);
     
     public void sendMail(EmailDTO emailDTO);
-    public EmailDTO getInfoOrderSuccess(OrderDTO orderDTO, String accountId);
+    public EmailDTO getInfoOrderSuccess(OrderDTO orderDTO, String customerName);
 }

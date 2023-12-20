@@ -38,9 +38,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Tours", 
 		description = "APIs for managing tours\n\n"
-		+ "__19/12/2023__\n\n"
-		+ "Thêm api auto-upate-id để cập nhật lại id các tour clone bằng mongodb compass\n\n"
-		+ "Thêm api clone để clone tour bằng id, tour clone có id không bị lỗi\n\n",
+		+ "__21/12/2023__\n\n"
+		+ "Cập nhật: khi tạo hoặc sửa tour có field videoURL, gọi createVideo để nhận url và nhập vào "
+		+ "(khi cập nhật với url mới khác url cũ thì video của url sẽ bị xóa)",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")

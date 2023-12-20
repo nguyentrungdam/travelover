@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.order.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,6 +45,7 @@ import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
@@ -129,6 +131,11 @@ public class OrderService implements IOrderService{
 		order.setLastModifiedBy(accountId);
 		order.setLastModifiedAt(dateNow);
 		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		order.setCreatedAt2(currentDate);
+		order.setLastModifiedAt2(currentDate);
+		
 		// create order
 		Order orderNew = new Order();
 		orderNew = orderRepository.save(order);
@@ -150,6 +157,10 @@ public class OrderService implements IOrderService{
 		LocalDate dateNow = LocalDateUtil.getDateNow();
 		order.setLastModifiedBy(accountId);
 		order.setLastModifiedAt(dateNow);
+		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		order.setLastModifiedAt2(currentDate);
 		
 		// update order
 		Order orderNew = new Order();
@@ -492,7 +503,7 @@ public class OrderService implements IOrderService{
 			payment.setMethod(orderPaymentUpdate.getMethod());
 			payment.setTransactionCode(orderPaymentUpdate.getTransactionCode());
 			payment.setAmount(orderPaymentUpdate.getAmount());
-			payment.setDate(orderPaymentUpdate.getDate());
+			payment.setCreateAt(LocalDateTimeUtil.getCurentDate());
 			paymentList.add(payment);
 			order.setPayment(paymentList);
 		} else {
@@ -503,7 +514,7 @@ public class OrderService implements IOrderService{
 			payment.setMethod(orderPaymentUpdate.getMethod());
 			payment.setTransactionCode(orderPaymentUpdate.getTransactionCode());
 			payment.setAmount(orderPaymentUpdate.getAmount());
-			payment.setDate(orderPaymentUpdate.getDate());
+			payment.setCreateAt(LocalDateTimeUtil.getCurentDate());
 			paymentList.add(payment);
 			order.setPayment(paymentList);
 		}

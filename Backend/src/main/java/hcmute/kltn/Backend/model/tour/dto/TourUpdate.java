@@ -20,7 +20,7 @@ public class TourUpdate {
 	private String tourTitle; // not null, unique
 	private String thumbnailUrl;
 	private List<String> image;
-	private String video;
+	private String videoUrl;
 	private int numberOfDay; // not null
 	private int numberOfNight; // not null
 	private Address address; // not null

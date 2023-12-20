@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.discount.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import hcmute.kltn.Backend.model.discount.dto.entity.Discount;
 import hcmute.kltn.Backend.model.discount.repository.DiscountRepository;
 import hcmute.kltn.Backend.model.discount.service.IDiscountService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 import hcmute.kltn.Backend.util.StringUtil;
 
@@ -112,6 +114,11 @@ public class DiscountService implements IDiscountService{
 		discount.setLastModifiedBy(accountId);
 		discount.setLastModifiedAt(currentDate);
 		
+		// new date
+		LocalDateTime currentDate2 = LocalDateTimeUtil.getCurentDate();
+		discount.setCreatedAt2(currentDate2);
+		discount.setLastModifiedAt2(currentDate2);
+		
 		// create discount
 		Discount discountNew = new Discount();
 		discountNew = discountRepository.save(discount);
@@ -133,6 +140,10 @@ public class DiscountService implements IDiscountService{
 		LocalDate currentDate = LocalDateUtil.getDateNow();
 		discount.setLastModifiedBy(accountId);
 		discount.setLastModifiedAt(currentDate);
+		
+		// new date
+		LocalDateTime currentDate2 = LocalDateTimeUtil.getCurentDate();
+		discount.setLastModifiedAt2(currentDate2);
 		
 		// update discount
 		Discount discountNew = new Discount();

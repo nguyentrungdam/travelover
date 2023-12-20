@@ -30,9 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Orders", 
 		description = "APIs for managing orders\n\n"
-				+ "__19/12/2023__\n\n"
-				+ "__3:45PM__\n\n"
-				+ "Thêm api payment/check để kiểm tra xem đơn hàng đã thanh toán thành công hay chưa\n\n",
+				+ "__21/12/2023__\n\n"
+				+ "Thông tin: khi tạo đơn hàng cho chỉnh sửa email, nếu email đã chỉnh sửa khác với email của account "
+				+ "thì khi thanh toán thành công sẽ gửi 2 email đến lần lượt email của account và email nhập vào",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")

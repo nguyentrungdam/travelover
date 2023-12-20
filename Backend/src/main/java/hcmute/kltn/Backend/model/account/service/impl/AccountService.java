@@ -2,6 +2,7 @@ package hcmute.kltn.Backend.model.account.service.impl;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
 @Service
@@ -101,6 +103,11 @@ public class AccountService implements IAccountService{
 		account.setCreatedAt(dateNow);
 		account.setLastModifiedBy(accountId);
 		account.setLastModifiedAt(dateNow);
+		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		account.setCreatedAt2(currentDate);
+		account.setLastModifiedAt2(currentDate);
 
 		// create account
 		Account accountNew = new Account();
@@ -122,6 +129,10 @@ public class AccountService implements IAccountService{
 		String currentAccountId = iAccountDetailService.getCurrentAccount().getAccountId();
 		account.setLastModifiedBy(currentAccountId);
 		account.setLastModifiedAt(LocalDateUtil.getDateNow());
+		
+		// new date
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		account.setLastModifiedAt2(currentDate);
 
 		// update account
 		Account accountNew = new Account();
@@ -341,7 +352,6 @@ public class AccountService implements IAccountService{
 		account.setCreatedAt(dateNow);
 		account.setLastModifiedBy(accountId);
 		account.setLastModifiedAt(dateNow);
- 
 
 		account = accountRepository.save(account);
 		

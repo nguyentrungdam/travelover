@@ -29,10 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/discounts")
 @Tag(
 		name = "Discounts", 
-		description = "APIs for managing discounts\n\n"
-				+ "__19/12/2023__\n\n"
-				+ "Cập nhập api create cho tự nhập mã hoặc tự tạo\n\n"
-				+ "Cập nhật api update cho nhập mã mới hoặc giữ nguyên giá cũ\n\n",
+		description = "APIs for managing discounts\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1K0hAFY-8JF1Az9ocQlKalb9W5TT003vN/view?usp=sharing")

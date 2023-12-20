@@ -1,6 +1,7 @@
 package hcmute.kltn.Backend.model.order.dto.extend;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -17,4 +18,5 @@ public class Payment {
 	private int amount;
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate date;
+	private LocalDateTime createAt;
 }

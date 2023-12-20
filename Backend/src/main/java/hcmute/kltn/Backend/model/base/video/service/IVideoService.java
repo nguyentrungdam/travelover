@@ -7,5 +7,8 @@ import hcmute.kltn.Backend.model.base.video.dto.Video;
 
 public interface IVideoService {
 	public Video createVideo(MultipartFile file);
+	
 	public UrlResource getVideo(String videoName);
+	
+	public boolean deleteVideoByUrl(String videoUrl);
 }

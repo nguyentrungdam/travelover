@@ -25,7 +25,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/videos")
 @Tag(
 		name = "Videos", 
-		description = "APIs for managing videos\n\n",
+		description = "APIs for managing videos\n\n"
+				+ "__21/12/2023__\n\n"
+				+ "Tạo mới: tạo api create video: tải video với max size là 100MB lên để nhận link",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1680C0xg0Ny--NNspQ7eG7rDPEHqmcQio/view?usp=sharing")
@@ -37,10 +39,13 @@ public class VideoController {
 	@Autowired
 	private IResponseObjectService iResponseObjectService;
 	
-	private final String createVideoDesc = "Tải video lên";
+	private final String createVideoDesc = "Tải video lên và nhận url\n\n"
+			+ "- Dung lượng max là 100MB\n\n"
+			+ "- Trên FE dùng url này bỏ vào src của thẻ viedeo và type là video/mp4 hoặc tương tự nếu có "
+			+ "(cái type t không rõ lắm nha)";
 	@RequestMapping(value = "/create", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@Operation(summary = "Create video - LOGIN", description = createVideoDesc)
-	@PreAuthorize("isAuthenticated()")
+	@Operation(summary = "Create video - ADMIN / STAFF", description = createVideoDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> createVideo(
 			@ModelAttribute MultipartFile file) {
 		Video video =	iVideoService.createVideo(file);

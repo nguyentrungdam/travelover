@@ -1,5 +1,6 @@
 package hcmute.kltn.Backend.model.base.video.service.impl;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,6 +64,57 @@ public class VideoService implements IVideoService{
     		throw new TryCatchException(e);
 		}
     }
+	
+	private File getVideoFile(String fileName) {
+    	File dir = new File(uploadDir);
+		File[] fileList = dir.listFiles();
+
+		if (fileList != null) {
+			for (File itemFile : fileList) {
+	        	if (itemFile.getName().startsWith(fileName)) {
+	        		return itemFile;
+	        	}
+	        }
+		}
+        
+        throw new CustomException("Cannot find video file");
+    }
+	
+	private boolean delete(String videoId) {
+		// get video file
+		File imageFile = getVideoFile(videoId);
+
+		// delete image file
+		boolean checkDelete = false;
+		checkDelete = imageFile.delete();
+        if (checkDelete == false) {
+        	throw new CustomException("An error occurred during video deletion");
+        }
+        
+		return checkDelete;
+	}
+	
+	private void deleteNotCheck(String videoId) {
+		File dir = new File(uploadDir);
+		File[] fileList = dir.listFiles();
+
+		if (fileList != null) {
+			for (File itemFile : fileList) {
+	        	if (itemFile.getName().startsWith(videoId)) {
+	        		itemFile.delete();
+	        		break;
+	        	}
+	        }
+		}
+	}
+	
+	private String getIdByUrl(String videoUrl) {
+		String[] urlSplit = videoUrl.split("/");
+		String[] fileName = urlSplit[urlSplit.length - 1].split("\\.");
+		String videoId = fileName[0];
+		
+		return videoId;
+	}
 
 	@Override
 	public Video createVideo(MultipartFile file) {
@@ -89,14 +141,29 @@ public class VideoService implements IVideoService{
 
 	@Override
 	public UrlResource getVideo(String videoName) {
+		String path = System.getProperty("user.dir") + "/" + uploadDir +"/" + videoName;
+		Path pathNew = Paths.get(path);
+
+		// check exists file 
+		if (!Files.exists(pathNew)) {
+			throw new CustomException("Cannot find video");
+		}
+		
 		try {
-			String path = System.getProperty("user.dir") + "/" + uploadDir +"/" + videoName;
-			Path pathNew = Paths.get(path);
 			UrlResource video = new UrlResource(pathNew.toUri());
 			return video;
 		} catch (Exception e) {
 			throw new TryCatchException(e);
 		}
+	}
+
+	@Override
+	public boolean deleteVideoByUrl(String videoUrl) {
+		String videoId = getIdByUrl(videoUrl);
+		
+		deleteNotCheck(videoId);
+
+		return true;
 	}
 
 }
