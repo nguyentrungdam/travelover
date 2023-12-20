@@ -145,14 +145,18 @@ const TourBooking = () => {
   };
   const handleApplyCoupon = async () => {
     setErrorMessage("");
-    const actionResult = await dispatch(
-      getCheckDiscount({ discountCode, totalPrice: tours[0]?.totalPrice })
-    );
-    setTotalSaleOff(actionResult.payload.data.data);
-    if (getCheckDiscount.rejected.match(actionResult)) {
-      setErrorMessage("Mã giảm giá không áp dụng được vui lòng thử mã khác!");
+    try {
+      const actionResult = await dispatch(
+        getCheckDiscount({ discountCode, totalPrice: tours[0]?.totalPrice })
+      );
+
+      setTotalSaleOff(actionResult.payload.data.data);
+    } catch (error) {
+      console.error(error); // In ra lỗi để kiểm tra
+      setErrorMessage("Mã giảm giá không áp dụng được, vui lòng thử mã khác!");
     }
   };
+
   const handleRemoveCoupon = () => {
     setDiscountCode(""); // Đặt giá trị của mã giảm giá về rỗng
     setErrorMessage(""); // Đặt giá trị của errorMessage về rỗng

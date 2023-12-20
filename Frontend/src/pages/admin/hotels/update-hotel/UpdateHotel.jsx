@@ -97,13 +97,13 @@ const UpdateHotel = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Thêm tour thành công ! 👌", {
+      toast.success("Update successful! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else {
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+      toast.error("Unable to update, please try again!", {
         position: toast.POSITION.TOP_RIGHT,
         pauseOnHover: true,
         autoClose: 1000,

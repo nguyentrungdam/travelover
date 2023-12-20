@@ -1,19 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Button } from "reactstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../../../styles/thank-you.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getOrderDetail } from "../../../slices/orderSlice";
+import { getOrderCheck, getOrderDetail } from "../../../slices/orderSlice";
 import { formatCurrencyWithoutD } from "../../../utils/validate";
 
 const ThankYou = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { order } = useSelector((state) => state.order);
+  const { order, status } = useSelector((state) => state.order);
   const [showModal, setShowModal] = useState(false);
+  const [displayStatus, setDisplayStatus] = useState(null);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   let params = new URLSearchParams(window.location.search);
-  let id = params.get("paymentStatus");
   let orderId = params.get("orderId");
+  useEffect(() => {
+    dispatch(getOrderCheck(orderId))
+      .unwrap()
+      .finally(() => {
+        setIsDataLoaded(true);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (status && isDataLoaded) {
+      setDisplayStatus("thankYou");
+    } else if (!status && isDataLoaded) {
+      setDisplayStatus("apology");
+    }
+  }, [status, isDataLoaded]);
   const handleViewDetail = () => {
     dispatch(getOrderDetail(orderId)).unwrap();
     openModal();
@@ -39,7 +55,8 @@ const ThankYou = () => {
     <section>
       <Container>
         <Row>
-          {id === "1" ? (
+          {displayStatus === "thankYou" && (
+            // Hiển thị phần cảm ơn
             <Col lg="12" className="pt-5 text-center">
               <div className="thank__you">
                 <span>
@@ -59,7 +76,9 @@ const ThankYou = () => {
                 </Button>
               </div>
             </Col>
-          ) : (
+          )}
+          {displayStatus === "apology" && (
+            // Hiển thị phần xin lỗi
             <Col lg="12" className="pt-5 text-center">
               <div className="thank__you">
                 <span>
@@ -76,6 +95,7 @@ const ThankYou = () => {
               </div>
             </Col>
           )}
+
           {showModal && (
             <div className="modal-overlay2" onClick={handleOverlayClick}>
               <div className="modal2 col-md-8">

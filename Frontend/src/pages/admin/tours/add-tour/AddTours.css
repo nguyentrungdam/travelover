@@ -131,3 +131,9 @@ body.modal-open {
 .w-15 {
   width: 15% !important;
 }
+.h200 {
+  height: 200px !important;
+}
+.h-150 {
+  height: 150px !important;
+}

@@ -145,14 +145,14 @@ const OrderList = () => {
   const notify = (prop) => {
     return new Promise((resolve) => {
       if (prop === 1) {
-        toast.success("Cập nhật thành công! 👌", {
+        toast.success("Update successful! 👌", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1000,
           pauseOnHover: true,
           onClose: resolve,
         });
       } else {
-        toast.error("Không thể cập nhật, vui lòng thử lại!", {
+        toast.error("Unable to update, please try again!", {
           position: toast.POSITION.TOP_RIGHT,
           pauseOnHover: true,
           autoClose: 1000,

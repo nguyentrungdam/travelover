@@ -17,6 +17,7 @@ import {
 const UpdateDiscount = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
+    discountCode: "",
     discountTitle: "",
     description: "",
     startDate: "",
@@ -54,6 +55,10 @@ const UpdateDiscount = () => {
     // Tạo đối tượng FormData
     const formDataObject = new FormData();
     formDataObject.append("discountId", id);
+    formDataObject.append(
+      "discountCode",
+      formData.discountCode || discount.discountCode
+    );
     formDataObject.append(
       "discountTitle",
       formData.discountTitle || discount.discountTitle
@@ -102,13 +107,13 @@ const UpdateDiscount = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Cập nhật discount thành công!👌", {
+      toast.success("Update successful! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else {
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+      toast.error("Unable to update, please try again!", {
         position: toast.POSITION.TOP_RIGHT,
         pauseOnHover: true,
         autoClose: 1000,
@@ -135,7 +140,7 @@ const UpdateDiscount = () => {
             <div className="card-body">
               <form>
                 <div className="row gx-3 mb-3">
-                  <div className="col-md-6">
+                  <div className="col-md-4">
                     <label className="small mb-1">Discount title</label>
                     <input
                       name="discountTitle"
@@ -146,7 +151,7 @@ const UpdateDiscount = () => {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="col-md-6">
+                  <div className="col-md-4">
                     <label className="small mb-1">Description</label>
                     <input
                       name="description"
@@ -155,6 +160,17 @@ const UpdateDiscount = () => {
                       className="form-control"
                       onChange={handleChange}
                       placeholder="Enter description"
+                    />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="small mb-1">Discount code</label>
+                    <input
+                      name="discountCode"
+                      defaultValue={discount.discountCode}
+                      className="form-control"
+                      type="text"
+                      placeholder="Code of the discount..."
+                      onChange={handleChange}
                     />
                   </div>
                 </div>

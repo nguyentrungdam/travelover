@@ -56,7 +56,8 @@
   max-width: 200px; /* Ảnh sẽ không vượt quá kích thước của ô */
   height: auto; /* Duy trì tỷ lệ khung hình khi thay đổi kích thước */
 }
-.modal-overlay2 {
+.modal-overlay2,
+.modal-overlay3 {
   position: fixed;
   top: 0;
   left: 0;
