@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.exception.TryCatchException;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.image.dto.Image;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
@@ -114,7 +115,7 @@ public class ImageService implements IImageService{
             
             return imageBytes;
     	} catch (Exception e) {
-			throw new CustomException("There was an error during file compression: " + e.getMessage());
+			throw new TryCatchException(e);
 		}
     }
     
@@ -131,11 +132,13 @@ public class ImageService implements IImageService{
         
         Path pathNew = Paths.get(path);
         try {
+        	if (!Files.exists(pathNew.getParent())) {
+                Files.createDirectories(pathNew.getParent());
+            }
         	Files.write(pathNew, imageBytes);
         } catch (Exception e) {
-        	throw new CustomException("There was an error during file compression: " + e.getMessage());
+        	throw new TryCatchException(e);
 		}
-        
     }
     
     private File getImageFile(String fileName) {
@@ -276,10 +279,8 @@ public class ImageService implements IImageService{
 				String imageId = getIdByUrl(itemString);
 				deleteNotCheck(imageId);
 			}
-			
-			throw new CustomException("An error occurred during the image upload process");
+			throw new TryCatchException(e);
 		}
-		
 		
 		return imegeUrlList;
 	}

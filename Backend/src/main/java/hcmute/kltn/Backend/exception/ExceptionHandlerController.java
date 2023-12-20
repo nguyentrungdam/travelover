@@ -30,6 +30,23 @@ public class ExceptionHandlerController {
 		});
     }
 	
+	@ExceptionHandler(TryCatchException.class)
+    public ResponseEntity<ResponseObject> handleTryCatchException(TryCatchException e) {
+		StackTraceElement[] stackTrace = e.getStackTrace();
+        String methodName = stackTrace[0].getMethodName();
+        
+        String messageSplit[] = e.getMessage().split(":");
+        String message = messageSplit[messageSplit.length - 1].trim();
+        
+		System.out.println("Something went wrong: <" + methodName + "> " + message);
+		
+    	return iResponseObjectService.failed(new Response() {
+			{
+				setMessage("Something went wrong: <" + methodName + "> " + message);
+			}
+		});
+    }
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseObject> handleValidationExceptions(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();

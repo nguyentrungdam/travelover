@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.exception.TryCatchException;
 import hcmute.kltn.Backend.model.base.video.dto.Video;
 import hcmute.kltn.Backend.model.base.video.service.IVideoService;
 
@@ -20,6 +21,28 @@ public class VideoService implements IVideoService{
     private String uploadDir;
 	@Value("${backend.dev.domain}")
     private String backendDomain;
+	
+	private void checkFieldCondition(MultipartFile file) {
+    	// check null file
+        if (file.isEmpty()) {
+            throw new CustomException("File is empty");
+        }
+        
+        // check file type
+        String contentType = file.getContentType();
+        System.out.println("contentType = " + contentType);
+        if (!contentType.startsWith("video/mp4")) {
+            throw new CustomException("Video files must have the extension of .mp4");
+        }
+        
+        // check file size
+//        long sizeByte = file.getSize();
+//        float sizeKB = sizeByte / 1024;
+//        float sizeMB = sizeKB / 1024;
+//		if (sizeMB > 2.1f) {
+//			throw new CustomException("File size cannot be larger than 2MB");
+//		}
+    }
 	
 	private void saveVideo(MultipartFile file, String path) {
 //    	long sizeByte = image.getSize();
@@ -37,12 +60,15 @@ public class VideoService implements IVideoService{
             }
     		Files.write(pathNew, videoBytes);
     	} catch (Exception e) {
-    		throw new CustomException("Video upload errors: " + e.getMessage());
+    		throw new TryCatchException(e);
 		}
     }
 
 	@Override
 	public Video createVideo(MultipartFile file) {
+		// check field condition
+		checkFieldCondition(file);
+				
 		System.out.println("file name = " + file.getOriginalFilename());
 		String fileName = file.getOriginalFilename();
     	String[] fileNameSplit = fileName.split("\\.");
@@ -69,7 +95,7 @@ public class VideoService implements IVideoService{
 			UrlResource video = new UrlResource(pathNew.toUri());
 			return video;
 		} catch (Exception e) {
-			throw new CustomException("Video get resource errors: " + e.getMessage());
+			throw new TryCatchException(e);
 		}
 	}
 

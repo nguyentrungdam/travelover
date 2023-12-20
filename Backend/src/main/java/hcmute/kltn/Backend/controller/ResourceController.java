@@ -3,6 +3,7 @@ package hcmute.kltn.Backend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping(path = "")
 @Tag(
-		name = "Videos Resource", 
+		name = "Resource", 
 		description = "APIs for managing videos resource\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
