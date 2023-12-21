@@ -114,9 +114,11 @@ public class EmailService implements IEmailService{
 				+ "		\r\n"
 				+ "		<p>Xin chào [tên tài khoản].</p>\r\n"
 				+ "		<p>Đơn hàng <span style=\"color: #436eee;\">[id]</span> của bạn đã được đặt thành công ngày [ngày hôm nay].</p>\r\n"
+				+ "		<!-- \r\n"
 				+ "		<div class=\"btn\">\r\n"
 				+ "			<a class=\"button\" href=\"https://drive.google.com/file/d/1RpOxkIjgATDdlxbtiVqj4vNprTorZhWK/view?usp=sharing\" style=\"color: #FFFFFF;\">Chi tiết đơn hàng</a>\r\n"
 				+ "		</div>\r\n"
+				+ "		-->\r\n"
 				+ "		\r\n"
 				+ "        <h3>THÔNG TIN ĐƠN HÀNG</h3>\r\n"
 				+ "        <table>\r\n"
@@ -135,6 +137,10 @@ public class EmailService implements IEmailService{
 				+ "            <tr>\r\n"
 				+ "                <th>Tên người đặt:</th>\r\n"
 				+ "                <th>[Full name]</th>\r\n"
+				+ "            </tr>\r\n"
+				+ "            <tr>\r\n"
+				+ "                <th>email:</th>\r\n"
+				+ "                <th>[email]</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Số điện thoại:</th>\r\n"
@@ -185,11 +191,11 @@ public class EmailService implements IEmailService{
 				+ "        <table>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Tổng thanh toán:</th>\r\n"
-				+ "                <th>[final price]</th>\r\n"
+				+ "                <th>[final price]đ</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Đã thanh toán:</th>\r\n"
-				+ "                <th>[discount.amount]</th>\r\n"
+				+ "                <th>[discount.amount]đ</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "        </table>\r\n"
 				+ "\r\n"
@@ -289,8 +295,10 @@ public class EmailService implements IEmailService{
 	public EmailDTO getInfoOrderSuccess(OrderDTO orderDTO, String customerName) {
 		String orderId = orderDTO.getOrderId();
 		
-		String orderDate = orderDTO.getCreatedAt().toString();
+		String orderDate = orderDTO.getCreatedAt2().toLocalDate().toString();
+		String orderTime = orderDTO.getCreatedAt2().toLocalTime().toString();
 		String fullName = orderDTO.getCustomerInformation().getFullName();
+		String emailAddress = orderDTO.getCustomerInformation().getEmail();
 		String phoneNumber = orderDTO.getCustomerInformation().getPhoneNumber();
 		String numberOfAdult = String.valueOf(orderDTO.getNumberOfAdult());
 		String numberOfChildren = String.valueOf(orderDTO.getNumberOfChildren());
@@ -342,13 +350,22 @@ public class EmailService implements IEmailService{
 		String finalPrice = String.valueOf(orderDTO.getFinalPrice());
 		
 		String paid = "0";
-		if (orderDTO.getPayment().size() > 0) {
+		if (orderDTO.getPayment() != null) {
 			paid = String.valueOf(orderDTO.getPayment().get(0).getAmount());
 		}
 		
 		String subject = "Đơn hàng " + orderId + " đã đặt thành công";
 		
 		String imageUrlTest = "https://th.bing.com/th/id/R.cacf2bd1c7a1bd05586301e49b0acc50?rik=8%2fqFSqnfOfPuwQ&riu=http%3a%2f%2fwwwnc.cdc.gov%2ftravel%2fimages%2ftravel-industry-air.jpg&ehk=KJKAlgrvTGmg2OgSI1Zs3jpyaeYaBMu6r5GBA1AvGYc%3d&risl=&pid=ImgRaw&r=0";
+		
+		String htmlDiscount = ""
+				+ "            <tr>\r\n"
+				+ "                <th>Giảm giá:</th>\r\n"
+				+ "                <th>-" + discountPrice + "đ</th>\r\n"
+				+ "            </tr>\r\n";
+		if (orderDTO.getDiscount().getDiscountCodeValue() == 0) {
+			htmlDiscount = "";
+		}
 		
 		String html = "<!DOCTYPE html>\r\n"
 				+ "<html>\r\n"
@@ -425,9 +442,9 @@ public class EmailService implements IEmailService{
 				+ "		\r\n"
 				+ "		<p>Xin chào " + customerName + ".</p>\r\n"
 				+ "		<p>Đơn hàng <span style=\"color: #436eee;\">" + orderId + "</span> của bạn đã được đặt thành công ngày " + orderDate + ".</p>\r\n"
-				+ "		<div class=\"btn\">\r\n"
-				+ "			<a class=\"button\" href=\"https://drive.google.com/file/d/1RpOxkIjgATDdlxbtiVqj4vNprTorZhWK/view?usp=sharing\" style=\"color: #FFFFFF;\">Chi tiết đơn hàng</a>\r\n"
-				+ "		</div>\r\n"
+//				+ "		<div class=\"btn\">\r\n"
+//				+ "			<a class=\"button\" href=\"https://drive.google.com/file/d/1RpOxkIjgATDdlxbtiVqj4vNprTorZhWK/view?usp=sharing\" style=\"color: #FFFFFF;\">Chi tiết đơn hàng</a>\r\n"
+//				+ "		</div>\r\n"
 				+ "		\r\n"
 				+ "        <h3>THÔNG TIN ĐƠN HÀNG</h3>\r\n"
 				+ "        <table>\r\n"
@@ -437,7 +454,7 @@ public class EmailService implements IEmailService{
 				+ "            </tr>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Ngày đặt hàng:</th>\r\n"
-				+ "                <th>" + orderDate + "</th>\r\n"
+				+ "                <th>" + orderDate + " " + orderTime + "</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "        </table>\r\n"
 				+ "        \r\n"
@@ -446,6 +463,10 @@ public class EmailService implements IEmailService{
 				+ "            <tr>\r\n"
 				+ "                <th>Tên người đặt:</th>\r\n"
 				+ "                <th>" + fullName + "</th>\r\n"
+				+ "            </tr>\r\n"
+				+ "            <tr>\r\n"
+				+ "                <th>email:</th>\r\n"
+				+ "                <th>" + emailAddress + "</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Số điện thoại:</th>\r\n"
@@ -481,21 +502,18 @@ public class EmailService implements IEmailService{
 				+ "                <th>Tổng tiền:</th>\r\n"
 				+ "                <th>" + totalPrice + "đ</th>\r\n"
 				+ "            </tr>\r\n"
-				+ "            <tr>\r\n"
-				+ "                <th>Giảm giá:</th>\r\n"
-				+ "                <th>-" + discountPrice + "đ</th>\r\n"
-				+ "            </tr>\r\n"
+				+ htmlDiscount
 				+ "        </table>\r\n"
 				+ "        \r\n"
 				+ "        <hr>\r\n"
 				+ "        <table>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Tổng thanh toán:</th>\r\n"
-				+ "                <th>" + finalPrice + "</th>\r\n"
+				+ "                <th>" + finalPrice + "đ</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Đã thanh toán:</th>\r\n"
-				+ "                <th>" + paid + "</th>\r\n"
+				+ "                <th>" + paid + "đ</th>\r\n"
 				+ "            </tr>\r\n"
 				+ "        </table>\r\n"
 				+ "\r\n"

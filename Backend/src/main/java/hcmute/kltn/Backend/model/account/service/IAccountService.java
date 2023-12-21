@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
+import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
@@ -21,4 +22,6 @@ public interface IAccountService {
 	public AccountDTO getDetailAccount(String accountId);
 //	public AccountDTO updateAccount(AccountDTO accountDTO);
 	public boolean initData(AccountDTO accountDTO);
+	
+	public void setRole(AccountSetRole accountSetRole);
 }

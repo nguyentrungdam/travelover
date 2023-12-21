@@ -769,26 +769,35 @@ public class TourService implements ITourService{
 				
 				Discount discountNew = new Discount();
 				discountNew = itemTour.getDiscount();
-				
-				discountNew.setUpdateIsDiscount(dateNow);
-				
 				try {
-					MonthDay startDate = MonthDay.from(discountNew.getStartDate());
-					MonthDay endDate = MonthDay.from(discountNew.getEndDate());
-					MonthDay currentDate = MonthDay.from(dateNow);
-					
-					if ((startDate.isBefore(currentDate) || startDate.equals(currentDate))
-							&& (endDate.isAfter(currentDate) || endDate.equals(currentDate))
+					if ((discountNew.getStartDate().isBefore(dateNow) || discountNew.getStartDate().equals(dateNow))
+							&& (discountNew.getEndDate().isAfter(dateNow) || discountNew.getEndDate().equals(dateNow))
 							) {
 						if (itemTour.getDiscount().getAuto() == true) {
 							discountNew.setIsDiscount(true);
 						}
 					} else {
 						discountNew.setIsDiscount(false);
-					}
+					}	
+					
+//					MonthDay startDate = MonthDay.from(discountNew.getStartDate());
+//					MonthDay endDate = MonthDay.from(discountNew.getEndDate());
+//					MonthDay currentDate = MonthDay.from(dateNow);
+//					
+//					if ((startDate.isBefore(currentDate) || startDate.equals(currentDate))
+//							&& (endDate.isAfter(currentDate) || endDate.equals(currentDate))
+//							) {
+//						if (itemTour.getDiscount().getAuto() == true) {
+//							discountNew.setIsDiscount(true);
+//						}
+//					} else {
+//						discountNew.setIsDiscount(false);
+//					}
 				} catch (Exception e) {
 					discountNew.setIsDiscount(false);
 				}
+				
+				discountNew.setUpdateIsDiscount(dateNow);
 				
 				itemTour.setDiscount(discountNew);
 				tourRepository.save(itemTour);

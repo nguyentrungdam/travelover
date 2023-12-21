@@ -103,7 +103,18 @@ public class DataLoader implements CommandLineRunner {
 		initCheck = iGeneratorSequenceService.initData(genGenSeqDiscount);
 		if (initCheck) {
 			logger.info("Success to gen data for Generator Sequence collection: "
-					+ "CollectionName = Dícount, Prefix = DCT, Description = Discount collection");
+					+ "CollectionName = Discount, Prefix = DCT, Description = Discount collection");
+		} 
+		
+		GeneratorSequenceDTO genGenSeqURL = new GeneratorSequenceDTO();
+		genGenSeqURL.setCollectionName("url");
+		genGenSeqURL.setPrefix("URL");
+		genGenSeqURL.setNumber(0);
+		genGenSeqURL.setDescription("URL collection");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqDiscount);
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = URL, Prefix = URL, Description = URL collection");
 		} 
 		
 		// GEN DATA FOR ACCOUNT TABLE

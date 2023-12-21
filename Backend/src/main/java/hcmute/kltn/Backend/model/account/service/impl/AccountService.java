@@ -4,7 +4,9 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import hcmute.kltn.Backend.component.JwtTokenUtil;
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
+import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
@@ -29,6 +32,7 @@ import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.repository.AccountRepository;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
+import hcmute.kltn.Backend.model.base.EOrderStatus;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
@@ -198,6 +202,26 @@ public class AccountService implements IAccountService{
 		return accountList;
 	}
 	
+	private String getRole(String role) {
+		int index = 0;
+		try {
+			index = Integer.valueOf(role);
+		} catch (Exception e) {
+			throw new CustomException("The role does not exist");
+		}
+		
+		
+		Map<String, String> roleMap = new HashMap<>();
+		
+		int roleId = 1;
+		for (ERole value : ERole.values()) {
+			roleMap.put(String.valueOf(roleId), String.valueOf(value));
+			roleId++;
+		}
+		
+		return roleMap.get(role);
+	}
+	
 	private AccountDTO getAccountDTO(Account account) {
 		AccountDTO accountDTONew = new AccountDTO();
 		modelMapper.map(account, accountDTONew);
@@ -356,6 +380,20 @@ public class AccountService implements IAccountService{
 		account = accountRepository.save(account);
 		
 		return true;
+	}
+
+	@Override
+	public void setRole(AccountSetRole accountSetRole) {
+		String role = getRole(accountSetRole.getRole());
+		if (role == null || role.equals("")) {
+			throw new CustomException("The role does not exist");
+		}
+		
+		Account account = new Account();
+		account = getDetail(accountSetRole.getAccountId());
+		
+		account.setRole(role);
+		update(account);
 	}
 
 //	@Override

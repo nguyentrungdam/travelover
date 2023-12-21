@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
+import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
@@ -31,7 +32,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/accounts")
 @Tag(
 		name = "Accounts", 
-		description = "APIs for managing accounts\n\n",
+		description = "APIs for managing accounts\n\n"
+				+ "__21/12/2023__\n\n"
+				+ "Tạo mới: tạo api setRole để cập nhật role cho account",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1XJgZ6J5RRIIl2k17FIpC890iZYTD6mGk/view?usp=sharing")
@@ -136,6 +139,24 @@ public class AccountController {
 			{
 				setMessage("Search Account successfully");
 				setData(accountDTOList);
+			}
+		});
+	}
+	
+	private final String setRoleDesc = "Cập nhật role cho tài khoản với giá trị tương ứng:\n\n"
+			+ "- 1: ADMIN\n\n"
+			+ "- 2: STAFF\n\n"
+			+ "- 3: CUSTOMER";
+	@RequestMapping(value = "/set-role", method = RequestMethod.PUT)
+	@Operation(summary = "Set account role - ADMIN", description = setRoleDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+	ResponseEntity<ResponseObject> setRole(
+			@RequestBody AccountSetRole accountSetRole) {
+		iAccountService.setRole(accountSetRole);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Set account role successfully");
 			}
 		});
 	}
