@@ -160,47 +160,171 @@ const tours = [
   },
 ];
 // data.js
-export const blogData = [
+export const blogDataBig = [
   {
-    title: "Du hành ngược thời gian tại làng dân gian Naganeupseong Hàn Quốc",
-    image:
-      "https://bizweb.dktcdn.net/100/489/447/articles/6-1.jpg?v=1688305324900",
-    link: "/du-hanh-nguoc-thoi-gian-tai-lang-dan-gian-naganeupseong-han-quoc",
-    date: "02/07/2023",
-    author: "Nguyễn Thị Kim Anh",
-    summary:
-      "Với lịch sử gần 700 năm, ngôi làng pháo đài Naganeupseong của Hàn Quốc khiến người ta ngỡ ngàng bởi thời gian dường như ngừng lại ở nơi đây. Những ngôi nhà xây đơn giản với mái tranh, đá không...",
-  },
-  {
-    title: "Cắm trại ở Chư Nâm ngắm thiên đường mây ở độ cao",
-    image:
-      "https://bizweb.dktcdn.net/100/489/447/articles/5.jpg?v=1688305387470",
-    link: "/cam-trai-o-chu-nam-ngam-thien-duong-may-o-do-cao",
-    date: "02/07/2023",
-    author: "Nguyễn Thị Kim Anh",
-    summary:
-      "Đỉnh Chư Nam Gia Lai là địa điểm dừng chân hấp dẫn thu hút những người đam mê trekking, khám phá thiên nhiên và cắm trại ở Chư Nâm chính là một trong những trải nghiệm đang rất được yêu thích thời gian gần đây. Cắm trại ở Chư Nâm ngắm thiên đường mây ở độ cao 1.472m luôn là một trải nghiệm tuyệt vời. Tạm rời xa chốn thị thành náo nhiệt cắm trại ở Chư Nâm và tận hưởng thiên nhiên tuyệt vời, tận hưởng cái nắng, cái gió và vẻ đẹp của núi đồi, bình nguyên xanh thẳm...",
-  },
-  {
+    id: 5,
     title:
-      "Kinh nghiệm cắm trại trên núi Bà Đen Tây Ninh cuối tuần siêu trải nghiệm",
+      "8 đặc sản Tết miền Tây trứ danh ai cũng muốn mua về làm quà năm mới",
     image:
-      "https://bizweb.dktcdn.net/100/489/447/articles/4.jpg?v=1688305102097",
-    link: "/kinh-nghiem-cam-trai-tren-nui-ba-den-tay-ninh-cuoi-tuan-sieu-trai-nghiem",
-    date: "02/07/2023",
-    author: "Nguyễn Thị Kim Anh",
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-235601035624-dac-san-tet-mien-tay-mua-ve-lam-qua-1.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
     summary:
-      "Cắm trại núi Bà Đen đang là một trong những hoạt động hấp dẫn được nhiều bạn trẻ quan tâm. Cắm trại tại núi Bà Đen với phong cảnh hùng vĩ, hoang sơ sẽ cho bạn nhiều trải nghiệm thú vị. 1. Định vị tọa độ núi Bà Đen ở đâu Tây Ninh? Núi Bà Đen Tây Ninh (Nguồn hình: Sưu tầm) Núi Bà Đen là địa điểm đã quá nổi tiếng với những người yêu thích du lịch trên núi. Núi thuộc tỉnh Tây Ninh, nằm ở phía Đông Bắc thành phố, cách trung tâm khoảng 11km, thuộc quần thể di tích văn hoá...",
+      "Miền Tây Nam Bộ được biết đến là vùng đất trù phú với những món ăn ngon, hấp dẫn. Vào dịp Tết Nguyên Đán, người dân miền Tây lại càng có dịp trổ tài nấu nướng để chuẩn bị những món ăn ngon nhất đãi khách. Trong đó, có những món ăn đặc sản đã trở thành thương hiệu, được nhiều người yêu thích và tìm mua về làm quà Tết sau khi đi du lịch miền Tây trở về.",
   },
   {
-    title: "Tháng 7 nên đi du lịch ở đâu Việt Nam là lý tưởng nhất?",
+    id: 6,
+    title:
+      "Hang Hung Thoòng - Hang động có vẻ đẹp siêu thực vừa được khám phá tại Quảng Bình",
     image:
-      "https://bizweb.dktcdn.net/100/489/447/articles/3.jpg?v=1688304814390",
-    link: "/thang-7-nen-di-du-lich-o-dau-viet-nam-la-ly-tuong-nhat",
-    date: "02/07/2023",
-    author: "Nguyễn Thị Kim Anh",
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-234007054003-hang-hung-thoong-quang-binh-2.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
     summary:
-      "Tháng 7 vẫn đang là khoảng thời gian mùa hè nên rất thích hợp cho những chuyến vi vu về các vùng biển vắng với nắng vàng, biển xanh, cát trắng. Còn với những ai yêu thích thiên nhiên, cây cỏ, yêu vẻ đẹp thanh bình, yên ả thì có thể chọn cho mình chuyến hành trình khám phá núi rừng hoang sơ thú vị. Bởi vậy, tháng 7 chính là thời điểm thích hợp để lên ý tưởng cho một hành trình lý tưởng. Đất nước Việt Nam xinh đẹp, bạn cũng có thể",
+      "Quảng Bình là một tỉnh miền Trung Việt Nam nổi tiếng với nhiều hang động kỳ vĩ, trong đó có hang Sơn Đoòng, hang động lớn nhất thế giới. Mới đây, các chuyên gia hang động đã phát hiện ra một hệ thống hang động mới mang tên Hung Thoòng, nằm sâu trong vùng lõi Vườn quốc gia Phong Nha - Kẻ Bàng.Hang Hung Thoòng Quảng Bình được đánh giá là một trong những hang động đẹp nhất thế giới với vẻ đẹp siêu thực, kỳ bí. Hang động được hình thành từ hàng triệu năm trước bởi sự bào mòn của nước mưa. Bên trong hang động, du khách sẽ được chiêm ngưỡng những nhũ đá và măng đá với đủ hình thù, màu sắc, tạo nên một khung cảnh vô cùng ấn tượng.",
+  },
+  {
+    id: 7,
+    title: "Những điểm check-in đẹp tại Quảng Bình dịp đầu xuân",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-231828041818-du-lich-quang-binh-dip-dau-mua-xuan-2.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+    summary:
+      "Du lịch Quảng Bình có nhiều danh lam thắng cảnh nổi tiếng, thu hút đông đảo du khách trong và ngoài nước. Dịp đầu xuân, Quảng Bình khoác lên mình một vẻ đẹp mới, tràn đầy sức sống, là thời điểm lý tưởng để du khách khám phá và check-in những địa điểm đẹp này.",
+  },
+  {
+    id: 8,
+    title: "5 địa điểm du lịch Quy Nhơn Tết đẹp mê hoặc lòng người",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/thanh0310-235221025250-dia-diem-du-lich-quy-nhon-1.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+    summary:
+      "Gây ấn tượng trong lòng du khách bởi thiên đường biển xinh đẹp cùng địa danh nổi tiếng để sống ảo và nghỉ dưỡng, Quy Nhơn luôn là điểm đến hàng đầu của nhiều du khách vào dịp Tết. Cùng “bỏ túi” những địa điểm du lịch Quy Nhơn Tết 2024 đáng trải nghiệm nhất dưới đây nhé.",
+  },
+];
+export const blogDataSmall = [
+  {
+    id: 2,
+    title: "Lưu gấp 8 địa điểm du lịch ngắm bình minh ở Đà Nẵng đẹp mê ly",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-230819110855-dia-diem-du-lich-ngam-binh-minh-o-da-nang-2.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+  },
+  {
+    id: 3,
+    title:
+      "Tết Dương lịch ở Đà Nẵng nên đi đâu chơi? - Gợi ý những điểm đến thú vị nhất",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-234111054107-dia-diem-du-lich-da-nang-tet-duong-lich-2.png",
+    date: "20/12/2023",
+    author: "Travelover",
+  },
+
+  {
+    id: 4,
+    title:
+      "Những lý do khiến bạn nhất định phải đón Giáng sinh ở Đà Lạt một lần trong đời",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/thanh0310-234901044924-giang-sinh-da-lat-01.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+  },
+];
+export const blogDataDetail = [
+  {
+    id: 1,
+    title:
+      "Du lịch Huế mùa xuân: tham quan Đại Nội và trải nghiệm đón Tết miền Trung",
+    image:
+      "https://media.gody.vn//images/thua-thien-hue/cung-dinh-hue/10-2016/20161018050342-cung-dinh-hue-gody%20(3).jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+    province: "Thành phố Đà Nẵng",
+    summary:
+      "Không chỉ cuốn hút du khách bởi cảnh quan thiên nhiên hữu tình, ẩm thực đặc sắc, Huế còn mang đậm dấu ấn văn hoá lịch sử của dân tộc qua các công trình, kiến trúc tiêu biểu. Để nói về vẻ đẹp Huế mùa xuân, nơi mà thể hiện được văn hoá lịch sử cùng cảnh quan thiên nhiên Huế mùa xuân đặc sắc nhất có lẽ Đại nội Huế là địa điểm nổi bật nhất. Du lịch Huế mùa xuân, hành trình tham quan Đại Nội Huế và những trải nghiệm đón Tết có lẽ là một trong những điều tuyệt vời, hãy cùng khám phá nhé.",
+  },
+  {
+    id: 2,
+    title: "Lưu gấp 8 địa điểm du lịch ngắm bình minh ở Đà Nẵng đẹp mê ly",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-230919110918-dia-diem-du-lich-ngam-binh-minh-o-da-nang-3.jpg",
+    date: "20/12/2023",
+    province: "Thành phố Đà Nẵng",
+    author: "Travelover",
+    summary:
+      "Du lịch Đà Nẵng được thiên nhiên ưu ái, ban tặng cảnh quan hoang sơ, mỗi bãi biển ở đây mang một vẻ đẹp riêng, đem đến những cảm nhận và nhiều trải nghiệm khác nhau cho du khách. Trong đó, ngắm bình minh là một trải nghiệm khó lòng bỏ qua trong hành trình khám phá vẻ đẹp của thành phố này. Dưới đây là những địa điểm ngắm bình minh Đà Nẵng khiến vạn người mê. Bãi biển Mỹ Khê, đỉnh Bàn Cờ, Bà Nà Hills, Mũi Nghê…. không chỉ là địa điểm check-in sống ảo đẹp được nhiều bạn trẻ yêu thích, mà còn là điểm ngắm bình minh không thể bỏ qua của nhiều du khách du lịch Đà Nẵng.",
+  },
+  {
+    id: 3,
+    title:
+      "Tết Dương lịch ở Đà Nẵng nên đi đâu chơi? - Gợi ý những điểm đến thú vị nhất",
+    province: "Thành phố Đà Nẵng",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-234011054031-dia-diem-du-lich-da-nang-tet-duong-lich-1.jpeg",
+    date: "20/12/2023",
+    author: "Travelover",
+    summary:
+      "Đà Nẵng là một thành phố biển xinh đẹp, nổi tiếng với những bãi biển thơ mộng, những cây cầu độc đáo, và những địa danh lịch sử, văn hóa hấp dẫn. Tết Dương lịch là thời điểm lý tưởng để du lịch Đà Nẵng, tận hưởng không khí vui tươi, nhộn nhịp của những ngày đầu năm mới. Dưới đây là một số gợi ý điểm đến thú vị cho bạn khi du lịch Đà Nẵng Tết Dương lịch: Bãi biển Mỹ Khê được mệnh danh là một trong những bãi biển đẹp nhất hành tinh. Nơi đây có bờ cát trắng mịn, làn nước trong xanh, và không khí trong lành. Bạn có thể thỏa sức tắm biển, vui đùa dưới nắng vàng, hoặc đơn giản là ngồi ngắm cảnh, tận hưởng những giây phút thư thái.",
+  },
+  {
+    id: 4,
+    title:
+      "Những lý do khiến bạn nhất định phải đón Giáng sinh ở Đà Lạt một lần trong đời",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/thanh0310-234901044924-giang-sinh-da-lat-01.jpg",
+    date: "20/12/2023",
+    province: "Tỉnh Lâm Đồng",
+    author: "Travelover",
+    summary:
+      "Mỗi khi nhắc đến địa điểm du lịch dịp Giáng sinh thích hợp nhất để vừa có thời tiết và không khí ấn tượng nhất có lẽ phải kể đến Đà Lạt. Tiết trời lạnh đặc trưng, khung cảnh tuyệt đẹp, nhiều lễ hội lớn là một vài trong ti tỉ lý do nên đón Giáng Sinh ở Đà Lạt được các tín đồ xê dịch truyền tai nhau, thành phố sương mù đang trở thành một trong những địa điểm check-in hot nhất với các tín đồ xê dịch mùa noel này. Dưới đây là những lý do nhất định bạn không nên bỏ lỡ chuyến du lịch Đà Lạt trong mùa Giáng sinh. Cái rét cắt da xứ cao nguyên hay những nhà thờ lung linh, cảnh sắc mơ mộng sẽ là lý do khiến chuyến du lịch Đà Lạt của bạn mùa Giáng Sinh trở nên thật tuyệt vời.",
+  },
+  {
+    id: 5,
+    title:
+      "8 đặc sản Tết miền Tây trứ danh ai cũng muốn mua về làm quà năm mới",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-235601035624-dac-san-tet-mien-tay-mua-ve-lam-qua-1.jpg",
+    date: "20/12/2023",
+    province: "Thành phố Cần Thơ",
+    author: "Travelover",
+    summary:
+      "Miền Tây Nam Bộ được biết đến là vùng đất trù phú với những món ăn ngon, hấp dẫn. Vào dịp Tết Nguyên Đán, người dân miền Tây lại càng có dịp trổ tài nấu nướng để chuẩn bị những món ăn ngon nhất đãi khách. Trong đó, có những món ăn đặc sản đã trở thành thương hiệu, được nhiều người yêu thích và tìm mua về làm quà Tết sau khi đi du lịch miền Tây trở về. Bánh tét Trà Cuôn là một trong những đặc sản Tết miền Tây trứ danh nhất. Bánh có hình dáng tròn, màu sắc bắt mắt với 4 màu xanh, đỏ, vàng, tím. Nhân bánh được làm từ thịt heo, đậu xanh, trứng muối... mang hương vị thơm ngon, đậm đà. Bánh tét Trà Cuôn thường được dùng để cúng gia tiên trong dịp Tết Nguyên Đán. Bánh tét Trà Cuôn là món quà quý để mọi người có thể tặng cho nhau như để thể hiện những tình cảm dạt dào, ý nghĩa thiết thực, giàu nét văn hóa bản địa, một đặc sản rất đời thường mà ngọt ngào hương vị.",
+  },
+  {
+    id: 6,
+    title:
+      "Hang Hung Thoòng - Hang động có vẻ đẹp siêu thực vừa được khám phá tại Quảng Bình",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-234007054003-hang-hung-thoong-quang-binh-2.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+    province: "Thành phố Đà Nẵng",
+    summary:
+      "Quảng Bình là một tỉnh miền Trung Việt Nam nổi tiếng với nhiều hang động kỳ vĩ, trong đó có hang Sơn Đoòng, hang động lớn nhất thế giới. Mới đây, các chuyên gia hang động đã phát hiện ra một hệ thống hang động mới mang tên Hung Thoòng, nằm sâu trong vùng lõi Vườn quốc gia Phong Nha - Kẻ Bàng. Hang Hung Thoòng Quảng Bình được đánh giá là một trong những hang động đẹp nhất thế giới với vẻ đẹp siêu thực, kỳ bí.",
+  },
+  {
+    id: 7,
+    title: "Những điểm check-in đẹp tại Quảng Bình dịp đầu xuân",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/camnhi-231828041818-du-lich-quang-binh-dip-dau-mua-xuan-2.jpg",
+    date: "20/12/2023",
+    province: "Thành phố Đà Nẵng",
+    author: "Travelover",
+    summary:
+      "Du lịch Quảng Bình có nhiều danh lam thắng cảnh nổi tiếng, thu hút đông đảo du khách trong và ngoài nước. Dịp đầu xuân, Quảng Bình khoác lên mình một vẻ đẹp mới, tràn đầy sức sống, là thời điểm lý tưởng để du khách khám phá và check-in những địa điểm đẹp này. Vũng Chùa - Đảo Yến là một địa điểm du lịch tâm linh nổi tiếng ở Quảng Bình. Nơi đây là nơi an nghỉ của Đại tướng Võ Nguyên Giáp. Dịp đầu xuân, Vũng Chùa - Đảo Yến khoác lên mình một vẻ đẹp bình yên, thanh tịnh là địa điểm lý tưởng để bạn viếng thăm và cầu nguyện. Ngoài ra, du khách cũng có thể tham quan khu vực xung quanh Vũng Chùa - Đảo Yến, ngắm nhìn cảnh biển hùng vĩ, thơ mộng.",
+  },
+  {
+    id: 8,
+    title: "5 địa điểm du lịch Quy Nhơn Tết đẹp mê hoặc lòng người",
+    image:
+      "https://wiki-travel.com.vn//uploads/picture/thanh0310-235221025250-dia-diem-du-lich-quy-nhon-1.jpg",
+    date: "20/12/2023",
+    author: "Travelover",
+    summary:
+      "Gây ấn tượng trong lòng du khách bởi thiên đường biển xinh đẹp cùng địa danh nổi tiếng để sống ảo và nghỉ dưỡng, Quy Nhơn luôn là điểm đến hàng đầu của nhiều du khách vào dịp Tết. Cùng “bỏ túi” những địa điểm du lịch Quy Nhơn Tết 2024 đáng trải nghiệm nhất dưới đây nhé. Sơ hữu cảnh quan thiên nhiên tuyệt đẹp với thời tiết thuận lợi quanh năm, Quy Nhơn luôn là điểm đến “hot” vào các tháng trong năm. Tuy nhiên, nếu lựa chọn dịp Tết để du lịch Quy Nhơn cũng là một lựa chọn tuyệt vời bởi, thời tiết ở Quy Nhơn vào dịp Tết mát mẻ, trời nắng đẹp và ít mưa, thích hợp để tham quan, tắm biển, tham gia các trò chơi giải trí hấp dẫn.",
   },
 ];
 export default tours;

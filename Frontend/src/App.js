@@ -30,6 +30,8 @@ import UpdateHotel from "./pages/admin/hotels/update-hotel/UpdateHotel";
 import TourScheduleForm from "./pages/admin/tours/add-tour/TourScheduleForm";
 import Introduce from "./pages/client/introduce/Introduce";
 import TourGuide from "./pages/client/tourGuide/TourGuide";
+import TourGuideDetail from "./pages/client/tourGuide/TourGuideDetail/TourGuideDetail";
+import { blogDataDetail } from "./assets/data/tours";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.account);
@@ -70,6 +72,10 @@ function App() {
       <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/introduce" element={<Introduce />} />
       <Route path="/tour-guide" element={<TourGuide />} />
+      <Route
+        path="/tour-guide/:id"
+        element={<TourGuideDetail data={blogDataDetail} />}
+      />
       <Route path="/*" element={<Page404 />} />
 
       {/* admin route */}

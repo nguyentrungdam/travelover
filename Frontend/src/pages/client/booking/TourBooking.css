@@ -163,6 +163,7 @@
   margin-bottom: 33px;
   margin-top: 45px;
 }
+.customer-list,
 .checkout-main.order-tour .customer-contact .customer-contact-inner {
   display: flex;
   align-items: center;
@@ -172,6 +173,7 @@
   border-radius: 10px;
   padding: 25px;
 }
+.info-customer-list,
 .checkout-main.order-tour .customer-contact .customer-contact-inner > * {
   width: 48%;
   margin-bottom: 20px;
@@ -467,4 +469,21 @@
 }
 .thank-img {
   width: 200px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+.w-22 {
+  width: 22% !important;
+}
+.title-persona {
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(0deg, #003773, #0054b0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 20px;
+  margin-left: 25px;
 }

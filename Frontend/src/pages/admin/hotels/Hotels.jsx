@@ -4,6 +4,7 @@ import DataTable from "../../../components/dataTable/DataTable";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../../components/Loading/Loading";
 import { getAllHotel } from "../../../slices/hotelSlice";
+import { formatDateAndHour } from "../../../utils/validate";
 
 const columns = [
   { field: "stt", headerName: "ID", width: 40, type: "string" },
@@ -34,9 +35,9 @@ const columns = [
     width: 200,
   },
   {
-    field: "createdAt",
-    headerName: "Created At",
-    width: 150,
+    field: "lastmodified",
+    headerName: "Last Modified",
+    width: 210,
     type: "string",
   },
 ];
@@ -52,7 +53,7 @@ const Hotels = () => {
           title: item.hotelName,
           email: item.contact.email,
           province: item.address.province,
-          createdAt: item.createdAt,
+          lastmodified: formatDateAndHour(item.lastModifiedAt2),
         }))
       : [];
 

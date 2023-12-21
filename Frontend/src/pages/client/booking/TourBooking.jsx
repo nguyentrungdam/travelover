@@ -40,7 +40,21 @@ const TourBooking = () => {
   const numberOfAdult = state.numberOfAdult;
   const numberOfChildren = state.numberOfChildren;
   const numberOfRoom = state.numberOfRoom;
-
+  const [adultArray, setAdultArray] = useState(
+    Array.from({ length: numberOfAdult - 1 }, (_, index) => ({
+      fullName: "",
+      age: 0,
+      gender: "Nam",
+    }))
+  );
+  const [childrenArray, setChildrenArray] = useState(
+    Array.from({ length: numberOfChildren }, (_, index) => ({
+      fullName: "",
+      age: 0,
+      gender: "Nam",
+    }))
+  );
+  const [externalMember, setExternalMember] = useState([]);
   const [note, setNote] = useState("");
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -58,7 +72,22 @@ const TourBooking = () => {
       })
     ).unwrap();
   }, []);
-  console.log(tours);
+
+  useEffect(() => {
+    // Combine both adultArray and childrenArray into one member array
+    const combinedArray = [...adultArray, ...childrenArray];
+    setExternalMember(combinedArray);
+  }, [adultArray, childrenArray]);
+
+  useEffect(() => {
+    // Update customerInformation when externalMember changes
+    setCustomerInformation((prevCustomerInformation) => ({
+      ...prevCustomerInformation,
+      member: externalMember,
+    }));
+  }, [externalMember]);
+
+  // console.log(tours);
   // validate date
   const startDateString = new Date(startDate);
   const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
@@ -69,6 +98,9 @@ const TourBooking = () => {
     fullName: getFromLocalStorage("fullName") || "",
     email: getFromLocalStorage("email") || "",
     phoneNumber: getFromLocalStorage("phoneNumber") || "",
+    gender: "Nam",
+    age: 0,
+    member: [],
   });
 
   const handleChange = (e) => {
@@ -90,7 +122,13 @@ const TourBooking = () => {
     }
 
     // Cập nhật giá trị của state chung
-    if (name === "fullName" || name === "email" || name === "phoneNumber") {
+    if (
+      name === "fullName" ||
+      name === "email" ||
+      name === "phoneNumber" ||
+      name === "age" ||
+      name === "gender"
+    ) {
       setCustomerInformation((prevCustomerInformation) => {
         return {
           ...prevCustomerInformation,
@@ -100,6 +138,19 @@ const TourBooking = () => {
     } else if (name === "note") {
       setNote(value);
     }
+  };
+  const handleChangeCustomer = (array, index, key, value) => {
+    const newArray = array.map((item, i) =>
+      i === index ? { ...item, [key]: value } : item
+    );
+    if (array === adultArray) {
+      setAdultArray(newArray);
+    } else if (array === childrenArray) {
+      setChildrenArray(newArray);
+    }
+    // Combine both adultArray and childrenArray into one member array
+    const combinedArray = [...adultArray, ...childrenArray];
+    setExternalMember(combinedArray);
   };
 
   const handlePayment = async (e) => {
@@ -162,7 +213,7 @@ const TourBooking = () => {
     setErrorMessage(""); // Đặt giá trị của errorMessage về rỗng
     setTotalSaleOff(0);
   };
-
+  console.log(customerInformation);
   const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
     return accumulator + currentRoom.price;
   }, 0);
@@ -186,14 +237,6 @@ const TourBooking = () => {
                   </div>
                 </div>
                 <div className="product-content">
-                  {/* <div className="s-rate">
-                    <span className="s-rate-span">9.98</span>
-                    <div className="s-comment">
-                      <h4>Rất tốt</h4>
-                      <span>649 quan tâm</span>
-                    </div>
-                  </div> */}
-
                   <p className="title" id="title">
                     {tours[0]?.tour?.tourTitle}
                   </p>
@@ -218,7 +261,7 @@ const TourBooking = () => {
             </div>
             <div className="col-md-7 col-12 left">
               <h3 style={{ color: "#2d4271" }}>Thông tin liên lạc</h3>
-              <div className="customer-contact mb-3">
+              <div className="customer-contact ">
                 <form
                   className="customer-contact-inner"
                   action="#"
@@ -279,9 +322,193 @@ const TourBooking = () => {
                       <span className="error-container1">{phoneError}</span>
                     )}
                   </div>
+                  <div className="w-22 position-relative mt-2">
+                    <label>
+                      Tuổi <b>*</b>
+                    </label>
+                    <input
+                      placeholder="Vd: 22"
+                      className="form-control"
+                      id="age"
+                      name="age"
+                      type="text"
+                      onChange={handleChange}
+                    />
+                  </div>{" "}
+                  <div className="w-22 position-relative mt-2">
+                    <label>
+                      Giới tính <b>*</b>
+                    </label>
+                    <select
+                      className="form-control dropdown Filter cursor-pointer"
+                      id="gender"
+                      name="gender"
+                      onChange={handleChange}
+                    >
+                      <option value="Nam">Nam</option>
+                      <option value="Nữ">Nữ</option>
+                      <option value="Khác">Khác</option>
+                    </select>
+                  </div>
                 </form>
               </div>
-
+              <h3 style={{ color: "#2d4271" }}>Danh sách hành khách</h3>
+              {adultArray.length > 0 ? (
+                <div className="title-persona">
+                  <img alt="Người lớn" src="/adult.svg" />
+                  Người lớn
+                </div>
+              ) : null}
+              {adultArray.map((item, index) => (
+                <div
+                  key={`adult_${index + 0.1}`}
+                  className="customer-list py-0"
+                >
+                  <div className="name position-relative info-customer-list">
+                    <label>
+                      Họ và Tên <b>*</b>
+                    </label>
+                    <input
+                      className="form-control"
+                      placeholder="Vd: Nguyễn Văn A"
+                      name="fullName"
+                      type="text"
+                      value={item.fullName}
+                      onChange={(e) =>
+                        handleChangeCustomer(
+                          adultArray,
+                          index,
+                          "fullName",
+                          e.target.value
+                        )
+                      }
+                    />
+                    {nameError && (
+                      <span className="error-container1">{nameError}</span>
+                    )}
+                  </div>
+                  <div className="info-customer-list w-22 position-relative">
+                    <label>
+                      Tuổi<b>*</b>
+                    </label>
+                    <input
+                      placeholder="Vd: 22"
+                      className="form-control"
+                      name="age"
+                      value={item.age}
+                      type="text"
+                      onChange={(e) =>
+                        handleChangeCustomer(
+                          adultArray,
+                          index,
+                          "age",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="info-customer-list w-22 position-relative">
+                    <label>
+                      Giới tính<b>*</b>
+                    </label>
+                    <select
+                      className="form-control dropdown Filter cursor-pointer"
+                      value={item.gender}
+                      name="gender"
+                      onChange={(e) =>
+                        handleChangeCustomer(
+                          adultArray,
+                          index,
+                          "gender",
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option value="Nam">Nam</option>
+                      <option value="Nữ">Nữ</option>
+                      <option value="Khác">Khác</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
+              {childrenArray.length > 0 ? (
+                <div className="title-persona">
+                  <img alt="Trẻ em" src="/children.svg" />
+                  Trẻ em
+                </div>
+              ) : null}
+              {childrenArray.map((item, index) => (
+                <div
+                  key={`children_${index + 0.2}`}
+                  className="customer-list py-0"
+                >
+                  <div className="name position-relative info-customer-list">
+                    <label>
+                      Họ và Tên <b>*</b>
+                    </label>
+                    <input
+                      className="form-control"
+                      placeholder="Vd: Nguyễn Văn A"
+                      value={item.fullName}
+                      name="fullName"
+                      type="text"
+                      onChange={(e) =>
+                        handleChangeCustomer(
+                          childrenArray,
+                          index,
+                          "fullName",
+                          e.target.value
+                        )
+                      }
+                    />
+                    {nameError && (
+                      <span className="error-container1">{nameError}</span>
+                    )}
+                  </div>
+                  <div className="info-customer-list w-22 position-relative">
+                    <label>
+                      Tuổi<b>*</b>
+                    </label>
+                    <input
+                      placeholder="Vd: 7"
+                      className="form-control"
+                      name="age"
+                      value={item.age}
+                      type="text"
+                      onChange={(e) =>
+                        handleChangeCustomer(
+                          childrenArray,
+                          index,
+                          "age",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="info-customer-list w-22 position-relative">
+                    <label>
+                      Giới tính<b>*</b>
+                    </label>
+                    <select
+                      className="form-control dropdown Filter cursor-pointer"
+                      name="gender"
+                      value={item.gender}
+                      onChange={(e) =>
+                        handleChangeCustomer(
+                          childrenArray,
+                          index,
+                          "gender",
+                          e.target.value
+                        )
+                      }
+                    >
+                      <option value="Nam">Nam</option>
+                      <option value="Nữ">Nữ</option>
+                      <option value="Khác">Khác</option>
+                    </select>
+                  </div>
+                </div>
+              ))}
               <div className="customer-save">
                 <h3>Quý khách có ghi chú lưu ý gì, hãy nói với chúng tôi !</h3>
                 <div className="customer-save-inner">
