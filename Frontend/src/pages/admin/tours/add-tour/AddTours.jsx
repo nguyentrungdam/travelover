@@ -9,6 +9,7 @@ import { axiosMultipart } from "../../../../apis/axios";
 
 const AddTours = () => {
   const fileInputRef = useRef();
+  const fileInputVideoRef = useRef();
   const fileInputRef2 = useRef();
   const [tourSchedule, setTourSchedule] = useState({
     schedule: [],
@@ -32,6 +33,7 @@ const AddTours = () => {
     termAndCondition: "",
     imageList: [],
     image: [],
+    video: "",
     //discount
     startDateDiscount: "",
     endDateDiscount: "",
@@ -365,7 +367,27 @@ const AddTours = () => {
       console.error("Lỗi khi gọi API:", error);
     }
   };
-  console.log(formData.imageList);
+  //! bên dưới là xử lý phần add video
+  const handleSelectVideo = (e) => {
+    const selectedFile = e.target.files[0];
+    const formDataClone = { ...formData };
+    const videoFormData = new FormData();
+    videoFormData.append("file", selectedFile);
+    axiosMultipart
+      .post("/videos/create", videoFormData)
+      .then((response) => {
+        formDataClone.video = response.data.data.url;
+        setFormData(formDataClone);
+      })
+      .catch((error) => {
+        notify(2);
+        console.error("Lỗi khi gọi API:", error);
+      });
+  };
+  function handleUploadButtonClickVideo() {
+    fileInputVideoRef.current.click();
+  }
+  console.log(formData.video);
   return (
     <>
       <div className="info">
@@ -654,7 +676,7 @@ const AddTours = () => {
             <div className="card-body text-center">
               <img
                 className="img-account-profile  mb-2"
-                src={formData.profileThumbnail || "/noavatar.png"}
+                src={formData.profileThumbnail || "/upload-image.jpg"}
                 alt=""
               />{" "}
               <input
@@ -686,6 +708,34 @@ const AddTours = () => {
                 onClick={openModal}
               >
                 Upload Image List
+              </button>
+            </div>
+          </div>
+          <div className="card mb-4 mb-xl-0 mt-3">
+            <div className="card-header">Video</div>
+            <div className="card-body text-center">
+              <img
+                className="img-account-profile  mb-2 w-50"
+                src="/upload-video.png"
+                alt="video/mp4"
+              />{" "}
+              <input
+                className="chooseFile"
+                type="file"
+                accept="mp4"
+                onChange={(e) => handleSelectVideo(e)}
+                style={{ display: "none" }}
+                ref={fileInputVideoRef}
+              />
+              <div className="small font-italic text-muted mb-4">
+                MP4 must not exceed 100 MB
+              </div>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={handleUploadButtonClickVideo}
+              >
+                Upload Video
               </button>
             </div>
           </div>

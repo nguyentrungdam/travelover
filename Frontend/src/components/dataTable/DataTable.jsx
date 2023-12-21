@@ -15,10 +15,16 @@ const DataTable = (props) => {
     renderCell: (params) => {
       return (
         <div className="action">
-          {props.handleUpdateOrderStatus ? (
+          {props.handleUpdateOrderStatus || props.handleUpdateAccountRole ? (
             <div
               className="update"
-              onClick={() => props.handleUpdateOrderStatus(params.row.id)}
+              onClick={() => {
+                if (props.handleUpdateOrderStatus) {
+                  props.handleUpdateOrderStatus(params.row.id);
+                } else if (props.handleUpdateAccountRole) {
+                  props.handleUpdateAccountRole(params.row.accountId);
+                }
+              }}
             >
               {props.customerRole ? (
                 <img src="/eye.svg" alt="" />

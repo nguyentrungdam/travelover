@@ -770,7 +770,7 @@ const UpdateTour = () => {
             <div className="card-body text-center">
               <img
                 className="img-account-profile  mb-2"
-                src={tour?.thumbnailUrl || "/noavatar.png"}
+                src={tour?.thumbnailUrl || "/upload-image.jpg"}
                 alt=""
               />{" "}
               <input
@@ -846,7 +846,7 @@ const UpdateTour = () => {
                     src={
                       imageUrl
                         ? imageUrl
-                        : tour.imageTotal?.[index] ?? "/noavatar.png"
+                        : tour.imageTotal?.[index] ?? "/upload-image.jpg"
                     }
                     alt=""
                   />

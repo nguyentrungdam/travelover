@@ -79,6 +79,12 @@ const ToursList = () => {
   const [showMultiSearchModal, setShowMultiSearchModal] = useState(false);
   const [tourId, setTourId] = useState("");
   const [selectedStatus, setSelectedStatus] = useState(true);
+  const [fields, setFields] = useState([{ field: "numberOfDay", value: "" }]);
+  const [currentField, setCurrentField] = useState("");
+  const [currentInputValue, setCurrentInputValue] = useState("");
+  const [keyWord, setKeyWord] = useState("");
+  const [isDiscount, setIsDiscount] = useState(false);
+  const [sort, setSort] = useState({ sortBy: "numberOfDay", order: "asc" });
   const transformedData =
     tours && Array.isArray(tours)
       ? tours.map((item, index) => ({
@@ -90,7 +96,9 @@ const ToursList = () => {
           isDiscount: item?.discount?.isDiscount,
           sale: item?.discount?.discountValue + "%",
           status: item.status,
-          lastmodified: formatDateAndHour(item.lastModifiedAt2),
+          lastmodified: formatDateAndHour(
+            item?.lastModifiedAt2 ? item.lastModifiedAt2 : new Date()
+          ),
         }))
       : [];
 
@@ -183,12 +191,6 @@ const ToursList = () => {
   };
   console.log(tours);
 
-  const [fields, setFields] = useState([{ field: "numberOfDay", value: "" }]);
-  const [currentField, setCurrentField] = useState("");
-  const [currentInputValue, setCurrentInputValue] = useState("");
-  const [keyWord, setKeyWord] = useState("");
-  const [isDiscount, setIsDiscount] = useState(false);
-  const [sort, setSort] = useState({ sortBy: "numberOfDay", order: "asc" });
   const handleAddSelect = () => {
     setFields((prevFields) => [
       ...prevFields,

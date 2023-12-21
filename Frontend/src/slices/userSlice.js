@@ -12,11 +12,22 @@ export const getAllUsers = createAsyncThunk(
     }
   }
 );
-
+export const updateRole = createAsyncThunk(
+  "accounts/set-role",
+  async (user, { rejectWithValue }) => {
+    try {
+      const response = await userApi.updateRole(user);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const userSlice = createSlice({
   name: "user",
   initialState: {
     users: [],
+    user: {},
     loading: false,
     error: null,
   },
