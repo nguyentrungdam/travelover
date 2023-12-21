@@ -8,7 +8,11 @@ import {
   getOrderDetail,
   updateOrder,
 } from "../../../slices/orderSlice";
-import { formatCurrencyWithoutD, formatDate } from "../../../utils/validate";
+import {
+  formatCurrencyWithoutD,
+  formatDate,
+  formatDateAndHour,
+} from "../../../utils/validate";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -63,13 +67,7 @@ const columns = [
     field: "createAt",
     type: "string",
     headerName: "Create At",
-    width: 150,
-  },
-  {
-    field: "lastModifiedAt",
-    type: "string",
-    headerName: "Last Modified ",
-    width: 180,
+    width: 200,
   },
 ];
 
@@ -96,8 +94,7 @@ const OrderList = () => {
           // discount: checkDiscount(item?.discount.discountTourValue),
           name: item?.customerInformation.fullName,
           status: item?.orderStatus,
-          createAt: formatDate(item?.createdAt),
-          lastModifiedAt: formatDate(item?.lastModifiedAt),
+          createAt: formatDateAndHour(item?.createdAt2),
         }))
       : [];
   console.log(orders);

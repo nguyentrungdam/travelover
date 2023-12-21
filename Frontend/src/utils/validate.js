@@ -53,6 +53,29 @@ export function formatDate(inputDate) {
   const formattedDate = format(dateObject, "dd-MM-yyyy");
   return formattedDate;
 }
+export function formatDateAndHour(inputDateTime) {
+  const originalDate = new Date(inputDateTime);
+  // Định dạng ngày tháng
+  const options = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  };
+
+  const formattedDateTime = new Intl.DateTimeFormat("en-US", options).format(
+    originalDate
+  );
+
+  // Tạo định dạng cuối cùng
+  const [datePart, timePart] = formattedDateTime.split(", ");
+  const [month, day, year] = datePart.split("/");
+  const formattedDateTimeFinal = `${day}-${month}-${year}, ${timePart}`;
+
+  return formattedDateTimeFinal;
+}
 
 export function formatDateToVietnamese(dateString) {
   const daysOfWeek = [

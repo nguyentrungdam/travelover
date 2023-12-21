@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { formatDateAndHour } from "../../../utils/validate";
 const columns = [
   { field: "id", headerName: "ID", width: 40, type: "string" },
   {
@@ -49,12 +50,6 @@ const columns = [
       );
     },
   },
-  {
-    field: "sale",
-    headerName: "Discount Percent",
-    width: 200,
-    type: "string",
-  },
 
   {
     field: "status",
@@ -68,6 +63,12 @@ const columns = [
         <span>&#10006;</span> // Hiển thị biểu tượng X khi là false
       );
     },
+  },
+  {
+    field: "lastmodified",
+    headerName: "Last Modified",
+    width: 210,
+    type: "string",
   },
 ];
 
@@ -89,6 +90,7 @@ const ToursList = () => {
           isDiscount: item?.discount?.isDiscount,
           sale: item?.discount?.discountValue + "%",
           status: item.status,
+          lastmodified: formatDateAndHour(item.lastModifiedAt2),
         }))
       : [];
 

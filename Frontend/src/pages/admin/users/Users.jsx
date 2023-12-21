@@ -6,6 +6,7 @@ import Add from "../../../components/add/Add";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../../../slices/userSlice";
 import Loading from "../../../components/Loading/Loading";
+import { formatDateAndHour } from "../../../utils/validate";
 
 const columns = [
   { field: "id", headerName: "ID", width: 50 },
@@ -42,6 +43,12 @@ const columns = [
     headerName: "Role",
     width: 150,
   },
+  {
+    field: "createdAt",
+    type: "string",
+    headerName: "Created At",
+    width: 200,
+  },
 ];
 
 const Users = () => {
@@ -57,6 +64,7 @@ const Users = () => {
           firstName: item.firstName,
           email: item.email,
           role: item.role,
+          createdAt: formatDateAndHour(item.createdAt2),
         }))
       : [];
 

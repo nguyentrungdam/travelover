@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllOrders, getOrderDetail } from "../../../slices/orderSlice";
 import {
   formatCurrencyWithoutD,
+  formatDateAndHour,
   getVietNameseNameOfProcess,
 } from "../../../utils/validate";
 import { useDispatch, useSelector } from "react-redux";
@@ -99,7 +100,7 @@ const Bill = () => {
           finalPrice: item?.finalPrice,
           totalPrice: item?.totalPrice,
           status: getVietNameseNameOfProcess(item?.orderStatus),
-          lastModifiedAt: item.lastModifiedAt,
+          lastModifiedAt: formatDateAndHour(item.lastModifiedAt2),
         }))
       : [];
   useEffect(() => {
@@ -131,6 +132,7 @@ const Bill = () => {
       rowsPerPageLabel.textContent = "Số hàng mỗi trang:";
     }
   }, []);
+  console.log(order);
   return (
     <div>
       {/* Billing history card*/}
@@ -157,7 +159,7 @@ const Bill = () => {
                 <div className="modal-overlay2" onClick={handleOverlayClick}>
                   <div className="modal2 col-md-8">
                     <div className="d-flex wrap-modal-addtour">
-                      <h5 className="card-header">Order Infomation</h5>
+                      <h5 className="card-header">Thông tin đặt hàng</h5>
                       <button className="close-btn2" onClick={closeModal}>
                         X
                       </button>
@@ -167,16 +169,19 @@ const Bill = () => {
                       <div className="row gx-3 mb-3">
                         <div className="col-md-4">
                           <div>
-                            Order Status: <span>{order.orderStatus}</span>
+                            Trạng thái:{" "}
+                            <span>
+                              {getVietNameseNameOfProcess(order.orderStatus)}
+                            </span>
                           </div>
                           <div>
-                            Last Modified At:{" "}
-                            <span>{order.lastModifiedAt}</span>
+                            Ngày đặt:{" "}
+                            <span>{formatDateAndHour(order?.createdAt2)}</span>
                           </div>
                           <div>Customer Information:</div>
                           <ul>
                             <li>
-                              Full Name:
+                              Họ Tên:
                               <span>{order.customerInformation.fullName}</span>
                             </li>
                             <li>
@@ -184,22 +189,22 @@ const Bill = () => {
                               <span>{order.customerInformation.email}</span>
                             </li>
                             <li>
-                              Phone Number:{" "}
+                              Số điện thoại:{" "}
                               <span>
                                 {order.customerInformation.phoneNumber}
                               </span>
                             </li>
                           </ul>
-                          <div>Discount Detail:</div>
+                          <div>Chi tiết giảm giá:</div>
                           <ul>
                             {order.discount.discountCode ? (
                               <>
                                 <li>
-                                  Discount Code:
+                                  Mã giảm giá:
                                   <span> {order.discount.discountCode}</span>
                                 </li>
                                 <li>
-                                  Discount Price:
+                                  Giá được giảm từ mã:
                                   <span>
                                     {" "}
                                     {formatCurrencyWithoutD(
@@ -211,12 +216,12 @@ const Bill = () => {
                               </>
                             ) : (
                               <li>
-                                <span>Tour didn't use the discount code.</span>
+                                <span>Tour không sử dụng mã giảm giá.</span>
                               </li>
                             )}
                             {order.discount.discountTourValue > 0 ? (
                               <li>
-                                Tour has been reduced by:{" "}
+                                Giá tour được giảm:{" "}
                                 <span>
                                   {" "}
                                   {formatCurrencyWithoutD(
@@ -227,11 +232,11 @@ const Bill = () => {
                               </li>
                             ) : (
                               <li>
-                                <span>Tour isn't discounted.</span>
+                                <span>Tour không có giảm giá.</span>
                               </li>
                             )}
                             <li>
-                              The final price of tour:{" "}
+                              Tổng cộng:{" "}
                               <span>
                                 {" "}
                                 {formatCurrencyWithoutD(order.finalPrice)}đ
@@ -240,7 +245,7 @@ const Bill = () => {
                           </ul>
                         </div>
                         <div className="col-md-8">
-                          <div>Tour Detail:</div>
+                          <div>Chi tiết tour:</div>
                           <ul>
                             <li className="d-flex ">
                               <img
@@ -249,30 +254,34 @@ const Bill = () => {
                                 alt={order.orderDetail.tourDetail.tourTitle}
                               />
                               <div className="text-cut">
-                                Tour Title:{" "}
+                                Tên tour:{" "}
                                 <span>
                                   {order.orderDetail.tourDetail.tourTitle}
                                 </span>
+                                <div className="">
+                                  Mã tour:{" "}
+                                  <span>{order.orderDetail.tourId}</span>
+                                </div>
                               </div>
                             </li>
                             <li>
-                              Number of days:{" "}
+                              Số ngày:{" "}
                               <span>
-                                {order.orderDetail.tourDetail.numberOfDay} days
-                                and {order.orderDetail.tourDetail.numberOfNight}{" "}
-                                nights.
+                                {order.orderDetail.tourDetail.numberOfDay} ngày
+                                và {order.orderDetail.tourDetail.numberOfNight}{" "}
+                                đêm.
                               </span>
                             </li>
                             <li>
-                              Number of people:
+                              Số người:
                               <span>
                                 {" "}
-                                {order.numberOfAdult} adults and{" "}
-                                {order.numberOfChildren} childrens.
+                                {order.numberOfAdult} người lớn và{" "}
+                                {order.numberOfChildren} trẻ em.
                               </span>
                             </li>
                             <li>
-                              Note:
+                              Ghi chú:
                               <span>{order?.note}</span>
                             </li>
                           </ul>
