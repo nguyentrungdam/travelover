@@ -59,9 +59,9 @@ const FeaturedTourList = () => {
 
   return (
     <>
-      {loading && <Loading />}
       <div className="col-md-12 col-12 main-content">
         <div className="row row-cols-1 row-cols-md-4 g-4">
+          {loading && <Loading />}
           {!loading &&
             tours?.map((item, index) => (
               <div

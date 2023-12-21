@@ -15,10 +15,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { formatDateAndHour } from "../../../utils/validate";
 const columns = [
-  { field: "id", headerName: "ID", width: 40, type: "string" },
+  { field: "id", headerName: "STT", width: 40, type: "string" },
   {
     field: "img",
-    headerName: "Image",
+    headerName: "Ảnh",
     width: 70,
     renderCell: (params) => {
       return <img src={params.row.img || "/noavatar.png"} alt="" />;
@@ -28,19 +28,19 @@ const columns = [
   {
     field: "title",
     type: "string",
-    headerName: "Tour Title",
+    headerName: "Tên tour",
     width: 300,
   },
   {
     field: "ordered",
     type: "string",
-    headerName: "Ordered",
+    headerName: "Đã đặt",
     width: 130,
   },
   {
     field: "isDiscount",
-    headerName: "On Sale",
-    width: 140,
+    headerName: "Đang giảm giá",
+    width: 180,
     type: "boolean",
     renderCell: (params) => {
       return params.value ? (
@@ -53,8 +53,8 @@ const columns = [
 
   {
     field: "status",
-    headerName: "Status",
-    width: 120,
+    headerName: "Trạng thái",
+    width: 140,
     type: "boolean",
     renderCell: (params) => {
       return params.value ? (
@@ -66,8 +66,8 @@ const columns = [
   },
   {
     field: "lastmodified",
-    headerName: "Last Modified",
-    width: 210,
+    headerName: "Ngày cập nhật",
+    width: 200,
     type: "string",
   },
 ];
@@ -147,28 +147,28 @@ const ToursList = () => {
   const notify = (prop) => {
     return new Promise((resolve) => {
       if (prop === 1) {
-        toast.success("Update successful! 👌", {
+        toast.success("Cập nhật thành công! 👌", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1000,
           pauseOnHover: true,
           onClose: resolve,
         });
       } else if (prop === 3) {
-        toast.success("Search successful! 👌", {
+        toast.success("Tìm kiếm thành công! 👌", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1000,
           pauseOnHover: true,
           onClose: resolve,
         });
       } else if (prop === 4) {
-        toast.error("Unable to search, please try again!", {
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
           position: toast.POSITION.TOP_RIGHT,
           pauseOnHover: true,
           autoClose: 1000,
           onClose: resolve,
         });
       } else {
-        toast.error("Unable to update, please try again!", {
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
           position: toast.POSITION.TOP_RIGHT,
           pauseOnHover: true,
           autoClose: 1000,
@@ -255,10 +255,10 @@ const ToursList = () => {
   return (
     <div className="products vh-100">
       <div className="info">
-        <h1>Tours</h1>
+        <h1>Tour</h1>
         <ToastContainer />
 
-        <a href="/tours-list/add-new">Add New Tour</a>
+        <a href="/tours-list/add-new">Thêm tour mới</a>
       </div>
       {/* TEST THE API */}
 
@@ -270,7 +270,7 @@ const ToursList = () => {
             className="btn-block1 w-15 mb-2 ms-0"
             onClick={openMultiSearchModal}
           >
-            Multi Search
+            Tìm Kiếm...
             <FontAwesomeIcon className=" ms-1" icon={faMagnifyingGlass} />
           </div>
           <DataTable
@@ -326,7 +326,7 @@ const ToursList = () => {
             <div className="modal-overlay3" onClick={handleOverlayClick2}>
               <div className="modal2 col-md-3">
                 <div className="d-flex wrap-modal-addtour">
-                  <h5 className="card-header">Multi Search</h5>
+                  <h5 className="card-header">Tìm kiếm</h5>
                   <button
                     className="close-btn2"
                     onClick={closeMultiSearchModal}
@@ -338,12 +338,12 @@ const ToursList = () => {
                   <input
                     className="form-control mb-2 "
                     type="text"
-                    placeholder="Enter keywords"
+                    placeholder="Nhập từ khóa"
                     value={keyWord}
                     onChange={(e) => setKeyWord(e.target.value)}
                   />
                   <button className="btn btn-primary" onClick={handleAddSelect}>
-                    Add select
+                    Thêm Lựa Chọn
                   </button>
                   {fields.map((field, index) => (
                     <div key={index} className="my-2">
@@ -354,16 +354,13 @@ const ToursList = () => {
                           handleSelectChange(index, e.target.value)
                         }
                       >
-                        <option value="numberOfDay">Number of day</option>
-                        <option value="numberOfOrdered">
-                          Number of ordered
-                        </option>
-                        <option value="discountValue">Discount percent</option>
+                        <option value="numberOfDay">Số ngày</option>
+                        <option value="numberOfOrdered">Số đơn đã đặt</option>
+                        <option value="discountValue">% giảm giá</option>
                       </select>
                       <input
                         className="form-control w-50"
                         type="text"
-                        placeholder={`Enter value for ${field.field}`}
                         value={field.value}
                         onChange={(e) =>
                           handleInputChange(index, e.target.value)
@@ -372,7 +369,7 @@ const ToursList = () => {
                     </div>
                   ))}
                   <div className="d-flex">
-                    <label className="small mb-1 me-2">Discount: </label>
+                    <label className="small mb-1 me-2">Có giảm giá: </label>
                     <input
                       name="discount"
                       className="checkbox-tour"
@@ -381,7 +378,7 @@ const ToursList = () => {
                       onChange={() => setIsDiscount(!isDiscount)}
                     />
                   </div>
-                  <label className="small mb-1 me-2">Sort: </label>
+                  <label className="small mb-1 me-2">Sắp xếp: </label>
                   <div className="d-flex">
                     <select
                       className="me-2 p-1 mb-2"
@@ -393,9 +390,9 @@ const ToursList = () => {
                         }))
                       }
                     >
-                      <option value="numberOfDay">Number of day</option>
-                      <option value="numberOfOrdered">Number of ordered</option>
-                      <option value="discountValue">Discount percent</option>
+                      <option value="numberOfDay">Số ngày</option>
+                      <option value="numberOfOrdered">Số đơn đã đặt</option>
+                      <option value="discountValue">% giảm giá</option>
                     </select>
                     <select
                       className="me-2 p-1 mb-2"
@@ -407,15 +404,15 @@ const ToursList = () => {
                         }))
                       }
                     >
-                      <option value="asc">Increase</option>
-                      <option value="desc">Decrease</option>
+                      <option value="asc">Tăng </option>
+                      <option value="desc">Giảm</option>
                     </select>
                   </div>
                   <button
                     className="btn btn-primary mt-2"
                     onClick={handleMultiSearch}
                   >
-                    Search
+                    Tìm Kiếm
                   </button>
                 </div>
               </div>

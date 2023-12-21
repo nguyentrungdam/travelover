@@ -9,7 +9,7 @@ const DataTable = (props) => {
 
   const actionColumn = {
     field: "action",
-    headerName: props.customerRole ? "Chi tiết" : "Action",
+    headerName: "Chi tiết",
     sortable: false,
     width: props.width80 ? props.width80 : 200,
     renderCell: (params) => {
@@ -60,11 +60,7 @@ const DataTable = (props) => {
   return (
     <div className="dataTable">
       <DataGrid
-        localeText={
-          props.VietNamese
-            ? viVN.components.MuiDataGrid.defaultProps.localeText
-            : ""
-        }
+        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
         className="dataGrid"
         rows={props.rows}
         columns={[...props.columns, actionColumn]}

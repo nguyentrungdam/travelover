@@ -1,17 +1,17 @@
 export const menu = [
   {
     id: 1,
-    title: "Home",
+    title: "Trang Chủ",
     listItems: [
       {
         id: 1,
-        title: "Dashboard",
+        title: "Thống Kê",
         url: "/dashboard",
         icon: "/home.svg",
       },
       {
         id: 2,
-        title: "Infomation",
+        title: "Hồ Sơ",
         url: "/user-profile",
         icon: "/user.svg",
       },
@@ -19,35 +19,35 @@ export const menu = [
   },
   {
     id: 2,
-    title: "List",
+    title: "Danh Sách",
     listItems: [
       {
         id: 1,
-        title: "Users",
+        title: "Người Dùng",
         url: "/users",
         icon: "/user.svg",
       },
       {
         id: 2,
-        title: "Tours",
+        title: "Tour",
         url: "/tours-list",
         icon: "/travel-list.svg",
       },
       {
         id: 3,
-        title: "Hotels",
+        title: "Khách Sạn",
         url: "/hotels",
         icon: "/hotel.svg",
       },
       {
         id: 4,
-        title: "Orders",
+        title: "Đơn Hàng",
         url: "/orders-list",
         icon: "/order.svg",
       },
       {
         id: 5,
-        title: "Discounts",
+        title: "Giảm Giá",
         url: "/discounts",
         icon: "/discount.svg",
       },

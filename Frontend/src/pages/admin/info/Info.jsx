@@ -121,7 +121,7 @@ const Info = () => {
       <div className="row mx-0">
         <div className="col-xl-4">
           <div className="card mb-4 mb-xl-0">
-            <div className="card-header">Profile picture</div>
+            <div className="card-header">Ảnh cá nhân</div>
             <div className="card-body text-center">
               <img
                 className="img-account-profile rounded-circle mb-2"
@@ -141,46 +141,46 @@ const Info = () => {
                 ref={fileInputRef}
               />
               <div className="small font-italic text-muted mb-4">
-                JPG or PNG must not exceed 2 MB
+                JPG hoặc PNG không quá 2 MB
               </div>
               <button
                 className="btn btn-primary"
                 type="button"
                 onClick={handleUploadButtonClick}
               >
-                Upload Image
+                Tải Ảnh
               </button>
             </div>
           </div>
         </div>
         <div className="col-xl-8">
           <div className="card mb-4">
-            <div className="card-header">Account Detail</div>
+            <div className="card-header">Chi tiết tài khoản</div>
             <div className="card-body">
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-6">
                     <label className="small mb-1" htmlFor="inputFirstName">
-                      Frist name
+                      Họ
                     </label>
                     <input
                       className="form-control"
                       id="inputFirstName"
                       type="text"
-                      placeholder="Frist name"
+                      placeholder=" Họ"
                       defaultValue={account?.data?.firstName}
                       onChange={handleChangeFirstName}
                     />
                   </div>
                   <div className="col-md-6">
                     <label className="small mb-1" htmlFor="inputLastName">
-                      Last name
+                      Tên
                     </label>
                     <input
                       className="form-control"
                       id="inputLastName"
                       type="text"
-                      placeholder="Last name"
+                      placeholder="Tên"
                       defaultValue={account?.data?.lastName}
                       onChange={handleChangeLastName}
                     />
@@ -189,13 +189,13 @@ const Info = () => {
                 <div className="row gx-3 mb-3">
                   <div className="">
                     <label className="small mb-1" htmlFor="inputLocation">
-                      Address
+                      Địa chỉ
                     </label>
                     <input
                       className="form-control"
                       id="inputLocation"
                       type="text"
-                      placeholder="Address"
+                      placeholder=" Địa chỉ"
                       defaultValue={account?.data?.address}
                       onChange={handleChangeAddress}
                     />
@@ -203,7 +203,7 @@ const Info = () => {
                 </div>
                 <div className="mb-3">
                   <label className="small mb-1" htmlFor="inputEmailAddress">
-                    Email address
+                    Email
                   </label>
                   <input
                     className="form-control"
@@ -216,13 +216,13 @@ const Info = () => {
                 <div className="row gx-3 mb-3">
                   <div className="col-md-6">
                     <label className="small mb-1" htmlFor="inputPhone">
-                      Phone number
+                      Số điện thoại
                     </label>
                     <input
                       className="form-control"
                       id="inputPhone"
                       type="tel"
-                      placeholder="Phone number"
+                      placeholder="Số điện thoại"
                       defaultValue={account?.data?.phoneNumber}
                       onChange={handleChangePhone}
                     />

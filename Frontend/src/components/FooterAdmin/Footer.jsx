@@ -4,7 +4,7 @@ const FooterAdmin = () => {
   return (
     <div className="footer">
       <span>Travelover</span>
-      <span>© Travelover Admin Dashboard</span>
+      <span>© Travelover Admin</span>
     </div>
   );
 };

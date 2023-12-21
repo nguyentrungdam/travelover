@@ -8,3 +8,6 @@
   padding: 5px;
   cursor: pointer;
 }
+.css-de9k3v-MuiDataGrid-selectedRowCount {
+  visibility: hidden !important;
+}

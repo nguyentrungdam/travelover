@@ -13,3 +13,12 @@
 .products1 {
   height: 79.5vh;
 }
+.w222 {
+  width: 222px !important;
+}
+.border-bottom-1 {
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+.border-bottom-none {
+  border-bottom: none !important;
+}

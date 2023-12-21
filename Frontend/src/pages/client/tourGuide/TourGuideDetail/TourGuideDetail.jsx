@@ -126,7 +126,7 @@ const TourGuideDetail = ({ data }) => {
                   {selectedBlog.author}
                 </span>
               </div>
-              <p className="justify summary  d-lg-block">
+              <p className="justify summary  d-lg-block w-75">
                 {selectedBlog.summary}
               </p>
             </div>

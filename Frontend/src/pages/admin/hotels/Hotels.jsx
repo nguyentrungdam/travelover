@@ -7,7 +7,7 @@ import { getAllHotel } from "../../../slices/hotelSlice";
 import { formatDateAndHour } from "../../../utils/validate";
 
 const columns = [
-  { field: "stt", headerName: "ID", width: 40, type: "string" },
+  { field: "stt", headerName: "STT", width: 40, type: "string" },
   // {
   //   field: "img",
   //   headerName: "Ảnh",
@@ -19,7 +19,7 @@ const columns = [
   {
     field: "title",
     type: "string",
-    headerName: "Hotel Name",
+    headerName: "Tên",
     width: 350,
   },
   {
@@ -31,12 +31,12 @@ const columns = [
   {
     field: "province",
     type: "string",
-    headerName: "Address",
+    headerName: "Địa chỉ",
     width: 200,
   },
   {
     field: "lastmodified",
-    headerName: "Last Modified",
+    headerName: "Ngày cập nhật",
     width: 210,
     type: "string",
   },
@@ -64,8 +64,8 @@ const Hotels = () => {
   return (
     <div className="products vh-100">
       <div className="info">
-        <h1>Hotels</h1>
-        <a href="/hotels/add-new">Add New Hotel</a>
+        <h1>Khách Sạn</h1>
+        <a href="/hotels/add-new">Thêm khách sạn mới</a>
       </div>
 
       {loading ? (
