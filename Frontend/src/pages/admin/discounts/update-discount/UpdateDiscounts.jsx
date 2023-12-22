@@ -107,13 +107,13 @@ const UpdateDiscount = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Update successful! 👌", {
+      toast.success("Cập nhật thành công! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else {
-      toast.error("Unable to update, please try again!", {
+      toast.error("Có lỗi, vui lòng thử lại!", {
         position: toast.POSITION.TOP_RIGHT,
         pauseOnHover: true,
         autoClose: 1000,
@@ -130,54 +130,61 @@ const UpdateDiscount = () => {
   return (
     <div className="vh-100">
       <div className="info">
-        <h1>Update Discount</h1>
-        <a href="/discounts">Back</a>
+        <h1>Cập Nhật Giảm Giá</h1>
       </div>
       <div className="row row-1">
         <div className="col-xl-12">
           <div className="card mb-4">
-            <div className="card-header">Discount Infomation</div>
+            <div className="d-flex justify-content-between border-bottom-1">
+              <div className="card-header border-bottom-none">
+                Thông tin giảm giá
+              </div>
+              <a href="/discounts">
+                <div className="btn btn-danger"> X</div>
+              </a>
+            </div>
+
             <div className="card-body">
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-4">
-                    <label className="small mb-1">Discount title</label>
+                    <label className="small mb-1">Tên mã</label>
                     <input
                       name="discountTitle"
                       defaultValue={discount.discountTitle}
                       className="form-control"
                       type="text"
-                      placeholder="Name of the discount..."
+                      placeholder="Tên của mã..."
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-4">
-                    <label className="small mb-1">Description</label>
+                    <label className="small mb-1">Mô tả</label>
                     <input
                       name="description"
                       defaultValue={discount.description}
                       type="text"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Enter description"
+                      placeholder="Mô tả"
                     />
                   </div>
                   <div className="col-md-4">
-                    <label className="small mb-1">Discount code</label>
+                    <label className="small mb-1">Mã giảm giá</label>
                     <input
                       name="discountCode"
                       defaultValue={discount.discountCode}
                       className="form-control"
                       type="text"
-                      placeholder="Code of the discount..."
+                      placeholder="Mã giảm giá..."
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3 ">
                   <div className="col-md-6 d-flex align-items-center">
-                    <label className="small mb-1 me-3 w200">
-                      Discount date
+                    <label className="small mb-1 me-3 w222">
+                      Ngày giảm giá
                     </label>
                     <input
                       maxLength={10}
@@ -185,52 +192,52 @@ const UpdateDiscount = () => {
                       defaultValue={formatDate(discount?.startDate)}
                       name="startDate"
                       className="form-control w-75"
-                      placeholder="Ex: 15-05"
+                      placeholder="VD: 15-05-2023"
                       onChange={handleChange}
                     />
-                    <label className="small mb-1 ms-3 me-1">to</label>
+                    <label className="small mb-1 ms-3 me-1">đến</label>
                     <input
                       defaultValue={formatDate(discount?.endDate)}
                       // defaultValue={discount.endDate}
                       maxLength={10}
                       name="endDate"
                       className="form-control ms-2  w-75"
-                      placeholder="Ex: 15-07"
+                      placeholder="Vd: 15-07-2023"
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-3">
-                    <label className="small mb-1">Discount value</label>
+                    <label className="small mb-1">Giá trị giảm</label>
                     <input
                       name="discountValue"
                       defaultValue={discount.discountValue}
                       className="form-control"
                       type="text"
-                      placeholder="Enter a discount value..."
+                      placeholder="Giá trị giảm..."
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-3">
-                    <label className="small mb-1">Min order</label>
+                    <label className="small mb-1">Giá trị tối thiểu</label>
                     <input
                       name="minOrder"
                       defaultValue={discount.minOrder}
                       className="form-control"
                       type="text"
-                      placeholder="Enter a min order..."
+                      placeholder="Giá trị tối thiểu..."
                       onChange={handleChange}
                     />
                   </div>{" "}
                   <div className="col-md-3">
-                    <label className="small mb-1">Max discount</label>
+                    <label className="small mb-1">Giảm tối đa</label>
                     <input
                       name="maxDiscount"
                       defaultValue={discount.maxDiscount}
                       className="form-control"
                       type="text"
-                      placeholder="Enter a max discount..."
+                      placeholder="Giảm tối đa..."
                       onChange={handleChange}
                     />
                   </div>
@@ -238,7 +245,7 @@ const UpdateDiscount = () => {
                 {/* Discount */}
                 <div className="col-md-3 d-flex align-items-center">
                   <label className="small mb-1 me-2">
-                    Limited number of vouchers:
+                    Giới hạn số lượng mã:
                   </label>
                   <input
                     defaultValue={discount.isQuantityLimit}
@@ -253,15 +260,13 @@ const UpdateDiscount = () => {
                   <>
                     <div className="row gx-3 mb-3">
                       <div className="col-md-3">
-                        <label className="small mb-1">
-                          Quantity of voucher
-                        </label>
+                        <label className="small mb-1">Số lượng mã</label>
                         <input
                           defaultValue={discount.numberOfCode}
                           name="numberOfCode"
                           className="form-control"
                           type="text"
-                          placeholder="Enter quantity..."
+                          placeholder="  Số lượng mã..."
                           onChange={handleChange}
                         />
                       </div>
@@ -274,7 +279,7 @@ const UpdateDiscount = () => {
                   type="button"
                   onClick={handleSubmit}
                 >
-                  Update Discount
+                  Cập Nhật
                 </button>
               </form>
             </div>

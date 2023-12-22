@@ -107,9 +107,7 @@ const LocationSelect = ({
             onChange={(e) => handleSetCity(e.target.value)}
             value={selectedCity}
           >
-            <option value="">
-              {english ? "Select province/city" : "Chọn tỉnh/thành phố"}
-            </option>
+            <option value="">Chọn tỉnh/thành phố</option>
             {sortByName(cities).map((city) => (
               <option key={city?.code} value={city.name}>
                 {city.name}
@@ -122,9 +120,7 @@ const LocationSelect = ({
             value={selectedDistrict}
             className="mx-2"
           >
-            <option value="">
-              {english ? "Select district" : "Chọn quận/huyện"}
-            </option>
+            <option value="">Chọn quận/huyện</option>
             {sortByName(districts).map((district) => (
               <option key={district.code} value={district.name}>
                 {district.name}
@@ -137,9 +133,7 @@ const LocationSelect = ({
             onChange={(e) => setSelectedWard(e.target.value)}
             value={selectedWard}
           >
-            <option value="">
-              {english ? "Select ward/commune" : "Chọn phường/xã"}
-            </option>
+            <option value="">Chọn phường/xã</option>
             {sortByName(wards).map((ward) => (
               <option key={ward.code} value={ward.name}>
                 {ward.name}

@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import "./AddTours.css";
 import LocationSelect from "./LocationSelect";
 import { useDispatch } from "react-redux";
@@ -32,6 +32,7 @@ const AddTours = () => {
     termAndCondition: "",
     imageList: [],
     image: [],
+    video: "",
     //discount
     startDateDiscount: "",
     endDateDiscount: "",
@@ -165,19 +166,25 @@ const AddTours = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Add tour successful! 👌", {
+      toast.success("Cập nhật thành công! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else if (prop === 3) {
-      toast.error("Exceeded file limit!", {
+      toast.error("Số lượng tối đa là 20!", {
+        position: toast.POSITION.TOP_RIGHT,
+        autoClose: 1000,
+        pauseOnHover: true,
+      });
+    } else if (prop === 4) {
+      toast.success("Thêm ảnh thành công!", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
       });
     } else {
-      toast.error("Unable to add, please try again!", {
+      toast.error("Có lỗi, vui lòng thử lại!", {
         position: toast.POSITION.TOP_RIGHT,
         pauseOnHover: true,
         autoClose: 1000,
@@ -360,58 +367,66 @@ const AddTours = () => {
       const newImageUrls = response.data.data.map((data) => data);
       formDataClone.imageList = newImageUrls;
       setFormData(formDataClone);
+      notify(4);
     } catch (error) {
       notify(2);
       console.error("Lỗi khi gọi API:", error);
     }
   };
-  console.log(formData.imageList);
+
+  console.log(formData.video);
   return (
     <>
       <div className="info">
-        <h1>Add New Tour</h1>
-        <a href="/tours-list">Back</a>
+        <h1>Thêm Tour</h1>
       </div>
       <div className="row row-1">
         <div className="col-xl-8">
           <div className="card mb-4">
-            <div className="card-header">Tour Infomation</div>
+            <div className="d-flex justify-content-between border-bottom-1">
+              <div className="card-header border-bottom-none">
+                Thông tin tour
+              </div>
+              <a href="/tours-list">
+                <div className="btn btn-danger"> X</div>
+              </a>
+            </div>
             <div className="card-body">
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-8">
-                    <label className="small mb-1">Tour title</label>
+                    <label className="small mb-1">Tên tour</label>
                     <input
                       name="tourTitle"
                       className="form-control"
                       type="text"
-                      placeholder="Name of the tour..."
+                      placeholder="Tên tour..."
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-2">
-                    <label className="small mb-1">Days</label>
+                    <label className="small mb-1">Số ngày</label>
                     <input
                       name="numberOfDay"
                       className="form-control"
                       type="text"
-                      placeholder="Ex:3"
+                      placeholder="Vd:3"
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-2">
-                    <label className="small mb-1">Nights</label>
+                    <label className="small mb-1">Số đêm</label>
                     <input
                       name="numberOfNight"
                       className="form-control"
                       type="text"
-                      placeholder="Ex:2"
+                      placeholder="Vd:2"
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  <label className="small mb-1">Address</label>
+                  <label className="small mb-1">Địa chỉ</label>
                   <LocationSelect
                     onSelectLocation={handleSelectLocation}
                     english
@@ -422,49 +437,49 @@ const AddTours = () => {
                       name="moreLocation"
                       className="form-control"
                       type="text"
-                      placeholder="Enter house number, street name,..."
+                      placeholder="Số nhà, tên đường,..."
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-8">
-                    <label className="small mb-1">Description</label>
+                    <label className="small mb-1">Mô tả</label>
                     <textarea
                       name="tourDescription"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Enter description"
+                      placeholder="Mô tả"
                       rows="4"
                     />
                   </div>
                   <div className="col-md-4 ">
-                    <label className="small mb-1">Suitable Person</label>
+                    <label className="small mb-1">Đối tượng phù hợp</label>
                     <input
                       name="suitablePerson"
                       className="form-control"
                       type="text"
-                      placeholder="Enter a suitable person..."
+                      placeholder="Vd: Mọi người"
                       onChange={handleChange}
                     />
                     <div className="d-flex gap-1 mt-2">
                       <div className="">
-                        <label className="small ">Price of adult</label>
+                        <label className="small ">Giá người lớn</label>
                         <input
                           name="priceOfAdult"
                           className="form-control"
                           type="text"
-                          placeholder="Enter price..."
+                          placeholder="Nhập giá..."
                           onChange={handleChange}
                         />
                       </div>
                       <div className="">
-                        <label className="small ">Price of children</label>
+                        <label className="small ">Giá của trẻ em</label>
                         <input
                           name="priceOfChildren"
                           className="form-control"
                           type="text"
-                          placeholder="Enter price..."
+                          placeholder="Nhập giá..."
                           onChange={handleChange}
                         />
                       </div>
@@ -473,33 +488,31 @@ const AddTours = () => {
                 </div>
                 <div className="row gx-3 mb-3 ">
                   <div className="col-md-6 d-flex  align-items-center">
-                    <label className="small mb-1">
-                      Suitable season from date
-                    </label>
+                    <label className="small mb-1"> Mùa thích hợp từ</label>
+
                     <input
                       maxLength={5}
                       name="startDate"
                       className="form-control w-50 ms-2"
-                      placeholder="Ex: 15-05"
+                      placeholder="Vd: 15-05"
                       onChange={handleChange}
                     />
                   </div>
                   <div className="col-md-6 d-flex  align-items-center ">
-                    <label className="small mb-1">to</label>
+                    <label className="small mb-1">đến</label>
                     <input
                       maxLength={5}
                       name="endDate"
                       className="form-control w-50 ms-2"
-                      placeholder="Ex: 15-07"
+                      placeholder="Vd: 15-07"
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 border-top">
-                    <label className="pt-1 mb-1">
-                      Detailed tour description
-                    </label>
+                    <label className="pt-1 mb-1">Lịch trình</label>
+
                     <div className="schedule">
                       <div>
                         <input
@@ -517,7 +530,7 @@ const AddTours = () => {
                           type="button"
                           onClick={handleUploadButtonClick2}
                         >
-                          Upload Schedule Image
+                          Thêm ngày
                         </button>
                       </div>
 
@@ -531,7 +544,7 @@ const AddTours = () => {
                             />
                             <div className="d-flex flex-column col-md-9 ms-2">
                               <div className="">
-                                <label>Title:</label>
+                                <label>Tên:</label>
                                 <input
                                   value={image.title}
                                   className="form-control w99"
@@ -541,7 +554,7 @@ const AddTours = () => {
                                 />
                               </div>
                               <div className="">
-                                <label>Description:</label>
+                                <label>Mô tả:</label>
                                 <textarea
                                   value={image.description}
                                   className="form-control w99"
@@ -556,7 +569,7 @@ const AddTours = () => {
                                 className="btn btn-danger w-15"
                                 onClick={() => handleRemoveImage(index)}
                               >
-                                Remove
+                                Xóa
                               </button>
                             </div>
                           </div>
@@ -567,7 +580,7 @@ const AddTours = () => {
                 </div>
                 {/* Discount */}
                 <div className="col-md-3 d-flex align-items-center">
-                  <label className="small mb-1 me-2">Discount: </label>
+                  <label className="small mb-1 me-2">Giảm giá: </label>
                   <input
                     name="discount"
                     className="checkbox-tour"
@@ -580,39 +593,39 @@ const AddTours = () => {
                   <>
                     <div className="row gx-3 mb-3 ">
                       <div className="col-md-4 d-flex align-items-center w29">
-                        <label className="small mb-1">Discount date:</label>
+                        <label className="small mb-1">Ngày giảm giá:</label>
                         <input
                           maxLength={10}
                           name="startDateDiscount"
                           className="form-control w-50 ms-2"
-                          placeholder="Ex: 15-05"
+                          placeholder="Vd: 15-05-2023"
                           onChange={handleChange}
                         />
                       </div>
                       <div className="col-md-4 d-flex  align-items-center w29">
-                        <label className="small mb-1 me-2">to</label>
+                        <label className="small mb-1 me-2">đến</label>
                         <input
                           maxLength={10}
                           name="endDateDiscount"
                           className="form-control w-50 ms-2"
-                          placeholder="Ex: 15-07"
+                          placeholder="Vd: 15-07-2023"
                           onChange={handleChange}
                         />
                       </div>
                     </div>
                     <div className="row gx-3 mb-3">
                       <div className="col-md-4">
-                        <label className="small mb-1">Discount value</label>
+                        <label className="small mb-1">Giá trị giảm</label>
                         <input
                           name="discountValue"
                           className="form-control"
                           type="text"
-                          placeholder="Enter a discount value..."
+                          placeholder="Giá trị giảm..."
                           onChange={handleChange}
                         />
                       </div>
                       <div className="col-md-3">
-                        <label className="small mb-1">Auto update</label>
+                        <label className="small mb-1">Tự động cập nhật</label>
                         <input
                           name="auto"
                           className="checkbox-tour"
@@ -626,12 +639,14 @@ const AddTours = () => {
                 ) : null}
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 ">
-                    <label className="small mb-1">Policies and terms</label>
+                    <label className="small mb-1">
+                      Điều khoản & chính sách
+                    </label>
                     <textarea
                       name="termAndCondition"
                       className="form-control"
                       onChange={handleChange}
-                      placeholder="Enter term and policies"
+                      placeholder="Điều khoản & chính sách"
                       rows="3"
                     />
                   </div>
@@ -641,7 +656,7 @@ const AddTours = () => {
                   type="button"
                   onClick={handleSubmit}
                 >
-                  Create Tour
+                  Tạo Tour
                 </button>
               </form>
             </div>
@@ -650,11 +665,11 @@ const AddTours = () => {
 
         <div className="col-xl-4 px-xl-0">
           <div className="card mb-4 mb-xl-0">
-            <div className="card-header">Thumbnail</div>
+            <div className="card-header">Ảnh Bìa</div>
             <div className="card-body text-center">
               <img
                 className="img-account-profile  mb-2"
-                src={formData.profileThumbnail || "/noavatar.png"}
+                src={formData.profileThumbnail || "/upload-image.jpg"}
                 alt=""
               />{" "}
               <input
@@ -666,26 +681,26 @@ const AddTours = () => {
                 ref={fileInputRef}
               />
               <div className="small font-italic text-muted mb-4">
-                JPG or PNG must not exceed 2 MB
+                JPG hoặc PNG không quá 2 MB
               </div>
               <button
                 className="btn btn-primary"
                 type="button"
                 onClick={handleUploadButtonClick}
               >
-                Upload Thumbnail
+                Tải Ảnh
               </button>
             </div>
           </div>
           <div className="card mb-4 mb-xl-0 mt-3">
-            <div className="card-header">Image list</div>
+            <div className="card-header">Danh sách ảnh</div>
             <div className="card-body text-center">
               <button
                 className="btn btn-primary"
                 type="button"
                 onClick={openModal}
               >
-                Upload Image List
+                Tải Danh Sách Ảnh
               </button>
             </div>
           </div>
@@ -695,7 +710,7 @@ const AddTours = () => {
         <div className="modal-overlay2" onClick={handleOverlayClick}>
           <div className="modal3 col-xl-7">
             <div className="d-flex wrap-modal-addtour">
-              <span className="card-header">Image List</span>
+              <span className="card-header">Danh sách ảnh</span>
               <button className="close-btn2" onClick={closeModal}>
                 X
               </button>
@@ -716,7 +731,7 @@ const AddTours = () => {
               type="button"
               onClick={handleOpenFileInput}
             >
-              Add Image
+              Thêm Ảnh
             </button>
 
             <div className="d-flex flex-wrap ">
@@ -735,7 +750,7 @@ const AddTours = () => {
                     type="button"
                     onClick={() => handleRemoveImageList(index)}
                   >
-                    Remove
+                    Xóa
                   </button>
                 </div>
               ))}
@@ -745,7 +760,7 @@ const AddTours = () => {
               type="button"
               onClick={handleConfirmUpload}
             >
-              Confirm Upload Image List
+              Xác Nhận Thêm Ảnh
             </button>
           </div>
         </div>

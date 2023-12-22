@@ -178,7 +178,7 @@ const Bill = () => {
                             Ngày đặt:{" "}
                             <span>{formatDateAndHour(order?.createdAt2)}</span>
                           </div>
-                          <div>Customer Information:</div>
+                          <div>Thông tin khách hàng:</div>
                           <ul>
                             <li>
                               Họ Tên:

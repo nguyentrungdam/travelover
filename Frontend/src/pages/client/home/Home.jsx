@@ -5,14 +5,12 @@ import heroImg from "../../../assets/images/hero-img01.jpg";
 import heroImg02 from "../../../assets/images/hero-img02.jpg";
 import heroVideo from "../../../assets/images/hero-video.mp4";
 import worldImg from "../../../assets/images/world.png";
-import experienceImg from "../../../assets/images/experience.png";
 import Subtitle from "../../../shared/subtitle";
 import SearchBar from "../../../shared/SearchBar";
 import ServiceList from "../../../services/ServiceList";
 import FeaturedTourList from "../../../components/Featured-tours/FeaturedTourList";
 import MasonryImagesGallery from "../../../components/Image-gallery/MasonryImagesGallery";
-import Testimonials from "../../../components/Testimonial/Testimonials";
-import NewsLetter from "../../../shared/Newsletter";
+
 import ScrollToTop from "../../../shared/ScrollToTop";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
@@ -92,7 +90,7 @@ const Home = () => {
 
       <section>
         <Container>
-          <Row>
+          <Row className="position-relative">
             <Col lg="12" className="mb-5">
               <Subtitle subtitle={"Tour"} />
               <h2 className="featured__tour-title">

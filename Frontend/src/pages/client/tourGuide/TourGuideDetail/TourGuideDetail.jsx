@@ -126,7 +126,7 @@ const TourGuideDetail = ({ data }) => {
                   {selectedBlog.author}
                 </span>
               </div>
-              <p className="justify summary  d-lg-block">
+              <p className="justify summary  d-lg-block w-75">
                 {selectedBlog.summary}
               </p>
             </div>
@@ -136,10 +136,12 @@ const TourGuideDetail = ({ data }) => {
               <div className="col-md-12 col-12 main-content">
                 <section className="promotion-search-result__result pt-2">
                   <div className="order-by-title mb-2">
-                    <strong>
-                      {" "}
-                      Các tour đi đến {selectedBlog.province} với giá rẻ nhất:
-                    </strong>
+                    {totalData > 0 ? (
+                      <strong>
+                        {" "}
+                        Các tour đi đến {selectedBlog.province} với giá rẻ nhất:
+                      </strong>
+                    ) : null}
                   </div>
                   <div className="row row-cols-1 row-cols-md-4 g-4">
                     {tours?.slice(0, 4).map((item, index) => (

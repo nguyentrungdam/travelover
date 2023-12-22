@@ -135,3 +135,10 @@ export const getVietNameseNameOfProcess = (value) => {
   else if (value === "underway") return "Trong chuyến đi"; //xanh lá
   else return "Hoàn thành"; //mờ
 };
+// việt hóa vai trò
+export const getVietNameseNameOfRole = (value) => {
+  if (value === "ADMIN") return "Quản Trị Viên";
+  else if (value === "CUSTOMER") return "Khách Hàng";
+  else if (value === "STAFF") return "Nhân Viên";
+  else return "Doanh Nghiệp";
+};

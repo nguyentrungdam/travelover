@@ -33,7 +33,7 @@ const Navbar = () => {
                 />
                 <div className="DropDownContent DropDownContent1">
                   <span className="SubA seperate" onClick={handleLogout}>
-                    Logout
+                    Đăng Xuất
                   </span>
                 </div>
               </div>

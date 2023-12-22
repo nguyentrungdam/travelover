@@ -9,16 +9,22 @@ const DataTable = (props) => {
 
   const actionColumn = {
     field: "action",
-    headerName: props.customerRole ? "Chi tiết" : "Action",
+    headerName: "Chi tiết",
     sortable: false,
     width: props.width80 ? props.width80 : 200,
     renderCell: (params) => {
       return (
         <div className="action">
-          {props.handleUpdateOrderStatus ? (
+          {props.handleUpdateOrderStatus || props.handleUpdateAccountRole ? (
             <div
               className="update"
-              onClick={() => props.handleUpdateOrderStatus(params.row.id)}
+              onClick={() => {
+                if (props.handleUpdateOrderStatus) {
+                  props.handleUpdateOrderStatus(params.row.id);
+                } else if (props.handleUpdateAccountRole) {
+                  props.handleUpdateAccountRole(params.row.accountId);
+                }
+              }}
             >
               {props.customerRole ? (
                 <img src="/eye.svg" alt="" />
@@ -54,11 +60,7 @@ const DataTable = (props) => {
   return (
     <div className="dataTable">
       <DataGrid
-        localeText={
-          props.VietNamese
-            ? viVN.components.MuiDataGrid.defaultProps.localeText
-            : ""
-        }
+        localeText={viVN.components.MuiDataGrid.defaultProps.localeText}
         className="dataGrid"
         rows={props.rows}
         columns={[...props.columns, actionColumn]}

@@ -7,42 +7,42 @@ import { getAllDiscounts } from "../../../slices/discountSlice";
 import { formatCurrencyWithoutD, formatDate } from "../../../utils/validate";
 
 const columns = [
-  { field: "stt", headerName: "ID", width: 40, type: "string" },
+  { field: "stt", headerName: "STT", width: 40, type: "string" },
   {
     field: "title",
-    headerName: "Discount Title",
+    headerName: "Tên mã ",
     width: 180,
     type: "string",
   },
   {
     field: "description",
     type: "string",
-    headerName: "Description",
+    headerName: "Mô tả",
     width: 400,
   },
   {
     field: "discountCode",
     type: "string",
-    headerName: "Discount Code",
+    headerName: "Mã giảm giá",
     width: 180,
   },
 
   {
     field: "quantity",
     type: "string",
-    headerName: "Quantity",
+    headerName: "Số lượng",
     width: 140,
   },
   {
     field: "numberOfCodeUsed",
     type: "string",
-    headerName: "Used",
+    headerName: "Đã dùng",
     width: 110,
   },
   {
     field: "endDate",
     type: "string",
-    headerName: "Expiration",
+    headerName: "Ngày hết hạn",
     width: 150,
   },
 ];
@@ -79,8 +79,8 @@ const DiscountList = () => {
   return (
     <div className="products1 ">
       <div className="info">
-        <h1>Discounts</h1>
-        <a href="/discounts/add-new">Add New Discount</a>
+        <h1>Giảm Giá</h1>
+        <a href="/discounts/add-new">Thêm mã mới</a>
       </div>
       {/* TEST THE API */}
 
