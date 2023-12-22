@@ -17,6 +17,18 @@ public class StringUtil {
         return sb.toString();
 	}
 	
+	public static String genRandomInteger(int length) {
+        String characters = "0123456789";
+        Random rnd = new Random();
+        StringBuilder sb = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            sb.append(characters.charAt(rnd.nextInt(characters.length())));
+        }
+
+        return sb.toString();
+	}
+	
 	public static String getIntegerString(String input) {
 		double varDouble = Double.valueOf(input);
 		int varInteger = (int) varDouble;

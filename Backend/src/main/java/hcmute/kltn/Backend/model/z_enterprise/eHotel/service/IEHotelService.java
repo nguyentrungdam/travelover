@@ -11,6 +11,7 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room2;
 
 public interface IEHotelService {
 	public EHotel createEHotel(EHotelCreate eHotelCreate);
@@ -19,6 +20,7 @@ public interface IEHotelService {
 	public List<EHotel> getAllEHotel();
 	public List<EHotel> searchEHotel(String keyword);
 	public List<Room> searchRoom(RoomSearch roomSearch);
+	public List<Room2> searchRoom2(RoomSearch roomSearch);
 	
 	public Order createOrder(EHotelOrderCreate eHotelOrderCreate);
 	public Order updateOrder(EHotelOrderUpdate eHotelOrderUpdate);

@@ -11,7 +11,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
-import hcmute.kltn.Backend.model.account.dto.extend.Notification;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;

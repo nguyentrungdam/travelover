@@ -32,8 +32,6 @@ import hcmute.kltn.Backend.model.order.dto.extend.HotelDetail;
 public class EmailService implements IEmailService{
 	@Autowired 
 	private JavaMailSender javaMailSender;
-	@Autowired
-	private IAccountService iAccountService;
 	
 	@Value("${spring.mail.username}") 
 	private String sender;

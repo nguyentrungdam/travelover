@@ -37,10 +37,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/tours")
 @Tag(
 		name = "Tours", 
-		description = "APIs for managing tours\n\n"
-		+ "__21/12/2023__\n\n"
-		+ "Cập nhật: khi tạo hoặc sửa tour có field videoURL, gọi createVideo để nhận url và nhập vào "
-		+ "(khi cập nhật với url mới khác url cũ thì video của url sẽ bị xóa)",
+		description = "APIs for managing tours\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")

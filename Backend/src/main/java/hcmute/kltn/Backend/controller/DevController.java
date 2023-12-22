@@ -21,10 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/devs")
 @Tag(
 		name = "Devs", 
-		description = "APIs for managing devs\n\n"
-				+ "__21/12/2023__\n\n"
-				+ "Tạo mới: tạo api update-new-date-time để cập nhật giá trị cho biến date-time mới "
-				+ "(bao gồm biến createdAt2 và lastModifiedAt2 cho tất cả các bảng)",
+		description = "APIs for managing devs\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/176XCXAx04e66xHKIOnL2V1smcR2fiEGo/view?usp=sharing")

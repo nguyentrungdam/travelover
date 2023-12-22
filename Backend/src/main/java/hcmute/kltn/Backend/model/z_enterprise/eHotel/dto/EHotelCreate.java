@@ -1,10 +1,8 @@
 package hcmute.kltn.Backend.model.z_enterprise.eHotel.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.RoomCreate;
+import hcmute.kltn.Backend.model.base.extend.Address;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +14,7 @@ public class EHotelCreate {
 	@JsonProperty("eHotelName")
 	private String eHotelName; // not null
 	private String description;
-	private String phoneNumber; // not null
-	private List<RoomCreate> room; // not null
+	private String phoneNumber;
+	private Address address;
+	private int numberOfStarRating;
 }

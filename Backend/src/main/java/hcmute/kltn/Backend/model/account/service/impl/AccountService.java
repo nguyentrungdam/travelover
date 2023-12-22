@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +28,22 @@ import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
+import hcmute.kltn.Backend.model.account.dto.ChangePassword;
 import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
+import hcmute.kltn.Backend.model.account.dto.ResetPasswordReq;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
+import hcmute.kltn.Backend.model.account.dto.extend.ResetPassword;
 import hcmute.kltn.Backend.model.account.repository.AccountRepository;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
-import hcmute.kltn.Backend.model.base.EOrderStatus;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
+import hcmute.kltn.Backend.model.email.dto.EmailDTO;
+import hcmute.kltn.Backend.model.email.service.IEmailService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
+import hcmute.kltn.Backend.util.StringUtil;
 
 @Service
 public class AccountService implements IAccountService{
@@ -57,6 +63,8 @@ public class AccountService implements IAccountService{
     private MongoTemplate mongoTemplate;
     @Autowired
 	private IImageService iImageService;
+	@Autowired
+	private IEmailService iEmailService;
 
     private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Account.class);
@@ -396,45 +404,155 @@ public class AccountService implements IAccountService{
 		update(account);
 	}
 
-//	@Override
-//	public AccountDTO updateAccount(AccountDTO accountDTO) {
-//		// check role
-//		boolean isRole = false;
-//		for (ERole item : ERole.values()) {
-//			if (item.name().equals(accountDTO.getRole())) {
-//				isRole = true;
-//				break;
-//			}
-//		}
-//		if (isRole == false) {
-//			throw new CustomException("Role does not exist");
-//		}
-//		
-//		// get account from db
-//		Account account = getDetail(accountDTO.getAccountId());
-//		
-//		// check image and delete old image
-//		if ((account.getAvatar() != null 
-//				&& !account.getAvatar().equals(""))
-//				&& !account.getAvatar().equals(accountDTO.getAvatar())) {
-//			boolean checkDelete = false;
-//			checkDelete = iImageService.deleteImageByUrl(account.getAvatar());
-//			if (checkDelete == false) {
-//				throw new CustomException("An error occurred during the processing of the old image");
-//			}
-//		}	
-//		
-//		// Mapping
-//		modelMapper.map(accountDTO, account);
-//		
-//		// update account
-//		Account accountNew = new Account();
-//		accountNew = update(account);
-//		
-//		// mapping accountDTO
-//		AccountDTO
-//		
-//		return account;
-//	}
+	@Override
+	public void changePassword(ChangePassword changePassword) {
+		String password = new BCryptPasswordEncoder().encode(changePassword.getPassword());
+		Account account = iAccountDetailService.getCurrentAccount();
+		try {
+			Authentication authentication = authManager.authenticate(
+	                new UsernamePasswordAuthenticationToken(
+	                		account.getEmail(), changePassword.getPassword())
+	        );
+		} catch (Exception e) {
+			throw new CustomException("Incorrect password");
+		}
+		
+		if (changePassword.getNewPassword() != null && !changePassword.getNewPassword().equals("")) {
+			String newPassword = new BCryptPasswordEncoder().encode(changePassword.getNewPassword());
+			account.setPassword(newPassword);
+			update(account);
+			
+			// send notification mail
+			EmailDTO emailDTO = new EmailDTO();
+			emailDTO.setTo(account.getEmail());
+			emailDTO.setSubject("Thay đổi mật khẩu thành công trên Travelover");
+			emailDTO.setContent("Chào " + account.getFirstName() + ",<br>\r\n"
+					+ "<br>\r\n"
+					+ "Chúng tôi gửi email này để thông báo rằng mật khẩu cho tài khoản của bạn "
+					+ "trên Travelover đã được thay đổi thành công.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Nếu bạn không yêu cầu thay đổi mật khẩu, "
+					+ "vui lòng liên hệ với bộ phận hỗ trợ của chúng tôi ngay lập tức.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Cảm ơn bạn đã sử dụng Travelover.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Trân trọng,<br>\r\n"
+					+ "Đội ngũ Travelover.");
+			iEmailService.sendMail(emailDTO);
+		}
+	}
+
+	@Override
+	public void resetPassword(ResetPasswordReq resetPasswordReq) {
+		// find account with email
+		Optional<Account> accountFind = accountRepository.findByEmail(resetPasswordReq.getEmail());
+		if (accountFind.isEmpty()) {
+			throw new CustomException("Email has not been used to sign up for an account");
+		}
+		Account account = new Account();
+		account = accountFind.get();
+		
+		// check create reset password
+		if (account.getResetPassword() == null) {
+			throw new CustomException("Invalid verification code");
+		}
+		
+		// check code
+		if (!resetPasswordReq.getCode().equals(account.getResetPassword().getCode())) {
+			throw new CustomException("Invalid verification code");
+		}
+		
+		// check expire
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		LocalDateTime endDate = account.getResetPassword().getCreateAt().plusMinutes(30);
+		if (currentDate.isAfter(endDate)) {
+			throw new CustomException("Invalid verification code");
+		}
+		
+		// update new password
+		if (resetPasswordReq.getNewPassword() != null && !resetPasswordReq.getNewPassword().equals("")) {
+			String newPassword = new BCryptPasswordEncoder().encode(resetPasswordReq.getNewPassword());
+			account.setPassword(newPassword);
+			account.setResetPassword(null);
+			update(account);
+			
+			// send notification mail
+			EmailDTO emailDTO = new EmailDTO();
+			emailDTO.setTo(account.getEmail());
+			emailDTO.setSubject("Thay đổi mật khẩu thành công trên Travelover");
+			emailDTO.setContent("Chào " + account.getFirstName() + ",<br>\r\n"
+					+ "<br>\r\n"
+					+ "Chúng tôi gửi email này để thông báo rằng mật khẩu cho tài khoản của bạn "
+					+ "trên Travelover đã được thay đổi thành công.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Nếu bạn không yêu cầu thay đổi mật khẩu, "
+					+ "vui lòng liên hệ với bộ phận hỗ trợ của chúng tôi ngay lập tức.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Cảm ơn bạn đã sử dụng Travelover.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Trân trọng,<br>\r\n"
+					+ "Đội ngũ Travelover.");
+			iEmailService.sendMail(emailDTO);
+		}
+		
+	}
+
+	@Override
+	public void requestResetPassword(String email) {
+		// find account with email
+		Optional<Account> accountFind = accountRepository.findByEmail(email);
+		if (accountFind.isEmpty()) {
+			throw new CustomException("Email has not been used to sign up for an account");
+		}
+		Account account = new Account();
+		account = accountFind.get();
+		
+		// create code for reset password
+		String code = StringUtil.genRandomInteger(6);
+		while (code.startsWith("0")) {
+			code = StringUtil.genRandomInteger(6);
+		}
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		
+		ResetPassword resetPassword = new ResetPassword();
+		resetPassword.setCode(code);
+		resetPassword.setCreateAt(currentDate);
+		
+		account.setResetPassword(resetPassword);
+		accountRepository.save(account);
+		
+		// send mail
+		EmailDTO emailDTO = new EmailDTO();
+		emailDTO.setTo(email);
+		emailDTO.setSubject("Đặt lại mật khẩu cho tài khoản Travelover của bạn");
+		emailDTO.setContent("Chào " + account.getFirstName() + ",<br>\r\n"
+				+ "<br>\r\n"
+				+ "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn trên Travelover. "
+				+ "Mã xác nhận của bạn là: " + code + "<br>\r\n"
+				+ "<br>\r\n"
+				+ "Vui lòng nhập mã này vào trang đặt lại mật khẩu trên Travelover của chúng tôi. "
+				+ "Mã xác nhận này sẽ hết hạn sau 30 phút.<br>\r\n"
+				+ "<br>\r\n"
+				+ "Nếu bạn không yêu cầu đặt lại mật khẩu, "
+				+ "vui lòng bỏ qua email này hoặc liên hệ với bộ phận hỗ trợ của chúng tôi.<br>\r\n"
+				+ "<br>\r\n"
+				+ "Trân trọng,<br>\r\n"
+				+ "Đội ngũ Travelover.");
+		iEmailService.sendMail(emailDTO);
+	}
+
+	private void test() {
+		String test = "Chào [Tên người dùng],<br>\r\n"
+				+ "\r\n"
+				+ "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn trên [Tên ứng dụng/website]. Mã xác nhận của bạn là: 123456\r\n"
+				+ "\r\n"
+				+ "Vui lòng nhập mã này vào trang đặt lại mật khẩu trên [Tên ứng dụng/website] của chúng tôi. Mã xác nhận này sẽ hết hạn sau 30 phút.\r\n"
+				+ "\r\n"
+				+ "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này hoặc liên hệ với bộ phận hỗ trợ của chúng tôi.\r\n"
+				+ "\r\n"
+				+ "Trân trọng,\r\n"
+				+ "[Đội ngũ hỗ trợ]\r\n"
+				+ "";
+	}
 
 }

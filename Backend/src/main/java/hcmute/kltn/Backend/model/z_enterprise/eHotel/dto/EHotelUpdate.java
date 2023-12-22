@@ -20,5 +20,4 @@ public class EHotelUpdate {
 	private String eHotelName; // not null
 	private String description;
 	private String phoneNumber; // not null
-	private List<Room> room; // not null
 }

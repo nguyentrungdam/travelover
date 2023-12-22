@@ -17,7 +17,9 @@ import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
+import hcmute.kltn.Backend.model.account.dto.ChangePassword;
 import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
+import hcmute.kltn.Backend.model.account.dto.ResetPasswordReq;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
@@ -33,8 +35,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Accounts", 
 		description = "APIs for managing accounts\n\n"
-				+ "__21/12/2023__\n\n"
-				+ "Tạo mới: tạo api setRole để cập nhật role cho account",
+				+ "__22/12/2023__\n\n"
+				+ "__8:00PM__\n\n"
+				+ "Tạo mới: tạo api password/change để đổi mật khẩu cho account đang đăng nhập\n\n"
+				+ "Tạo mới: tạo api password/request-reset để yêu cầu reset password bằng email\n\n"
+				+ "Tạo mới: tạo api password/reset để đổi mật khẩu mới ngay sau khi yêu cầu reset password",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1XJgZ6J5RRIIl2k17FIpC890iZYTD6mGk/view?usp=sharing")
@@ -157,6 +162,60 @@ public class AccountController {
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Set account role successfully");
+			}
+		});
+	}
+	
+	private final String changePasswordDesc = "Thay đổi password khi đang đăng nhặp:\n\n"
+			+ "- api chỉ có password và newPassword nên FE tự check cconfirmPassword và độ dài "
+			+ "(hoặc các yêu cầu về password như lúc đăng ký tài khoản)\n\n"
+			+ "- api chỉ trả về lỗi khi password không đúng với password hiện tại của account";
+	@RequestMapping(value = "/password/change", method = RequestMethod.PUT)
+	@Operation(summary = "Change password - LOGIN", description = changePasswordDesc)
+	@PreAuthorize("isAuthenticated()")
+	ResponseEntity<ResponseObject> changePassword(
+			@RequestBody ChangePassword changePassword) {
+		iAccountService.changePassword(changePassword);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Change password successfully");
+			}
+		});
+	}
+	
+	private final String requestResetPasswordDesc = "Yêu cầu đặt lại mật khẩu:\n\n"
+			+ "- Mã xác nhận sẽ được gửi qua email\n\n"
+			+ "- Trả về lỗi nếu email chưa đuọc đăng ký tài khoản";
+	@RequestMapping(value = "/password/request-reset", method = RequestMethod.GET)
+	@Operation(summary = "Request Reset password", description = requestResetPasswordDesc)
+	ResponseEntity<ResponseObject> requestResetPassword(
+			@RequestParam String email) {
+		iAccountService.requestResetPassword(email);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Request Reset password successfully");
+			}
+		});
+	}
+	
+	private final String resetPasswordDesc = "Đặt lại mật khẩu:\n\n"
+			+ "- Các field bắt buộc phải nhập\n\n"
+			+ "- - email: '' (lấy email từ bước yêu cầu reset password)\n\n"
+			+ "- - code: '' (lấy code được gửi trong email yêu cầu reset password)\n\n"
+			+ "- - newPassword: '' (trên FE thêm 1 bước kiểm tra confirm password và các yêu cầu về password nếu có)\n\n"
+			+ "- Trả về lỗi 'Invalid verification code' nếu email chưa đuọc đăng ký tài khoản "
+			+ "hoặc code không hợp lệ hoặc tài khoản không thực hiện reset password";
+	@RequestMapping(value = "/password/reset", method = RequestMethod.PUT)
+	@Operation(summary = "Reset password", description = resetPasswordDesc)
+	ResponseEntity<ResponseObject> resetPassword(
+			@RequestBody ResetPasswordReq resetPasswordReq) {
+		iAccountService.resetPassword(resetPasswordReq);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Reset password successfully");
 			}
 		});
 	}

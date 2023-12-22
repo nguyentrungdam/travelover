@@ -4,9 +4,12 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +20,6 @@ import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
-import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
-import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
@@ -30,8 +30,10 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.OrderDetail;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room2;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.repository.EHotelRepository;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+import hcmute.kltn.Backend.util.IntegerUtil;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 
@@ -56,8 +58,14 @@ public class EHotelService implements IEHotelService{
 		if(eHotelDTO.getEHotelName() == null || eHotelDTO.getEHotelName().equals("")) {
 			throw new CustomException("Enterprise Hotel Name is not null");
 		}
-		if(eHotelDTO.getRoom() == null) {
-			throw new CustomException("Room is not null");
+		if(eHotelDTO.getAddress() == null) {
+			throw new CustomException("Address is not null");
+		}
+		if(eHotelDTO.getPhoneNumber() == null || eHotelDTO.getPhoneNumber().equals("")) {
+			throw new CustomException("Phone number is not null");
+		}
+		if(eHotelDTO.getNumberOfStarRating() < 1 || eHotelDTO.getNumberOfStarRating() > 5) {
+			throw new CustomException("Number Of Star Rating must be between 1 and 5");
 		}
 		
 		// check unique
@@ -72,9 +80,9 @@ public class EHotelService implements IEHotelService{
 		modelMapper.map(eHotelDTO, eHotel);
 		
 		// set roomId
-		for(Room itemRoom : eHotel.getRoom()) {
-			itemRoom.setRoomId(String.valueOf(eHotel.getRoom().indexOf(itemRoom) + 1));
-		}
+//		for(Room itemRoom : eHotel.getRoom()) {
+//			itemRoom.setRoomId(String.valueOf(eHotel.getRoom().indexOf(itemRoom) + 1));
+//		}
 		
 		// set default value
 		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
@@ -189,11 +197,131 @@ public class EHotelService implements IEHotelService{
 		return eHotelList;
 	}
 	
+	private Room2 genRoom(String type, int rating) {
+		Map<String, String> nameMap = new HashMap<>();
+		nameMap.put("1", "Phòng tiêu chuẩn giường đơn");
+		nameMap.put("2", "Phòng tiêu chuẩn giường đôi");
+		nameMap.put("3", "Phòng tiện nghi giường đôi");
+		nameMap.put("4", "Phòng rộng rãi giường đôi");
+		nameMap.put("5", "Phòng tiêu chuẩn 2 giường đơn");
+		nameMap.put("6", "Phòng tiêu chuẩn 2 giường");
+		nameMap.put("7", "Phòng tiện nghi 2 giường");
+		nameMap.put("8", "Phòng rộng rãi 2 giường");
+		nameMap.put("9", "Phòng tiêu chuẩn 3 giường đơn");
+		nameMap.put("10", "Phòng tiêu chuẩn gia đình");
+		nameMap.put("11", "Phòng tiện nghi gia đình");
+		nameMap.put("12", "Phòng rộng rãi gia đình");
+		
+		Map<String, List<String>> bedMap = new HashMap<>();
+		bedMap.put("1", Arrays.asList("1 Giường đơn"));
+		bedMap.put("2", Arrays.asList("1 Giường đôi"));
+		bedMap.put("3", Arrays.asList("1 Giường đôi lớn"));
+		bedMap.put("4", Arrays.asList("1 Giường lớn"));
+		bedMap.put("5", Arrays.asList("2 Giường đơn"));
+		bedMap.put("6", Arrays.asList("1 Giường đơn", "1 Giường đôi"));
+		bedMap.put("7", Arrays.asList("1 Giường đơn", "1 Giường đôi lớn"));
+		bedMap.put("8", Arrays.asList("1 Giường đơn", "1 Giường lớn"));
+		bedMap.put("9", Arrays.asList("3 Giường đơn"));
+		bedMap.put("10", Arrays.asList("2 Giường đôi"));
+		bedMap.put("11", Arrays.asList("2 Giường đôi lớn"));
+		bedMap.put("12", Arrays.asList("2 Giường lớn"));
+		
+		Map<String, Integer> standardNumberOfAdultMap = new HashMap<>();
+		standardNumberOfAdultMap.put("1", 1);
+		standardNumberOfAdultMap.put("2", 2);
+		standardNumberOfAdultMap.put("3", 2);
+		standardNumberOfAdultMap.put("4", 2);
+		standardNumberOfAdultMap.put("5", 2);
+		standardNumberOfAdultMap.put("6", 3);
+		standardNumberOfAdultMap.put("7", 3);
+		standardNumberOfAdultMap.put("8", 3);
+		standardNumberOfAdultMap.put("9", 3);
+		standardNumberOfAdultMap.put("10", 4);
+		standardNumberOfAdultMap.put("11", 4);
+		standardNumberOfAdultMap.put("12", 4);
+		
+		Map<String, Integer> maximumNumberOfChildrenMap = new HashMap<>();
+		maximumNumberOfChildrenMap.put("1", 1);
+		maximumNumberOfChildrenMap.put("2", 2);
+		maximumNumberOfChildrenMap.put("3", 2);
+		maximumNumberOfChildrenMap.put("4", 2);
+		maximumNumberOfChildrenMap.put("5", 2);
+		maximumNumberOfChildrenMap.put("6", 3);
+		maximumNumberOfChildrenMap.put("7", 3);
+		maximumNumberOfChildrenMap.put("8", 3);
+		maximumNumberOfChildrenMap.put("9", 3);
+		maximumNumberOfChildrenMap.put("10", 4);
+		maximumNumberOfChildrenMap.put("11", 4);
+		maximumNumberOfChildrenMap.put("12", 4);
+		
+		Map<String, String> actualNumberOfAdultMap = new HashMap<>();
+		actualNumberOfAdultMap.put("1", "1-1");
+		actualNumberOfAdultMap.put("2", "1-2");
+		actualNumberOfAdultMap.put("3", "1-2");
+		actualNumberOfAdultMap.put("4", "1-2");
+		actualNumberOfAdultMap.put("5", "2-3");
+		actualNumberOfAdultMap.put("6", "2-4");
+		actualNumberOfAdultMap.put("7", "2-4");
+		actualNumberOfAdultMap.put("8", "2-4");
+		actualNumberOfAdultMap.put("9", "3-5");
+		actualNumberOfAdultMap.put("10", "3-5");
+		actualNumberOfAdultMap.put("11", "3-5");
+		actualNumberOfAdultMap.put("12", "3-5");
+		
+		Map<Integer, Integer> priceRandomMap = new HashMap<>();
+		priceRandomMap.put(1, IntegerUtil.randomRange(-50, 50) * 1000);
+		priceRandomMap.put(2, IntegerUtil.randomRange(-100, 100) * 1000);
+		priceRandomMap.put(3, IntegerUtil.randomRange(-200, 200) * 1000);
+		priceRandomMap.put(4, IntegerUtil.randomRange(-300, 300) * 1000);
+		priceRandomMap.put(5, IntegerUtil.randomRange(-400, 400) * 1000);
+		
+		Map<String, Integer> priceMap = new HashMap<>();
+		priceMap.put("1", 200000 * rating + priceRandomMap.get(rating));
+		priceMap.put("2", 300000 * rating + priceRandomMap.get(rating));
+		priceMap.put("3", 400000 * rating + priceRandomMap.get(rating));
+		priceMap.put("4", 500000 * rating + priceRandomMap.get(rating));
+		priceMap.put("5", 600000 * rating + priceRandomMap.get(rating));
+		priceMap.put("6", 700000 * rating + priceRandomMap.get(rating));
+		priceMap.put("7", 800000 * rating + priceRandomMap.get(rating));
+		priceMap.put("8", 900000 * rating + priceRandomMap.get(rating));
+		priceMap.put("9", 1000000 * rating + priceRandomMap.get(rating));
+		priceMap.put("10", 1100000 * rating + priceRandomMap.get(rating));
+		priceMap.put("11", 1200000 * rating + priceRandomMap.get(rating));
+		priceMap.put("12", 1300000 * rating + priceRandomMap.get(rating));
+		
+		Room2 room = new Room2();
+		room.setName(nameMap.get(type));
+		room.setBed(bedMap.get(type));
+		room.setStandardNumberOfAdult(standardNumberOfAdultMap.get(type));
+		room.setMaximumNumberOfChildren(maximumNumberOfChildrenMap.get(type));
+		room.setActualNumberOfAdult(actualNumberOfAdultMap.get(type));
+		room.setPrice(priceMap.get(type));
+		room.setStatus(true);
+		
+		return room;
+	}
+	
 	@Override
 	public EHotel createEHotel(EHotelCreate eHotelCreate) {
 		// mapping hotelDTO
 		EHotelDTO eHotelDTO = new EHotelDTO();
 		modelMapper.map(eHotelCreate, eHotelDTO);
+		
+		List<Room2> roomList = new ArrayList<>();
+		int index = 1;
+		for (int type = 1; type <= 12; type++) {
+			Room2 room2 = new Room2();
+			room2 = genRoom(String.valueOf(type), eHotelCreate.getNumberOfStarRating());
+			
+			for (int rating = 1; rating <= (eHotelCreate.getNumberOfStarRating() * 2); rating++) {
+				Room2 room = new Room2();
+				modelMapper.map(room2, room);
+				room.setRoomId(String.valueOf(index));
+				roomList.add(room);
+				index++;
+			}
+		}
+		eHotelDTO.setRoom2(roomList);
 		
 		// create hotel
 		EHotel eHotel = create(eHotelDTO);
@@ -486,5 +614,11 @@ public class EHotelService implements IEHotelService{
 		}
 
 		return roomListResult;
+	}
+
+	@Override
+	public List<Room2> searchRoom2(RoomSearch roomSearch) {
+		
+		return null;
 	}
 }

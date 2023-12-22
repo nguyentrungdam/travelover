@@ -9,7 +9,9 @@ import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
+import hcmute.kltn.Backend.model.account.dto.ChangePassword;
 import hcmute.kltn.Backend.model.account.dto.RegisterRequest;
+import hcmute.kltn.Backend.model.account.dto.ResetPasswordReq;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
 
 public interface IAccountService {
@@ -24,4 +26,7 @@ public interface IAccountService {
 	public boolean initData(AccountDTO accountDTO);
 	
 	public void setRole(AccountSetRole accountSetRole);
+	public void changePassword(ChangePassword changePassword);
+	public void requestResetPassword(String email);
+	public void resetPassword(ResetPasswordReq resetPasswordReq);
 }

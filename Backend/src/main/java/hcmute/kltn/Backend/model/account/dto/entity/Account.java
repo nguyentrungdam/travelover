@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import hcmute.kltn.Backend.model.account.dto.extend.Notification;
+import hcmute.kltn.Backend.model.account.dto.extend.ResetPassword;
 import hcmute.kltn.Backend.model.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,6 +37,7 @@ public class Account extends BaseEntity implements UserDetails{
 	private String phoneNumber;
 	private String rank;
 	private List<Notification> notification;
+	private ResetPassword resetPassword;
 	
 	@Override
 	@JsonIgnore

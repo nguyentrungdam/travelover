@@ -43,7 +43,8 @@ public class Z_HotelController {
 			+ "- 'hotelName': ''\n"
 			+ "- 'phoneNumber': ''\n"
 			+ "- 'address': ''\n"
-			+ "- 'room': ''\n";
+			+ "- 'numberOfStarRating': '' (giá trị từ 1 đến 5)\n\n"
+			+ "Khi gọi create sẽ tự tạo ra danh sách phòng dựa trên số sao đánh giá (biến phòng mới là room2)";
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
 	@Operation(tags = "Z Enterprise Hotels", summary = "Create Hotel - ADMIN", description = createHotelDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")

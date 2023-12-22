@@ -25,9 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/videos")
 @Tag(
 		name = "Videos", 
-		description = "APIs for managing videos\n\n"
-				+ "__21/12/2023__\n\n"
-				+ "Tạo mới: tạo api create video: tải video với max size là 100MB lên để nhận link",
+		description = "APIs for managing videos\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1680C0xg0Ny--NNspQ7eG7rDPEHqmcQio/view?usp=sharing")
