@@ -1,194 +1,208 @@
-import React from "react";
-
+import React, { useState } from "react";
+import { validatePassword } from "../../../utils/validate";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUserPassword } from "../../../slices/accountSlice";
+import Loading from "../../../components/Loading/Loading";
 const Security = () => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.account);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [newPasswordError, setNewPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [showPasswords, setShowPasswords] = useState([false, false, false]);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    if (id === "currentPassword") {
+      setCurrentPassword(value);
+      const isValidPassword = validatePassword(e.target.value);
+      if (!isValidPassword) {
+        setPasswordError(
+          "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)"
+        );
+      } else {
+        setPasswordError("");
+      }
+    } else if (id === "newPassword") {
+      setNewPassword(value);
+      const isValidPassword = validatePassword(e.target.value);
+      if (!isValidPassword) {
+        setNewPasswordError(
+          "Mật khẩu nên có 8-20 ký tự và bao gồm ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt (!@#$%^&*)"
+        );
+      } else {
+        setNewPasswordError("");
+      }
+    } else if (id === "confirmPassword") {
+      setConfirmPassword(value);
+    }
+  };
+
+  const handleTogglePassword = (index) => {
+    setShowPasswords((prevShowPasswords) =>
+      prevShowPasswords.map((showPassword, i) =>
+        i === index ? !showPassword : showPassword
+      )
+    );
+  };
+
+  const handleSave = async () => {
+    // Kiểm tra xác nhận mật khẩu
+    if (newPassword !== confirmPassword) {
+      setConfirmPasswordError("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+    console.log(currentPassword);
+    console.log(newPassword);
+    try {
+      const res = await dispatch(
+        updateUserPassword({ password: currentPassword, newPassword })
+      ).unwrap();
+      console.log(res);
+      if (res.data.status === "ok") {
+        notify(1);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log(error);
+      notify(2);
+    }
+  };
+
+  const notify = (prop) => {
+    return new Promise((resolve) => {
+      if (prop === 1) {
+        toast.success("Đổi mật khẩu thành công! 👌", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
+      } else {
+        toast.error("Sai mật khẩu, thử lại!", {
+          position: toast.POSITION.TOP_RIGHT,
+          pauseOnHover: true,
+          autoClose: 1000,
+          onClose: resolve,
+        });
+      }
+    });
+  };
   return (
-    <div className="row">
-      <div className="col-lg-8">
-        {/* Change password card*/}
-        <div className="card mb-4">
-          <div className="card-header">Change Password</div>
-          <div className="card-body">
-            <form>
-              {/* Form Group (current password)*/}
-              <div className="mb-3">
-                <label className="small mb-1" htmlFor="currentPassword">
-                  Current Password
-                </label>
-                <input
-                  className="form-control"
-                  id="currentPassword"
-                  type="password"
-                  placeholder="Enter current password"
-                />
+    <>
+      {loading && <Loading />}
+      {!loading && (
+        <div className="row vh70">
+          <div className="col-lg-7">
+            <div className="card mb-4">
+              <div className="card-header">Thay đổi mật khẩu</div>
+              <div className="card-body">
+                <form>
+                  <div className="formInput  mb-2">
+                    <label className="small mb-1" htmlFor="currentPassword">
+                      Mật khẩu hiện tại
+                    </label>
+                    <div className="mb-1 inputContainer">
+                      <input
+                        className="input-form p-2 w-100"
+                        id="currentPassword"
+                        type={showPasswords[0] ? "text" : "password"}
+                        placeholder="Nhập mật khẩu hiện tại"
+                        value={currentPassword}
+                        onChange={handleChange}
+                      />
+                      <div
+                        className="passwordIconContainer"
+                        onClick={() => handleTogglePassword(0)}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPasswords[0] ? faEye : faEyeSlash}
+                          className="passwordIcon "
+                        />
+                      </div>
+                    </div>
+                    {passwordError && (
+                      <div className="error-container">{passwordError}</div>
+                    )}
+                  </div>{" "}
+                  <div className="formInput mb-2 ">
+                    <label className="small mb-1" htmlFor="newPassword">
+                      Mật khẩu mới
+                    </label>
+                    <div className="mb-1 inputContainer">
+                      <input
+                        className="input-form p-2 w-100"
+                        id="newPassword"
+                        type={showPasswords[1] ? "text" : "password"}
+                        placeholder="Nhập mật khẩu mới"
+                        value={newPassword}
+                        onChange={handleChange}
+                      />
+                      <div
+                        className="passwordIconContainer"
+                        onClick={() => handleTogglePassword(1)}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPasswords[1] ? faEye : faEyeSlash}
+                          className="passwordIcon "
+                        />
+                      </div>
+                    </div>
+                    {newPasswordError && (
+                      <div className="error-container">{newPasswordError}</div>
+                    )}
+                  </div>{" "}
+                  <div className="formInput mb-2 ">
+                    <label className="small mb-1" htmlFor="confirmPassword">
+                      Xác nhận mật khẩu
+                    </label>
+                    <div className="mb-1 inputContainer">
+                      <input
+                        className="input-form p-2 w-100"
+                        id="confirmPassword"
+                        type={showPasswords[2] ? "text" : "password"}
+                        placeholder="Xác nhận mật khẩu"
+                        value={confirmPassword}
+                        onChange={handleChange}
+                      />
+                      <div
+                        className="passwordIconContainer"
+                        onClick={() => handleTogglePassword(2)}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPasswords[2] ? faEye : faEyeSlash}
+                          className="passwordIcon "
+                        />
+                      </div>
+                    </div>
+                    {confirmPasswordError && (
+                      <div className="error-container">
+                        {confirmPasswordError}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    className="btn btn-primary"
+                    type="button"
+                    onClick={handleSave}
+                  >
+                    Lưu
+                  </button>
+                </form>
               </div>
-              {/* Form Group (new password)*/}
-              <div className="mb-3">
-                <label className="small mb-1" htmlFor="newPassword">
-                  New Password
-                </label>
-                <input
-                  className="form-control"
-                  id="newPassword"
-                  type="password"
-                  placeholder="Enter new password"
-                />
-              </div>
-              {/* Form Group (confirm password)*/}
-              <div className="mb-3">
-                <label className="small mb-1" htmlFor="confirmPassword">
-                  Confirm Password
-                </label>
-                <input
-                  className="form-control"
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm new password"
-                />
-              </div>
-              <button className="btn btn-primary" type="button">
-                Save
-              </button>
-            </form>
+            </div>
           </div>
+          <ToastContainer />
         </div>
-        {/* Security preferences card*/}
-        <div className="card mb-4">
-          <div className="card-header">Security Preferences</div>
-          <div className="card-body">
-            {/* Account privacy optinos*/}
-            <h5 className="mb-1">Account Privacy</h5>
-            <p className="small text-muted">
-              By setting your account to private, your profile information and
-              posts will not be visible to users outside of your user groups.
-            </p>
-            <form>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-custom"
-                  id="radioPrivacy1"
-                  type="radio"
-                  name="radioPrivacy"
-                  defaultChecked
-                />
-                <label className="form-check-label" htmlFor="radioPrivacy1">
-                  Public (posts are available to all users)
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-custom"
-                  id="radioPrivacy2"
-                  type="radio"
-                  name="radioPrivacy"
-                />
-                <label className="form-check-label" htmlFor="radioPrivacy2">
-                  Private (posts are available to only users in your groups)
-                </label>
-              </div>
-            </form>
-            <hr className="my-4" />
-            {/* Data sharing options*/}
-            <h5 className="mb-1">Data Sharing</h5>
-            <p className="small text-muted">
-              Sharing usage data can help us to improve our products and better
-              serve our users as they navigation through our application. When
-              you agree to share usage data with us, crash reports and usage
-              analytics will be automatically sent to our development team for
-              investigation.
-            </p>
-            <form>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-custom"
-                  id="radioUsage1"
-                  type="radio"
-                  name="radioUsage"
-                  defaultChecked
-                />
-                <label className="form-check-label" htmlFor="radioUsage1">
-                  Yes, share data and crash reports with app developers
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-custom"
-                  id="radioUsage2"
-                  type="radio"
-                  name="radioUsage"
-                />
-                <label className="form-check-label" htmlFor="radioUsage2">
-                  No, limit my data sharing with app developers
-                </label>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div className="col-lg-4">
-        {/* Two factor authentication card*/}
-        <div className="card mb-4">
-          <div className="card-header">Two-Factor Authentication</div>
-          <div className="card-body">
-            <p>
-              Add another level of security to your account by enabling
-              two-factor authentication. We will send you a text message to
-              verify your login attempts on unrecognized devices and browsers.
-            </p>
-            <form>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-custom"
-                  id="twoFactorOn"
-                  type="radio"
-                  name="twoFactor"
-                  defaultChecked
-                />
-                <label className="form-check-label" htmlFor="twoFactorOn">
-                  On
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input form-check-custom"
-                  id="twoFactorOff"
-                  type="radio"
-                  name="twoFactor"
-                />
-                <label className="form-check-label" htmlFor="twoFactorOff">
-                  Off
-                </label>
-              </div>
-              <div className="mt-3">
-                <label className="small mb-1" htmlFor="twoFactorSMS">
-                  SMS Number
-                </label>
-                <input
-                  className="form-control"
-                  id="twoFactorSMS"
-                  type="tel"
-                  placeholder="Enter a phone number"
-                  defaultValue="555-123-4567"
-                />
-              </div>
-            </form>
-          </div>
-        </div>
-        {/* Delete account card*/}
-        <div className="card mb-4">
-          <div className="card-header">Delete Account</div>
-          <div className="card-body">
-            <p>
-              Deleting your account is a permanent action and cannot be undone.
-              If you are sure you want to delete your account, select the button
-              below.
-            </p>
-            <button className="btn btn-danger-soft text-danger" type="button">
-              I understand, delete my account
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

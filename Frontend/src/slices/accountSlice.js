@@ -48,7 +48,40 @@ export const updateUserInfo = createAsyncThunk(
     }
   }
 );
+export const updateUserPassword = createAsyncThunk(
+  "accounts/password/change",
+  async (user, { rejectWithValue }) => {
+    try {
+      const response = await accountApi.updateUserPassword(user);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
+export const sendOtpToEmail = createAsyncThunk(
+  "accounts/password/request-reset",
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await accountApi.sendOtpToEmail(email);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const updateResetPassword = createAsyncThunk(
+  "accounts/password/reset",
+  async (user, { rejectWithValue }) => {
+    try {
+      const response = await accountApi.updateResetPassword(user);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 // export const updateUserInfo = createAsyncThunk(
 //   "user/updateUserInfo",
 //   async (user, { rejectWithValue, dispatch }) => {
@@ -156,19 +189,36 @@ export const accountSlice = createSlice({
       state.account = action.payload.data;
       console.log(state.account);
     },
-    // ,
-    // [isUserLoggedIn.pending]: (state) => {
-    //   state.loading = true;
-    // },
-    // [isUserLoggedIn.rejected]: (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.error;
-    // },
-    // [isUserLoggedIn.fulfilled]: (state, action) => {
-    //   state.loading = false;
-    //   state.user = action.payload.data.user;
-    //   state.isAuthenticated = true;
-    // },
+    [updateUserPassword.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateUserPassword.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [updateUserPassword.fulfilled]: (state, action) => {
+      state.loading = false;
+    },
+    [sendOtpToEmail.pending]: (state) => {
+      state.loading = true;
+    },
+    [sendOtpToEmail.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [sendOtpToEmail.fulfilled]: (state, action) => {
+      state.loading = false;
+    },
+    [updateResetPassword.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateResetPassword.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [updateResetPassword.fulfilled]: (state, action) => {
+      state.loading = false;
+    },
   },
 });
 export const { signout } = accountSlice.actions;

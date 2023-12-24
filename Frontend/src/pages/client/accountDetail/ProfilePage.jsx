@@ -123,7 +123,7 @@ const ProfilePage = () => {
       <div className="row">
         <div className="col-xl-4">
           <div className="card mb-4 mb-xl-0">
-            <div className="card-header">Ảnh Cá Nhân</div>
+            <div className="card-header">Ảnh cá nhân</div>
             <div className="card-body text-center">
               <img
                 className="img-account-profile1 rounded-circle mb-2"

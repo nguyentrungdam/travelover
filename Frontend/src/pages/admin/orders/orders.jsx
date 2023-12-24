@@ -12,6 +12,7 @@ import {
   formatCurrencyWithoutD,
   formatDate,
   formatDateAndHour,
+  formatDateToVietnamese,
   getVietNameseNameOfProcess,
 } from "../../../utils/validate";
 import { useNavigate } from "react-router-dom";
@@ -184,8 +185,10 @@ const OrderList = () => {
           {showModal && (
             <div className="modal-overlay2" onClick={handleOverlayClick}>
               <div className="modal2 col-md-8">
-                <div className="d-flex wrap-modal-addtour">
-                  <h5 className="card-header">Chi tiết đơn hàng</h5>
+                <div className="d-flex wrap-modal-addtour border-bottom-1">
+                  <h5 className="card-header border-bottom-none">
+                    Thông tin đặt hàng
+                  </h5>
                   <button className="close-btn2" onClick={closeModal}>
                     X
                   </button>
@@ -290,6 +293,14 @@ const OrderList = () => {
                               Xem Chi Tiết
                             </div>
                           </div>
+                        </li>
+                        <li>
+                          Ngày đi:{" "}
+                          <span>{formatDateToVietnamese(order.startDate)}</span>
+                        </li>
+                        <li>
+                          Ngày về:{" "}
+                          <span>{formatDateToVietnamese(order.endDate)}</span>
                         </li>
                         <li>
                           Số ngày:{" "}

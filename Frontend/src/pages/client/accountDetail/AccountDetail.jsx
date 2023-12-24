@@ -41,14 +41,15 @@ const AccountDetail = () => {
           >
             Thanh toán
           </span>
-          {/* <span
+          <span
             className={`nav-link ${
               activeTab === "securityPage" ? "active" : ""
             }`}
             onClick={() => handleTabClick("securityPage")}
           >
             Bảo mật
-          </span>
+          </span>{" "}
+          {/* 
           <span
             className={`nav-link ${
               activeTab === "notificationsPage" ? "active" : ""

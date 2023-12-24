@@ -55,7 +55,6 @@ const columns = [
     field: "status",
     headerName: "Trạng thái",
     width: 140,
-    type: "boolean",
     renderCell: (params) => {
       return params.value ? (
         <span>&#10004;</span> // Hiển thị biểu tượng tick khi là true
@@ -64,6 +63,7 @@ const columns = [
       );
     },
   },
+
   {
     field: "lastmodified",
     headerName: "Ngày cập nhật",
@@ -105,9 +105,6 @@ const ToursList = () => {
   useEffect(() => {
     dispatch(getAllTours()).unwrap();
   }, []);
-  useEffect(() => {
-    dispatch(getAllTours()).unwrap();
-  }, [tour.status]);
 
   const openModal = () => {
     setShowModal(true);
@@ -139,11 +136,6 @@ const ToursList = () => {
     }
   };
 
-  const handleEnableOrDisable = (id) => {
-    setTourId(id);
-    dispatch(getTourDetail(id)).unwrap();
-    openModal();
-  };
   const notify = (prop) => {
     return new Promise((resolve) => {
       if (prop === 1) {
@@ -177,6 +169,12 @@ const ToursList = () => {
       }
     });
   };
+  const handleSwitchChange = (tourId, currentStatus) => {
+    setTourId(tourId);
+    setSelectedStatus(!currentStatus);
+    openModal();
+  };
+
   const handleSaveStatus = async () => {
     console.log(tourId);
     console.log(selectedStatus);
@@ -185,10 +183,13 @@ const ToursList = () => {
         updateTourStatus({ tourId: tourId, status: selectedStatus })
       ).unwrap();
       notify(1);
+      closeModal();
+      dispatch(getAllTours()).unwrap();
     } catch (error) {
       notify(2);
     }
   };
+
   console.log(tours);
 
   const handleAddSelect = () => {
@@ -276,15 +277,15 @@ const ToursList = () => {
           <DataTable
             tourSwitch
             slug="tours-list"
-            handleEnableOrDisable={handleEnableOrDisable}
             columns={columns}
             rows={transformedData}
+            onSwitchChange={handleSwitchChange}
           />
           {showModal && (
             <div className="modal-overlay2" onClick={handleOverlayClick}>
               <div className="modal2 col-md-3">
                 <div className="d-flex wrap-modal-addtour">
-                  <h5 className="card-header">Tour Status</h5>
+                  <h5 className="card-header">Trạng thái tour</h5>
                   <button className="close-btn2" onClick={closeModal}>
                     X
                   </button>
@@ -293,31 +294,33 @@ const ToursList = () => {
                 <div className="wrap-modal-addtour mt-2">
                   <div className="row  mb-3">
                     <div>
-                      Tour status: <span>{tour.status ? "true" : "false"}</span>
+                      Trạng thái tour hiện tại:{" "}
+                      <span>
+                        {!selectedStatus ? "Hoạt động" : "Vô hiệu hóa"}
+                      </span>
                     </div>
                   </div>
 
                   <div className="d-flex  ">
-                    {/* Thêm select vào đây */}
-                    <label htmlFor="orderStatus" className="me-3 ">
-                      Update Tour Status:
+                    <label htmlFor="orderStatus" className="me-3 mb-3">
+                      Bạn có chắc đổi trạng thái tour thành{" "}
+                      <span>
+                        {selectedStatus ? "Hoạt động" : "Vô hiệu hóa"}
+                      </span>{" "}
+                      ?
                     </label>
-                    <select
-                      id="orderStatus"
-                      name="orderStatus"
-                      value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
-                    >
-                      <option value="true">True</option>
-                      <option value="false">False</option>
-                    </select>
                   </div>
-                  <button
-                    className="btn btn-primary mt-2"
-                    onClick={handleSaveStatus}
-                  >
-                    Save Status
-                  </button>
+                  <div className="d-flex justify-content-between">
+                    <button
+                      className="btn btn-primary w-25"
+                      onClick={handleSaveStatus}
+                    >
+                      Có
+                    </button>
+                    <button className="btn-block1  w-25" onClick={closeModal}>
+                      Không
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -27,6 +27,10 @@ export const validateVietnamesePhoneNumber = (phoneNumber) => {
   const regex = /^\d{1,10}$/;
   return regex.test(phoneNumber);
 };
+export const validateOTP = (otp) => {
+  const regex = /^\d{1,6}$/;
+  return regex.test(otp);
+};
 export function validatePasswordMatch(password, confirmPassword) {
   return password === confirmPassword;
 }
