@@ -299,7 +299,7 @@ const TourDetail = () => {
               <h5>Chính sách và điều khoản</h5>
               <FormatLine text={tours[0]?.tour?.termAndCondition} />
             </div>
-            <div className="hotelDetailsPrice col-md-4">
+            <div className="hotelDetailsPrice col-md-4 ">
               <h2>Chi tiết giá tour</h2>
               <div className="table-price">
                 <table>

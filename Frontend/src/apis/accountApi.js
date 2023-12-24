@@ -18,22 +18,19 @@ const accountApi = {
     return axiosMultipart.put(url, user);
   },
 
-  // isUserLoggedIn: () => {
-  //   const url = "/accounts/isUserLoggedIn";
-  //   return axios.post(url);
-  // },
-  // sendOtpToEmail: (user) => {
-  //   const url = "/accounts/sendOtpToEmail";
-  //   return axios.post(url, user);
-  // },
-  // verifyOtp: (user) => {
-  //   const url = "/accounts/verifyOtp";
-  //   return axios.post(url, user);
-  // },
-  // updateUserInfo: (user) => {
-  //   const url = "/user/updateUserInfo";
-  //   return axios.post(url, user);
-  // },
+  sendOtpToEmail: (email) => {
+    const url = `/accounts/password/request-reset?email=${email}`;
+    return axios.get(url, email);
+  },
+
+  updateUserPassword: (user) => {
+    const url = "/accounts/password/change";
+    return axios.put(url, user);
+  },
+  updateResetPassword: (user) => {
+    const url = "/accounts/password/reset";
+    return axios.put(url, user);
+  },
 };
 
 export default accountApi;

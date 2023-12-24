@@ -32,16 +32,16 @@ import Introduce from "./pages/client/introduce/Introduce";
 import TourGuide from "./pages/client/tourGuide/TourGuide";
 import TourGuideDetail from "./pages/client/tourGuide/TourGuideDetail/TourGuideDetail";
 import { blogDataDetail } from "./assets/data/tours";
+import ResetPassword from "./pages/client/account/ResetPassword";
 
 function App() {
-  const { isAuthenticated } = useSelector((state) => state.account);
+  const { isAuthenticated, role } = useSelector((state) => state.account);
+  console.log(role);
   const dispatch = useDispatch();
   useEffect(() => {
     if (isAuthenticated) {
       const fetchData = () => {
         dispatch(getAccountProfile(localStorage.getItem("token")));
-        // dispatch(getUserAddress());
-        // dispatch(getOrdersByUser());
       };
       fetchData();
     }
@@ -60,11 +60,12 @@ function App() {
 
   return (
     <Routes>
-      {/* client route */}
+      {/* user */}
       <Route path="/" element={<Navigate to="/home" />} key="home" />
       <Route path="/home" element={<Home />} key="home" />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/account" element={<AccountDetail />} />
       <Route path="/tours/search-tour" element={<List />} />
       <Route path="/tours/tour-detail/:tourId" element={<TourDetail />} />
@@ -78,7 +79,7 @@ function App() {
       />
       <Route path="/*" element={<Page404 />} />
 
-      {/* admin route */}
+      {/* admin  */}
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<Users />} />
@@ -96,7 +97,7 @@ function App() {
         <Route path="discounts/add-new" element={<AddDiscount />} />
       </Route>
 
-      {/* enterprise route */}
+      {/* enterprise  */}
       <Route path="/" element={<LayoutAdmin />}>
         <Route path="hotel-z" element={<ZHotel />} />
       </Route>

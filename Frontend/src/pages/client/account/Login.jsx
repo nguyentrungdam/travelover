@@ -134,8 +134,12 @@ const Login = () => {
                         onChange={handleChange}
                       />
                     ))}
+                    <p className="text-dark mt-2 text-left  ">
+                      Bạn quên mật khẩu?{" "}
+                      <Link to="/reset-password">Lấy lại ở đây</Link>
+                    </p>
                     <Button
-                      className="btn secondary__btn auth__btn mt-4"
+                      className="btn secondary__btn auth__btn "
                       type="submit"
                     >
                       Đăng Nhập

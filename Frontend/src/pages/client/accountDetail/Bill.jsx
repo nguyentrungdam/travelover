@@ -3,6 +3,7 @@ import { getAllOrders, getOrderDetail } from "../../../slices/orderSlice";
 import {
   formatCurrencyWithoutD,
   formatDateAndHour,
+  formatDateToVietnamese,
   getVietNameseNameOfProcess,
 } from "../../../utils/validate";
 import { useDispatch, useSelector } from "react-redux";
@@ -158,8 +159,10 @@ const Bill = () => {
               {showModal && (
                 <div className="modal-overlay2" onClick={handleOverlayClick}>
                   <div className="modal2 col-md-8">
-                    <div className="d-flex wrap-modal-addtour">
-                      <h5 className="card-header">Thông tin đặt hàng</h5>
+                    <div className="d-flex wrap-modal-addtour border-bottom-1">
+                      <h5 className="card-header border-bottom-none">
+                        Thông tin đặt hàng
+                      </h5>
                       <button className="close-btn2" onClick={closeModal}>
                         X
                       </button>
@@ -263,6 +266,18 @@ const Bill = () => {
                                   <span>{order.orderDetail.tourId}</span>
                                 </div>
                               </div>
+                            </li>
+                            <li>
+                              Ngày đi:{" "}
+                              <span>
+                                {formatDateToVietnamese(order.startDate)}
+                              </span>
+                            </li>
+                            <li>
+                              Ngày về:{" "}
+                              <span>
+                                {formatDateToVietnamese(order.endDate)}
+                              </span>
                             </li>
                             <li>
                               Số ngày:{" "}
