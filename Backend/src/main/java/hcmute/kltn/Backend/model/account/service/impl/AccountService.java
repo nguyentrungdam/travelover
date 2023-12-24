@@ -544,7 +544,12 @@ public class AccountService implements IAccountService{
 			String newPassword = new BCryptPasswordEncoder().encode(resetPasswordReq.getNewPassword());
 			account.setPassword(newPassword);
 			account.setResetPassword(null);
-			update(account);
+			
+			// Set default value
+			account.setLastModifiedBy(account.getAccountId());
+			account.setLastModifiedAt2(currentDate);
+			
+			accountRepository.save(account);
 			
 			// send notification mail
 			EmailDTO emailDTO = new EmailDTO();
@@ -563,8 +568,8 @@ public class AccountService implements IAccountService{
 					+ "Trân trọng,<br>\r\n"
 					+ "Đội ngũ Travelover.");
 			iEmailService.sendMail(emailDTO);
+			
 		}
-		
 	}
 
 	@Override
