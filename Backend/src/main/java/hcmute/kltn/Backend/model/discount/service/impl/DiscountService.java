@@ -4,6 +4,9 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.BaseEntity;
+import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.discount.dto.DiscountCreate;
 import hcmute.kltn.Backend.model.discount.dto.DiscountDTO;
@@ -224,6 +229,70 @@ public class DiscountService implements IDiscountService{
 	        discountList = mongoTemplate.find(query, Discount.class);
 		}
 		
+		return discountList;
+	}
+	
+	private String getAllValue(Discount discount) {
+		String result = new String();
+		
+		// value of account
+		for (Field itemField : Discount.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				boolean isList = itemField.getType().isAssignableFrom(List.class);
+				Object object = itemField.get(discount);
+				if (object != null && !isList) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		// value of base
+		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				Object object = itemField.get(discount);
+				if (object != null) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+
+		return result;
+	}
+	
+	private List<Discount> search2(String keyword) {
+		// init tour List
+		List<Discount> discountList = new ArrayList<>();
+		discountList = discountRepository.findAll();
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+
+		if (keyword != null && !keyword.isEmpty()) {
+			if (discountList != null) {
+				List<Discount> discountListClone = new ArrayList<>();
+				discountListClone.addAll(discountList);
+				for (Discount itemDiscount : discountListClone) {
+					String keywordNew = StringUtil.getNormalAlphabet(keyword);
+					String fieldNew = StringUtil.getNormalAlphabet(getAllValue(itemDiscount));
+					
+					if (!fieldNew.contains(keywordNew)) {
+						discountList.remove(itemDiscount);
+						if (discountList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		return discountList;
 	}
 	
@@ -443,5 +512,123 @@ public class DiscountService implements IDiscountService{
 		// update discount
 		Discount discountNew = new Discount();
 		discountNew = discountRepository.save(discount);
+	}
+
+	@Override
+	public List<DiscountDTO> listDiscountSearch(String keyword) {
+		List<Discount> discountList = new ArrayList<>();
+		discountList.addAll(search2(keyword));
+		
+		return getDiscountDTOList(discountList);
+	}
+
+	@Override
+	public List<DiscountDTO> listDiscountFilter(HashMap<String, String> discountFilter,
+			List<DiscountDTO> discountDTOList) {
+		List<DiscountDTO> discountDTOListClone = new ArrayList<>();
+		discountDTOListClone.addAll(discountDTOList);
+		for (DiscountDTO itemDiscountDTO : discountDTOListClone) {
+			discountFilter.forEach((fieldName, fieldValue) -> {
+				// filter of account class
+				for (Field itemField : DiscountDTO.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of account
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemDiscountDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								discountDTOList.remove(itemDiscountDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+				// filter of base class
+				for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of base
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemDiscountDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								discountDTOList.remove(itemDiscountDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+			});
+			if (discountDTOList.size() <= 0) {
+				break;
+			}
+		}
+		
+		return discountDTOList;
+	}
+
+	@Override
+	public List<DiscountDTO> listDiscountSort(Sort sort, List<DiscountDTO> discountDTOList) {
+		Collections.sort(discountDTOList, new Comparator<DiscountDTO>() {
+            @Override
+            public int compare(DiscountDTO discountDTO1, DiscountDTO discountDTO2) {
+            	int result = 0;
+            	
+            	// sort of account class
+        		for (Field itemField : DiscountDTO.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of account
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(discountDTO1));
+		            		String string2 = String.valueOf(itemField.get(discountDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		// sort of base class
+        		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of base
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(discountDTO1));
+		            		String string2 = String.valueOf(itemField.get(discountDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		if (sort.getOrder().equals("asc")) {
+
+            	} else if (sort.getOrder().equals("desc")) {
+            		result = -result;
+            	} else {
+            		result = 0;
+            	}
+            	
+            	return result;
+            }
+        });
+		
+		return discountDTOList;
 	}
 }

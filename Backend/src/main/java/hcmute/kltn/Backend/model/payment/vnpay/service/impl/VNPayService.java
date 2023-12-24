@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -21,11 +22,27 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.model.base.externalAPI.dto.ApiCallResponse;
+import hcmute.kltn.Backend.model.base.externalAPI.service.IExternalAPIService;
+import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
+import hcmute.kltn.Backend.model.order.dto.OrderDTO;
+import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayCreate;
+import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayRefund;
+import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPaymentDTO;
+import hcmute.kltn.Backend.model.payment.vnpay.dto.entity.VNPayment;
+import hcmute.kltn.Backend.model.payment.vnpay.repository.VNPaymentRepository;
 import hcmute.kltn.Backend.model.payment.vnpay.service.IVNPayService;
+import hcmute.kltn.Backend.util.LocalDateTimeUtil;
+import hcmute.kltn.Backend.util.StringUtil;
 
 @Service
 public class VNPayService implements IVNPayService{
@@ -35,8 +52,23 @@ public class VNPayService implements IVNPayService{
     private String vnpayTmnCode;
 	@Value("${vnpay.secretKey}")
     private String vnpaySecretKey;
+	@Value("${vnpay.ApiUrl}")
+    private String vnpayAPIUrl;
 	@Value("${backend.dev.domain}")
     private String backendDomain;
+	
+	@Autowired
+	private VNPaymentRepository vnPaymentRepository;
+	@Autowired
+	private IGeneratorSequenceService iGeneratorSequenceService;
+	@Autowired
+	private IExternalAPIService iExternalAPIService;
+	@Autowired
+    private MongoTemplate mongoTemplate;
+	@Autowired
+	private ModelMapper modelMapper;
+//	@Autowired
+//	private IOrderService iOrderService;
 	
 	private String md5(String message) {
         String digest = null;
@@ -127,6 +159,52 @@ public class VNPayService implements IVNPayService{
         }
         return sb.toString();
     }
+    
+	private String getCollectionName() {
+        String collectionName = mongoTemplate.getCollectionName(VNPayment.class);
+        return collectionName;
+    }
+    
+	private VNPayment create(VNPayment vnPayment) {
+		// check field condition
+//		checkFieldCondition(hotel);
+		
+		// set default value
+		String vnPaymentId = iGeneratorSequenceService.genId(getCollectionName());
+//		String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		vnPayment.setVnPaymentId(vnPaymentId);
+		vnPayment.setStatus(true);
+//		vnPayment.setCreatedBy();
+		vnPayment.setCreatedAt2(currentDate);
+//		vnPayment.setLastModifiedBy();
+		vnPayment.setLastModifiedAt2(currentDate);
+		
+		// create hotel
+		VNPayment vnPaymentNew = new VNPayment();
+	
+		vnPaymentNew = vnPaymentRepository.save(vnPayment);
+
+		return vnPaymentNew;
+	}
+	
+	private VNPayment getDetail(String vnPaymentId) {
+		// check exists
+		if(!vnPaymentRepository.existsById(vnPaymentId)) {
+			throw new CustomException("Cannot find hotel");
+		}
+		
+		// get hotel from database
+		VNPayment vnPayment = vnPaymentRepository.findById(vnPaymentId).get();
+
+		return vnPayment;
+	}
+	
+	private VNPaymentDTO getVNPaymentDTO(VNPayment vnPayment) {
+		VNPaymentDTO vnPaymentDTONew = new VNPaymentDTO();
+		modelMapper.map(vnPayment, vnPaymentDTONew);
+		return vnPaymentDTONew;
+	}
 
 	@Override
 	public String createPayment(VNPayCreate vnPayCreate, String ipAddress) {
@@ -193,6 +271,7 @@ public class VNPayService implements IVNPayService{
         return paymentUrl;
 	}
 	
+	@Override
 	public int checkPayment(HttpServletRequest request){
         Map fields = new HashMap();
         for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
@@ -227,4 +306,126 @@ public class VNPayService implements IVNPayService{
             return -1;
         }
     }
+
+	@Override
+	public void refundPayment(VNPayRefund vnPayRefund, String ipAddress) {
+		String vnp_RequestId = StringUtil.genRandom(10);
+		String vnp_Version = "2.1.0";
+        String vnp_Command = "refund";
+        String vnp_TmnCode = vnpayTmnCode;
+        
+        VNPayment vnPayment = getDetail(vnPayRefund.getVnPaymentId());
+        System.out.println("vnPayment = " + vnPayment);
+        
+        LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+        String date = String.valueOf(currentDate);
+        String[] dateSplit = date.split("\\.");
+        date = dateSplit[0];
+        date = date.replaceAll("-", "");
+        date = date.replaceAll("T", "");
+        date = date.replaceAll(":", "");
+        System.out.println("date = " + date);
+        
+        String data = vnp_RequestId
+        		+ "|" + vnp_Version
+        		+ "|" + vnp_Command
+        		+ "|" + vnp_TmnCode
+        		+ "|" + "02"
+        		+ "|" + vnPayment.getVnp_TxnRef()
+        		+ "|" + String.valueOf(vnPayment.getAmount()*100)
+        		+ "|" + vnPayment.getVnp_TransactionNo()
+        		+ "|" + vnPayment.getVnp_PayDate()
+        		+ "|" + vnPayRefund.getCreateBy()
+        		+ "|" + date
+        		+ "|" + ipAddress
+        		+ "|" + vnPayRefund.getOrderInfo();
+        String vnp_SecureHash = hmacSHA512(vnpaySecretKey, data);
+        
+        HashMap<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_RequestId", vnp_RequestId);
+        vnp_Params.put("vnp_Version", vnp_Version);
+        vnp_Params.put("vnp_Command", vnp_Command);
+        vnp_Params.put("vnp_TmnCode", vnp_TmnCode);
+        vnp_Params.put("vnp_TransactionType", "02");
+        vnp_Params.put("vnp_TxnRef", vnPayment.getVnp_TxnRef());
+        vnp_Params.put("vnp_Amount", String.valueOf(vnPayment.getAmount()*100));
+        vnp_Params.put("vnp_OrderInfo", vnPayRefund.getOrderInfo());
+        vnp_Params.put("vnp_TransactionNo", vnPayment.getVnp_TransactionNo());
+        vnp_Params.put("vnp_TransactionDate", vnPayment.getVnp_PayDate());
+        vnp_Params.put("vnp_CreateBy", vnPayRefund.getCreateBy());
+        vnp_Params.put("vnp_CreateDate", date);
+        vnp_Params.put("vnp_IpAddr", ipAddress);
+        vnp_Params.put("vnp_SecureHash", vnp_SecureHash);
+        
+        ApiCallResponse ApiCallResponse = new ApiCallResponse();
+        ApiCallResponse = iExternalAPIService.post(vnpayAPIUrl, null, vnp_Params);
+        
+        if (ApiCallResponse.getStatus() != HttpStatus.OK) {
+        	System.out.println("ApiCallResponse = " + ApiCallResponse.getBody());
+        	throw new CustomException("There was an error during the refund process");
+        }
+		
+        VNPayment vnPaymentRefund = new VNPayment();
+        HashMap<String, String> respone = new HashMap<>();
+        respone = (HashMap<String, String>) ApiCallResponse.getBody();
+        
+        vnPaymentRefund.setVnp_BankCode(respone.get("vnp_BankCode"));
+        vnPaymentRefund.setVnp_TransactionNo(respone.get("vnp_TransactionNo")); 
+        vnPaymentRefund.setVnp_TmnCode(respone.get("vnp_TmnCode")); 
+        vnPaymentRefund.setVnp_TxnRef(respone.get("vnp_TxnRef")); 
+        vnPaymentRefund.setVnp_OrderInfo(respone.get("vnp_OrderInfo")); 
+        vnPaymentRefund.setVnp_Amount(respone.get("vnp_Amount")); 
+        vnPaymentRefund.setVnp_ResponseCode(respone.get("vnp_ResponseCode")); 
+        vnPaymentRefund.setVnp_ResponseId(respone.get("vnp_ResponseId")); 
+        vnPaymentRefund.setVnp_Command(respone.get("vnp_Command")); 
+        vnPaymentRefund.setVnp_PayDate(respone.get("vnp_PayDate")); 
+        vnPaymentRefund.setVnp_TransactionType(respone.get("vnp_TransactionType")); 
+        vnPaymentRefund.setVnp_SecureHash(respone.get("vnp_SecureHash")); 
+        vnPaymentRefund.setVnp_TransactionStatus(respone.get("vnp_TransactionStatus")); 
+        vnPaymentRefund.setVnp_Message(respone.get("vnp_Message")); 
+		vnPaymentRefund.setName("Hoàn tiền cho khách hàng");
+		vnPaymentRefund.setDescription("");
+		vnPaymentRefund.setCreatedBy(vnPayRefund.getCreateBy());
+		vnPaymentRefund.setLastModifiedBy(vnPayRefund.getCreateBy());
+		
+		if (!vnPaymentRefund.getVnp_ResponseCode().equals("00")) {
+			throw new CustomException(
+					"There was an error during the refund process: " 
+					+ vnPaymentRefund.getVnp_ResponseCode() + " " 
+					+ vnPaymentRefund.getVnp_Message());
+		}
+		
+		VNPayment vnPaymentRefundNew = new VNPayment();
+		vnPaymentRefundNew = create(vnPaymentRefund);
+	}
+
+	@Override
+	public VNPaymentDTO createVNPayment(VNPaymentDTO vnpaymentDTO) {
+		// mapping hotel
+		VNPayment vnPayment = new VNPayment();
+		modelMapper.map(vnpaymentDTO, vnPayment);
+		
+		// get accountId
+//		OrderDTO orderDTO = new OrderDTO();
+//		orderDTO = iOrderService.getDetailOrder(vnpaymentDTO.getOrderId());
+//		vnPayment.setCreatedBy(orderDTO.getCreatedBy());
+//		vnPayment.setLastModifiedBy(orderDTO.getCreatedBy());
+		
+		// set default value
+		vnPayment.setAmount(Integer.valueOf(vnpaymentDTO.getVnp_Amount()) / 100);
+		
+		// create hotel
+		VNPayment vnPaymentNew = new VNPayment();
+		vnPaymentNew = create(vnPayment);
+		
+		return getVNPaymentDTO(vnPaymentNew);
+	}
+
+	@Override
+	public VNPaymentDTO getDetailHotel(String vnPaymentId) {
+		// get hotel 
+		VNPayment vnPayment = getDetail(vnPaymentId);
+
+		return getVNPaymentDTO(vnPayment);
+	}
 }

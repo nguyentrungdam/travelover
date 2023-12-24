@@ -21,7 +21,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/devs")
 @Tag(
 		name = "Devs", 
-		description = "APIs for managing devs\n\n",
+		description = "APIs for managing devs\n\n"
+				+ "__24/12/2023__\n\n"
+				+ "__1:20PM__\n\n"
+				+ "__Z Enterprise Hotels (api cho bên thứ 3 enterprise)__\n\n"
+				+ "Cập nhật: ehotels/create theo hướng tự động\n\n"
+				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
+				+ "Thông tin: khi gọi api list/search sẽ sắp xếp mặc định theo ngày tạo mới nhất\n\n"
+				+ "Thông tin: đã có api room/saerch2 để search hotel, thông tin search ra sẽ như api này trả về, "
+				+ "khả năng trước mắt là dùng luôn api này để search enterprise hotel chứ không qua cái hotel được nha",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/176XCXAx04e66xHKIOnL2V1smcR2fiEGo/view?usp=sharing")

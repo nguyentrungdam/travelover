@@ -1,5 +1,7 @@
 package hcmute.kltn.Backend.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.base.Pagination;
+import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -20,6 +23,7 @@ import hcmute.kltn.Backend.model.discount.dto.DiscountCreate;
 import hcmute.kltn.Backend.model.discount.dto.DiscountDTO;
 import hcmute.kltn.Backend.model.discount.dto.DiscountUpdate;
 import hcmute.kltn.Backend.model.discount.service.IDiscountService;
+
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,7 +33,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/discounts")
 @Tag(
 		name = "Discounts", 
-		description = "APIs for managing discounts\n\n",
+		description = "APIs for managing discounts\n\n"
+				+ "__24/12/2023__\n\n"
+				+ "__1:20PM__\n\n"
+				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
+				+ "Tạo mới: tạo api list/search cho admin lúc load danh sách discount, có filter và sort sẵn trong đây",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1K0hAFY-8JF1Az9ocQlKalb9W5TT003vN/view?usp=sharing")
@@ -113,12 +121,19 @@ public class DiscountController {
 			@ModelAttribute Pagination pagination) {
 		List<DiscountDTO> discountDTOList = iDiscountService.getAllDiscount();
 		
+		// default sort
+		Sort sort = new Sort();
+		sort.setSortBy("createdAt2");
+		sort.setOrder("desc");
+		List<DiscountDTO> discountDTOListNew = new ArrayList<>();
+		discountDTOListNew.addAll(iDiscountService.listDiscountSort(sort, discountDTOList));
+		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get All Discount successfully");
 				setPageSize(pagination.getPageSize());
 				setPageNumber(pagination.getPageNumber());
-				setData(discountDTOList);
+				setData(discountDTOListNew);
 			}
 		});
 	}
@@ -134,6 +149,45 @@ public class DiscountController {
 			{
 				setMessage("Search Discount successfully");
 				setData(discountDTOList);
+			}
+		});
+	}
+	
+	private final String listDiscountSearchDesc = "Search discount bằng keyword, search trên bảng discount "
+			+ "- discountFilter: nhập dạng 'tên field': 'giá trị' (thêm bao nhiêu field tùy ý, "
+			+ "khi filter sẽ tìm đúng tên field và xem giá trị từ account có chứa giá trị nhập vào)\n\n"
+			+ "- - 'minOrder': '0',\n\n"
+			+ "- - 'createdAt2': '2023-12'\n\n"
+			+ "- sort: nhập tên field và kiểu sort có 2 kiểu là asc hoặc desc (chỉ sort theo 1 cột)";
+	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
+	@Operation(summary = "Search discount for admin page - ADMIN / STAFF", description = listDiscountSearchDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> listDiscountSearch(
+			@RequestParam(required = false) String keyword,
+			@RequestParam HashMap<String, String> discountFilter,
+			@ModelAttribute Sort sort,
+			@ModelAttribute Pagination pagination) {
+		List<DiscountDTO> discountDTOList = iDiscountService.listDiscountSearch(keyword);
+		List<DiscountDTO> discountDTOFilterList = iDiscountService.listDiscountFilter(discountFilter, discountDTOList);
+		if (sort == null) {
+			sort = new Sort();
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		} else if (sort.getSortBy() == null) {
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		} else if (sort.getSortBy().isEmpty()) {
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		}
+		List<DiscountDTO> discountDTOSortList = iDiscountService.listDiscountSort(sort, discountDTOFilterList);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search discount for admin page successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
+				setData(discountDTOSortList);
 			}
 		});
 	}

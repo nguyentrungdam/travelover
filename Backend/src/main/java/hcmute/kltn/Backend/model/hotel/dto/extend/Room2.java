@@ -1,4 +1,4 @@
-package hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend;
+package hcmute.kltn.Backend.model.hotel.dto.extend;
 
 import java.util.List;
 
@@ -18,9 +18,4 @@ public class Room2 {
 	private int maximumNumberOfChildren;
 	private String actualNumberOfAdult;
 	private int price;
-	private boolean status;
-	
-	public boolean getStatus() {
-		return this.status;
-	}
 }

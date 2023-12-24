@@ -13,10 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Payment {
+	private String vnPaymentId;
 	private String method;
-	private String transactionCode;
 	private int amount;
 	@DateTimeFormat(pattern="yyyy-MM-dd")
 	private LocalDate date;
 	private LocalDateTime createAt;
+
 }

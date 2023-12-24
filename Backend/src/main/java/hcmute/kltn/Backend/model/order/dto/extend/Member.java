@@ -11,4 +11,6 @@ public class Member {
 	private String fullName;
 	private int age;
 	private String gender;
+	private String frontIDImageUrl; 
+	private String backIDImageUrl; 
 }

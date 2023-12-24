@@ -116,6 +116,18 @@ public class DataLoader implements CommandLineRunner {
 					+ "CollectionName = URL, Prefix = URL, Description = URL collection");
 		} 
 		
+		GeneratorSequenceDTO genGenSeqVNPayment = new GeneratorSequenceDTO();
+		genGenSeqVNPayment.setCollectionName("vnpayment");
+		genGenSeqVNPayment.setPrefix("VNP");
+		genGenSeqVNPayment.setNumber(0);
+		genGenSeqVNPayment.setDescription("VNPayment collection");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqVNPayment);
+		
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = VNPayment, Prefix = VNP, Description = VNPayment collection");
+		} 
+		
 		// GEN DATA FOR ACCOUNT TABLE
 		// FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = SUPER_ADMIN
 		

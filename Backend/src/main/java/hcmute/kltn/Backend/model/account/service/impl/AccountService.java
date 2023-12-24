@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import hcmute.kltn.Backend.component.JwtTokenUtil;
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
 import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
+import hcmute.kltn.Backend.model.account.dto.AccountSort;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
@@ -36,6 +39,7 @@ import hcmute.kltn.Backend.model.account.dto.extend.ResetPassword;
 import hcmute.kltn.Backend.model.account.repository.AccountRepository;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.ERole;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.email.dto.EmailDTO;
@@ -228,6 +232,72 @@ public class AccountService implements IAccountService{
 		}
 		
 		return roleMap.get(role);
+	}
+	
+	private String getAllValue(Account account) {
+		String result = new String();
+		
+		// value of account
+		for (Field itemField : Account.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				boolean isPassword = itemField.getName().equals("password");
+				boolean isList = itemField.getType().isAssignableFrom(List.class);
+				boolean isResetPassword = itemField.getType().isAssignableFrom(ResetPassword.class);
+				Object object = itemField.get(account);
+				if (object != null && !isPassword && !isList && !isResetPassword) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		// value of base
+		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				Object object = itemField.get(account);
+				if (object != null) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+
+		return result;
+	}
+	
+	private List<Account> search2(String keyword) {
+		// init tour List
+		List<Account> accountList = new ArrayList<>();
+		accountList = accountRepository.findAll();
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+
+		if (keyword != null && !keyword.isEmpty()) {
+			if (accountList != null) {
+				List<Account> accountListClone = new ArrayList<>();
+				accountListClone.addAll(accountList);
+				for (Account itemAccount : accountListClone) {
+					String keywordNew = StringUtil.getNormalAlphabet(keyword);
+					String fieldNew = StringUtil.getNormalAlphabet(getAllValue(itemAccount));
+					
+					if (!fieldNew.contains(keywordNew)) {
+						accountList.remove(itemAccount);
+						if (accountList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		return accountList;
 	}
 	
 	private AccountDTO getAccountDTO(Account account) {
@@ -555,4 +625,120 @@ public class AccountService implements IAccountService{
 				+ "";
 	}
 
+	@Override
+	public List<AccountDTO> listAccountFilter(HashMap<String, String> accountFilter, List<AccountDTO> accountDTOList) {
+		List<AccountDTO> accountDTOListClone = new ArrayList<>();
+		accountDTOListClone.addAll(accountDTOList);
+		for (AccountDTO itemAccountDTO : accountDTOListClone) {
+			accountFilter.forEach((fieldName, fieldValue) -> {
+				// filter of account class
+				for (Field itemField : AccountDTO.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of account
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemAccountDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								accountDTOList.remove(itemAccountDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+				// filter of base class
+				for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of base
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemAccountDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								accountDTOList.remove(itemAccountDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+			});
+			if (accountDTOList.size() <= 0) {
+				break;
+			}
+		}
+		
+		return accountDTOList;
+	}
+
+	@Override
+	public List<AccountDTO> listAccountSort(AccountSort accountSort, List<AccountDTO> accountDTOList) {
+		Collections.sort(accountDTOList, new Comparator<AccountDTO>() {
+            @Override
+            public int compare(AccountDTO accountDTO1, AccountDTO accountDTO2) {
+            	int result = 0;
+            	
+            	// sort of account class
+        		for (Field itemField : AccountDTO.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of account
+    				if (accountSort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(accountDTO1));
+		            		String string2 = String.valueOf(itemField.get(accountDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		// sort of base class
+        		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of base
+    				if (accountSort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(accountDTO1));
+		            		String string2 = String.valueOf(itemField.get(accountDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		if (accountSort.getOrder().equals("asc")) {
+
+            	} else if (accountSort.getOrder().equals("desc")) {
+            		result = -result;
+            	} else {
+            		result = 0;
+            	}
+            	
+            	return result;
+            }
+        });
+		
+		return accountDTOList;
+	}
+
+	@Override
+	public List<AccountDTO> listAccountSearch(String keyword) {
+		List<Account> accountList = new ArrayList<>();
+		accountList.addAll(search2(keyword));
+		
+		return getAccountDTOList(accountList);
+	}
 }

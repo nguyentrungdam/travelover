@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -119,6 +120,47 @@ public class ExternalAPIService implements IExternalAPIService{
 
 			// call api
 			ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String.class);
+
+		    ApiCallResponse res = new ApiCallResponse();
+		    res.setStatus(response.getStatusCode());
+		    res.setBody(getJsonObject(response.getBody()));
+
+			return res;
+		} catch (Exception e) {
+			System.out.println("ExternalAPIService get error = " + e.getMessage());
+			// get error
+			String[] eSplit = e.getMessage().split("\"", 2);
+			String error = eSplit[1];
+			int errorLength = error.length();
+			error = error.substring(0, errorLength - 1);
+		    
+		    String status = e.getMessage().substring(0, 3);
+		    ApiCallResponse res = new ApiCallResponse();
+		    res.setStatus(status);
+		    res.setBody(getJsonObject(error));
+
+			return res;
+		}
+	}
+
+	@Override
+	public ApiCallResponse post(String url, HashMap<String, String> header, HashMap<String, String> param) {
+		try {
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			
+			// set header
+			if (header != null) {
+				for (String key : header.keySet()) {
+					String value = header.get(key);
+					headers.set(key, value);
+				}
+			} 
+			String jsonParam = new ObjectMapper().writeValueAsString(param);
+			HttpEntity<String> entity = new HttpEntity<String>(jsonParam, headers);
+
+			// call api
+			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 		    ApiCallResponse res = new ApiCallResponse();
 		    res.setStatus(response.getStatusCode());

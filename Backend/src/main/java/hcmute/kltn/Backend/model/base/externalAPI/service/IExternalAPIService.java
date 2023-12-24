@@ -13,5 +13,7 @@ import hcmute.kltn.Backend.model.base.externalAPI.dto.ApiCallResponse;
 
 public interface IExternalAPIService {
 	public ApiCallResponse get(String url, HashMap<String, String> header, HashMap<String, String> param);
+	public ApiCallResponse post(String url, HashMap<String, String> header, HashMap<String, String> param);
+	
 	public Object getJsonObject(String json);
 }

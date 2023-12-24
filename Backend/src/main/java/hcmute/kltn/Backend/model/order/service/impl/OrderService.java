@@ -18,12 +18,17 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.model.account.dto.AccountDTO;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.EOrderStatus;
+import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.discount.dto.DiscountDTO;
 import hcmute.kltn.Backend.model.discount.dto.DiscountUpdate;
 import hcmute.kltn.Backend.model.discount.service.IDiscountService;
+import hcmute.kltn.Backend.model.email.dto.EmailDTO;
+import hcmute.kltn.Backend.model.email.service.IEmailService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
 import hcmute.kltn.Backend.model.hotel.dto.extend.Room;
@@ -43,10 +48,13 @@ import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import hcmute.kltn.Backend.model.order.dto.extend.VOTourDetail;
 import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
+import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayRefund;
+import hcmute.kltn.Backend.model.payment.vnpay.service.IVNPayService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
+import hcmute.kltn.Backend.util.StringUtil;
 
 @Service
 public class OrderService implements IOrderService{
@@ -66,6 +74,10 @@ public class OrderService implements IOrderService{
 	private ITourService iTourService;
 	@Autowired
 	private IDiscountService iDiscountService;
+	@Autowired
+	private IVNPayService iVNPayService;
+	@Autowired
+	private IEmailService iEmailService;
 	
 	private String getOrderStatus(String orderStatus) {
 		int index = Integer.valueOf(orderStatus);
@@ -220,6 +232,73 @@ public class OrderService implements IOrderService{
 			
 			// search
 			orderList = mongoTemplate.find(query, Order.class);
+		}
+
+		return orderList;
+	}
+	
+	private String getAllValue(Order order) {
+		String result = new String();
+		
+		// value of account
+		for (Field itemField : Order.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				boolean isList = itemField.getType().isAssignableFrom(List.class);
+				boolean isOrderDetail = itemField.getType().isAssignableFrom(OrderDetail.class);
+				boolean isCustomerInformation = itemField.getType().isAssignableFrom(CustomerInformation.class);
+				boolean isDiscount = itemField.getType().isAssignableFrom(Discount.class);
+				Object object = itemField.get(order);
+				if (object != null && !isList && !isOrderDetail && !isCustomerInformation && !isDiscount) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		// value of base
+		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				Object object = itemField.get(order);
+				if (object != null) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+
+		return result;
+	}
+	
+	private List<Order> search2(String keyword) {
+		// init tour List
+		List<Order> orderList = new ArrayList<>();
+		orderList = orderRepository.findAll();
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+
+		if (keyword != null && !keyword.isEmpty()) {
+			if (orderList != null) {
+				List<Order> orderListClone = new ArrayList<>();
+				orderListClone.addAll(orderList);
+				for (Order itemOrder : orderListClone) {
+					String keywordNew = StringUtil.getNormalAlphabet(keyword);
+					String fieldNew = StringUtil.getNormalAlphabet(getAllValue(itemOrder));
+					
+					if (!fieldNew.contains(keywordNew)) {
+						orderList.remove(itemOrder);
+						if (orderList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
 		}
 
 		return orderList;
@@ -444,9 +523,9 @@ public class OrderService implements IOrderService{
 			throw new CustomException("Can't update status for canceled orders");
 		}
 		// check finished status
-				if (order.getOrderStatus().equals("finished")) {
-					throw new CustomException("Can't update status for finished orders");
-				}
+		if (order.getOrderStatus().equals("finished")) {
+			throw new CustomException("Can't update status for finished orders");
+		}
 		// check follow status
 		int orderStatusOld = 0;
 		if (!orderStatus.equals("canceled")) {
@@ -472,6 +551,8 @@ public class OrderService implements IOrderService{
 		if (orderStatus.equals("finished")) {
 			iTourService.updateNumberOfOrdered(order.getOrderDetail().getTourId());
 		}
+		
+
 
 		order.setOrderStatus(orderStatus);
 		
@@ -480,6 +561,39 @@ public class OrderService implements IOrderService{
 		Account account = iAccountDetailService.getCurrentAccount();
 		order.setLastModifiedBy(account.getAccountId());
 		order.setLastModifiedAt(today);
+		
+		// check cancel status
+		if (orderStatus.equals("canceled")) {
+			// refund
+			VNPayRefund VNPayRefund = new VNPayRefund();
+			VNPayRefund.setVnPaymentId(order.getPayment().get(0).getVnPaymentId());
+			VNPayRefund.setOrderInfo("Hoàn tiền cho đơn hàng bị hủy: " + orderStatusUpdate.getMessage());
+			VNPayRefund.setCreateBy(account.getAccountId());
+			iVNPayService.refundPayment(null, orderStatus);
+			
+			// send mail
+			String discountString = "Để bù đắp, chúng tôi xin gửi tặng Quý khách mã giảm giá: "
+					+ orderStatusUpdate.getDiscountCode() + " cho lần mua hàng tiếp theo. ";
+			
+			EmailDTO emailDTO = new EmailDTO();
+			emailDTO.setTo(order.getCreatedBy());
+			emailDTO.setSubject("Thông báo về việc hủy đơn hàng");
+			emailDTO.setContent("Chào Kính gửi Quý khách,<br>\r\n"
+					+ "<br>\r\n"
+					+ "Chúng tôi rất tiếc phải thông báo rằng đơn hàng tour du lịch của Quý khách "
+					+ "(Mã đơn hàng: " + order.getOrderId() + ") đã bị hủy vì lý do: " + orderStatusUpdate.getMessage() + "<br>\r\n"
+					+ "<br>\r\n"
+					+ "Chúng tôi hiểu rằng việc này có thể gây ra sự bất tiện cho Quý khách và chúng tôi xin lỗi vì điều này. "
+					+ discountString
+					+ "Nếu Quý khách có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, "
+					+ "vui lòng liên hệ với chúng tôi qua email này.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Chúng tôi rất mong được phục vụ Quý khách trong tương lai gần.<br>\r\n"
+					+ "<br>\r\n"
+					+ "Trân trọng,<br>\r\n"
+					+ "Đội ngũ Travelover.");
+			iEmailService.sendMail(emailDTO);
+		}
 
 		// update order
 		Order orderNew = new Order();
@@ -500,8 +614,8 @@ public class OrderService implements IOrderService{
 			
 			// update payment
 			Payment payment = new Payment();
+			payment.setVnPaymentId(orderPaymentUpdate.getVnPaymentId());
 			payment.setMethod(orderPaymentUpdate.getMethod());
-			payment.setTransactionCode(orderPaymentUpdate.getTransactionCode());
 			payment.setAmount(orderPaymentUpdate.getAmount());
 			payment.setCreateAt(LocalDateTimeUtil.getCurentDate());
 			paymentList.add(payment);
@@ -511,8 +625,8 @@ public class OrderService implements IOrderService{
 			
 			// update payment
 			Payment payment = new Payment();
+			payment.setVnPaymentId(orderPaymentUpdate.getVnPaymentId());
 			payment.setMethod(orderPaymentUpdate.getMethod());
-			payment.setTransactionCode(orderPaymentUpdate.getTransactionCode());
 			payment.setAmount(orderPaymentUpdate.getAmount());
 			payment.setCreateAt(LocalDateTimeUtil.getCurentDate());
 			paymentList.add(payment);
@@ -576,5 +690,122 @@ public class OrderService implements IOrderService{
 			}
 		}
 		System.out.println("Delete Unpaid Order Successfully");
+	}
+
+	@Override
+	public List<OrderDTO> listOrderSearch(String keyword) {
+		List<Order> orderList = new ArrayList<>();
+		orderList.addAll(search2(keyword));
+		
+		return getOrderDTOList(orderList);
+	}
+
+	@Override
+	public List<OrderDTO> listOrderFilter(HashMap<String, String> filter, List<OrderDTO> orderDTOList) {
+		List<OrderDTO> orderDTOListClone = new ArrayList<>();
+		orderDTOListClone.addAll(orderDTOList);
+		for (OrderDTO itemOrderDTO : orderDTOListClone) {
+			filter.forEach((fieldName, fieldValue) -> {
+				// filter of account class
+				for (Field itemField : HotelDTO.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of account
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemOrderDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								orderDTOList.remove(itemOrderDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+				// filter of base class
+				for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of base
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemOrderDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								orderDTOList.remove(itemOrderDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+			});
+			if (orderDTOList.size() <= 0) {
+				break;
+			}
+		}
+		
+		return orderDTOList;
+	}
+
+	@Override
+	public List<OrderDTO> listOrderSort(Sort sort, List<OrderDTO> orderDTOList) {
+		Collections.sort(orderDTOList, new Comparator<OrderDTO>() {
+            @Override
+            public int compare(OrderDTO orderDTO1, OrderDTO orderDTO2) {
+            	int result = 0;
+            	
+            	// sort of account class
+        		for (Field itemField : HotelDTO.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of account
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(orderDTO1));
+		            		String string2 = String.valueOf(itemField.get(orderDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		// sort of base class
+        		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of base
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(orderDTO1));
+		            		String string2 = String.valueOf(itemField.get(orderDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		if (sort.getOrder().equals("asc")) {
+
+            	} else if (sort.getOrder().equals("desc")) {
+            		result = -result;
+            	} else {
+            		result = 0;
+            	}
+            	
+            	return result;
+            }
+        });
+		
+		return orderDTOList;
 	}
 }

@@ -11,6 +11,7 @@ import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.extend.Contact;
 import hcmute.kltn.Backend.model.base.extend.Image;
+import hcmute.kltn.Backend.model.hotel.dto.extend.SearchAPI;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,4 +32,5 @@ public class Hotel extends BaseEntity {
 	private Contact contact; // not null
 	private List<Image> image;
 	private Address address; // not null
+	private SearchAPI searchAPI;
 }

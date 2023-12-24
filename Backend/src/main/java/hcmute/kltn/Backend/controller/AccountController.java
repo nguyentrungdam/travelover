@@ -1,5 +1,7 @@
 package hcmute.kltn.Backend.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
 import hcmute.kltn.Backend.model.account.dto.AccountSetRole;
+import hcmute.kltn.Backend.model.account.dto.AccountSort;
 import hcmute.kltn.Backend.model.account.dto.AccountUpdateProfile;
 import hcmute.kltn.Backend.model.account.dto.AuthRequest;
 import hcmute.kltn.Backend.model.account.dto.AuthResponse;
@@ -25,6 +28,7 @@ import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
+
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -35,11 +39,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Accounts", 
 		description = "APIs for managing accounts\n\n"
-				+ "__22/12/2023__\n\n"
-				+ "__8:00PM__\n\n"
-				+ "Tạo mới: tạo api password/change để đổi mật khẩu cho account đang đăng nhập\n\n"
-				+ "Tạo mới: tạo api password/request-reset để yêu cầu reset password bằng email\n\n"
-				+ "Tạo mới: tạo api password/reset để đổi mật khẩu mới ngay sau khi yêu cầu reset password",
+				+ "__24/12/2023__\n\n"
+				+ "__1:20PM__\n\n"
+				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
+				+ "Tạo mới: tạo api list/search cho admin lúc load danh sách account, có filter và sort sẵn trong đây\n\n"
+				+ "Lưu ý: test lại về password xem đã chạy ok chưa",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1XJgZ6J5RRIIl2k17FIpC890iZYTD6mGk/view?usp=sharing")
@@ -124,12 +128,19 @@ public class AccountController {
 			@ModelAttribute Pagination pagination) {
 		List<AccountDTO> accountDTOList = iAccountService.getAllAccount();
 		
+		// default sort
+		AccountSort accountSort = new AccountSort();
+		accountSort.setSortBy("createdAt2");
+		accountSort.setOrder("desc");
+		List<AccountDTO> accountDTOListNew = new ArrayList<>();
+		accountDTOListNew.addAll(iAccountService.listAccountSort(accountSort, accountDTOList));
+		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all Accounts");
 				setPageSize(pagination.getPageSize());
 				setPageNumber(pagination.getPageNumber());
-				setData(accountDTOList);
+				setData(accountDTOListNew);
 			}
 		});
 	}
@@ -144,6 +155,45 @@ public class AccountController {
 			{
 				setMessage("Search Account successfully");
 				setData(accountDTOList);
+			}
+		});
+	}
+	
+	private final String listAccountSearchDesc = "Search account bằng keyword, search trên bảng account "
+			+ "- accountFilter: nhập dạng 'tên field': 'giá trị' (thêm bao nhiêu field tùy ý, "
+			+ "khi filter sẽ tìm đúng tên field và xem giá trị từ account có chứa giá trị nhập vào)\n\n"
+			+ "- - 'role': 'CUSTOMER',\n\n"
+			+ "- - 'createdAt2': '2023-12'\n\n"
+			+ "- accountSort: nhập tên field và kiểu sort có 2 kiểu là asc hoặc desc (chỉ sort theo 1 cột)";
+	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
+	@Operation(summary = "Search account for admin page - ADMIN / STAFF", description = listAccountSearchDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> listAccountSearch(
+			@RequestParam(required = false) String keyword,
+			@RequestParam HashMap<String, String> accountFilter,
+			@ModelAttribute AccountSort accountSort,
+			@ModelAttribute Pagination pagination) {
+		List<AccountDTO> accountDTOList = iAccountService.listAccountSearch(keyword);
+		List<AccountDTO> accountDTOFilterList = iAccountService.listAccountFilter(accountFilter, accountDTOList);
+		if (accountSort == null) {
+			accountSort = new AccountSort();
+			accountSort.setSortBy("createdAt2");
+			accountSort.setOrder("desc");
+		} else if (accountSort.getSortBy() == null) {
+			accountSort.setSortBy("createdAt2");
+			accountSort.setOrder("desc");
+		} else if (accountSort.getSortBy().isEmpty()) {
+			accountSort.setSortBy("createdAt2");
+			accountSort.setOrder("desc");
+		}
+		List<AccountDTO> accountDTOSortList = iAccountService.listAccountSort(accountSort, accountDTOFilterList);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search account for admin page successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
+				setData(accountDTOSortList);
 			}
 		});
 	}

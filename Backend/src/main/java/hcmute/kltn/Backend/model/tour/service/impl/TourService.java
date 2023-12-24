@@ -19,7 +19,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.model.account.dto.extend.ResetPassword;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.base.video.service.IVideoService;
@@ -279,6 +281,8 @@ public class TourService implements ITourService{
 	
 	private String getAllValue(Tour tour) {
 		String result = new String();
+		
+		// value of tour
 		for (Field itemField : Tour.class.getDeclaredFields()) {
 			itemField.setAccessible(true);
 			try {
@@ -289,6 +293,20 @@ public class TourService implements ITourService{
 				boolean isDiscount = itemField.getType().isAssignableFrom(Discount.class);
 				Object object = itemField.get(tour);
 				if (object != null && !isList && !isAddress && !isReasonableTime && !isDiscount) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		// value of base
+		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				Object object = itemField.get(tour);
+				if (object != null) {
 					result += String.valueOf(object) + " ";
 				} 
 			} catch (Exception e) {
@@ -1023,20 +1041,22 @@ public class TourService implements ITourService{
             public int compare(TourDTO tourDTO1, TourDTO tourDTO2) {
             	int result = 0;
             	
-        		for (Field itemField : TourDTO.class.getDeclaredFields()) {
-        			itemField.setAccessible(true);
-        			// field of tour
-    				if (tourSort.getSortBy().equals(itemField.getName())) {
-    					try {
-		            		String string1 = String.valueOf(itemField.get(tourDTO1));
-		            		String string2 = String.valueOf(itemField.get(tourDTO2));
-		            		result = string1.compareTo(string2);
-		            	} catch (Exception e) {
-		            		result = 0;
+				for (Field itemField : TourDTO.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of tour
+					if (tourSort.getSortBy().equals(itemField.getName())) {
+						try {
+							String string1 = String.valueOf(itemField.get(tourDTO1));
+							String string2 = String.valueOf(itemField.get(tourDTO2));
+							result = string1.compareTo(string2);
+						} catch (Exception e) {
+							result = 0;
 						}
-    					
-    					break;
-    				}
+
+						break;
+					}
+    				
+    				
     				
     				// field of discount of tour
     				if (itemField.getType().isAssignableFrom(Discount.class)) {
@@ -1065,6 +1085,23 @@ public class TourService implements ITourService{
 						}
     				}
     			}
+				
+        		// sort of base class
+        		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of base
+    				if (tourSort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(tourDTO1));
+		            		String string2 = String.valueOf(itemField.get(tourDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
         		
         		if (tourSort.getOrder().equals("asc")) {
 
@@ -1087,9 +1124,10 @@ public class TourService implements ITourService{
 		tourDTOListClone.addAll(tourDTOList);
 		for (TourDTO itemTourDTO : tourDTOListClone) {
 			tourFilter.forEach((fieldName, fieldValue) -> {
+				// filter of tour
 				for (Field itemField : TourDTO.class.getDeclaredFields()) {
 					itemField.setAccessible(true);
-					// filter of tour
+					// field of tour
 					if (itemField.getName().equals(fieldName)) {
 						try {
 							String value = String.valueOf(itemField.get(itemTourDTO));
@@ -1104,7 +1142,7 @@ public class TourService implements ITourService{
 						}
 					}
 					
-					//filter of discount of tour
+					// field of discount of tour
 					if (itemField.getType().isAssignableFrom(Discount.class)) {
 						try {
 							Discount discount = new Discount();
@@ -1135,6 +1173,25 @@ public class TourService implements ITourService{
 							// TODO: handle exception
 						}
 						
+					}
+				}
+				
+				// filter of base class
+				for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of base
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemTourDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								tourDTOList.remove(itemTourDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
 					}
 				}
 				

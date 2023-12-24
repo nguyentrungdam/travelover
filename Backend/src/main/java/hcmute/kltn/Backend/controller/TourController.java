@@ -1,5 +1,6 @@
 package hcmute.kltn.Backend.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.base.Pagination;
+import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -37,7 +39,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/tours")
 @Tag(
 		name = "Tours", 
-		description = "APIs for managing tours\n\n",
+		description = "APIs for managing tours\n\n"
+				+ "__24/12/2023__\n\n"
+				+ "__1:20PM__\n\n"
+				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
+				+ "Thông tin: khi gọi api list/search sẽ sắp xếp mặc định theo ngày tạo mới nhất",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")
@@ -132,12 +138,19 @@ public class TourController {
 		iTourService.updateIsDiscount();
 		List<TourDTO> tourDTOList = iTourService.getAllTour();
 		
+		// default sort
+		TourSort tourSort = new TourSort();
+		tourSort.setSortBy("createdAt2");
+		tourSort.setOrder("desc");
+		List<TourDTO> tourDTOListNew = new ArrayList<>();
+		tourDTOListNew.addAll(iTourService.listTourSort(tourSort, tourDTOList));
+		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all tour successfully");
 				setPageSize(pagination.getPageSize());
 				setPageNumber(pagination.getPageNumber());
-				setData(tourDTOList);
+				setData(tourDTOListNew);
 			}
 		});
 	}
@@ -249,15 +262,29 @@ public class TourController {
 	ResponseEntity<ResponseObject> listTourSearch(
 			@RequestParam(required = false) String keyword,
 			@RequestParam HashMap<String, String> tourFilter,
-			@ModelAttribute TourSort tourSort) {
+			@ModelAttribute TourSort tourSort,
+			@ModelAttribute Pagination pagination) {
 		iTourService.updateIsDiscount();
 		List<TourDTO> tourDTOList = iTourService.listTourSearch(keyword);
 		List<TourDTO> tourDTOFilterList = iTourService.listTourFilter(tourFilter, tourDTOList);
+		if (tourSort == null) {
+			tourSort = new TourSort();
+			tourSort.setSortBy("createdAt2");
+			tourSort.setOrder("desc");
+		} else if (tourSort.getSortBy() == null) {
+			tourSort.setSortBy("createdAt2");
+			tourSort.setOrder("desc");
+		} else if (tourSort.getSortBy().isEmpty()) {
+			tourSort.setSortBy("createdAt2");
+			tourSort.setOrder("desc");
+		}
 		List<TourDTO> tourDTOSortList = iTourService.listTourSort(tourSort, tourDTOFilterList);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search tour for admin page successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
 				setData(tourDTOSortList);
 			}
 		});

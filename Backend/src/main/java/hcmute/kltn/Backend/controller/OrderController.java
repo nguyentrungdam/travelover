@@ -1,5 +1,7 @@
 package hcmute.kltn.Backend.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.base.Pagination;
+import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -20,6 +23,7 @@ import hcmute.kltn.Backend.model.order.dto.OrderCreate;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
+
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,7 +33,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/orders")
 @Tag(
 		name = "Orders", 
-		description = "APIs for managing orders\n\n",
+		description = "APIs for managing orders\n\n"
+				+ "__24/12/2023__\n\n"
+				+ "__1:20PM__\n\n"
+				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
+				+ "Tạo mới: tạo api list/search cho admin lúc load danh sách order, có filter và sort sẵn trong đây\n\n"
+				+ "Cập nhật: đã thêm 2 field frontIDImageUrl và backIDImageUrl trong phần CustomerInformation "
+				+ "và Member để lưu đường dẫn đến hình ảnh cccd "
+				+ "(cân nhắc có nên dùng hay không vì t thấy trang booking họ cũng không yêu cầu cccd)\n\n"
+				+ "Cập nhật: Thêm 2 field là message và discountCode cho api status/update để xử lý tình huống "
+				+ "admin hủy đơn hàng (sẽ thông báo và hoàn tiền)\n\n"
+				+ "- field message (khi hủy đơn mới cần nhập): nhập lý do đơn hàng bị hủy\n"
+				+ "- field discountCode (khi có mã giảm giá đền bù thì mới cần nhập): nhập mã giảm giá "
+				+ "đền bù cho đơn hàng bị hủy",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
@@ -131,12 +147,19 @@ public class OrderController {
 		
 		List<OrderDTO> orderDTOList = iOrderService.getAllOrder();
 		
+		// default sort
+		Sort sort = new Sort();
+		sort.setSortBy("createdAt2");
+		sort.setOrder("desc");
+		List<OrderDTO> orderDTOListNew = new ArrayList<>();
+		orderDTOListNew.addAll(iOrderService.listOrderSort(sort, orderDTOList));
+		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get all order successfully");
 				setPageSize(pagination.getPageSize());
 				setPageNumber(pagination.getPageNumber());
-				setData(orderDTOList);
+				setData(orderDTOListNew);
 			}
 		});
 	}
@@ -155,6 +178,45 @@ public class OrderController {
 			}
 		});
 	} 
+	
+	private final String listOrderSearchDesc = "Search hotel bằng keyword, search trên bảng hotel "
+			+ "- filter: nhập dạng 'tên field': 'giá trị' (thêm bao nhiêu field tùy ý, "
+			+ "khi filter sẽ tìm đúng tên field và xem giá trị từ account có chứa giá trị nhập vào)\n\n"
+			+ "- - 'hotelDescription': 'Khách sạn',\n\n"
+			+ "- - 'createdAt2': '2023-12'\n\n"
+			+ "- sort: nhập tên field và kiểu sort có 2 kiểu là asc hoặc desc (chỉ sort theo 1 cột)";
+	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
+	@Operation(summary = "Search order for admin page - ADMIN / STAFF", description = listOrderSearchDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> listOrderSearch(
+			@RequestParam(required = false) String keyword,
+			@RequestParam HashMap<String, String> filter,
+			@ModelAttribute Sort sort,
+			@ModelAttribute Pagination pagination) {
+		List<OrderDTO> orderDTOList = iOrderService.listOrderSearch(keyword);
+		List<OrderDTO> orderDTOFilterList = iOrderService.listOrderFilter(filter, orderDTOList);
+		if (sort == null) {
+			sort = new Sort();
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		} else if (sort.getSortBy() == null) {
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		} else if (sort.getSortBy().isEmpty()) {
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		}
+		List<OrderDTO> orderDTOSortList = iOrderService.listOrderSort(sort, orderDTOFilterList);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search order for admin page successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
+				setData(orderDTOSortList);
+			}
+		});
+	}
 	
 	@RequestMapping(value = "/payment/check", method = RequestMethod.GET)
 	@Operation(summary = "Payment check")

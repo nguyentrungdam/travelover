@@ -4,7 +4,11 @@ import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +19,30 @@ import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.BaseEntity;
+import hcmute.kltn.Backend.model.base.Sort;
+import hcmute.kltn.Backend.model.base.extend.Address;
+import hcmute.kltn.Backend.model.base.extend.Contact;
+import hcmute.kltn.Backend.model.base.externalAPI.dto.ApiCallResponse;
+import hcmute.kltn.Backend.model.base.externalAPI.service.IExternalAPIService;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelCreate;
 import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.HotelUpdate;
 import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
+import hcmute.kltn.Backend.model.hotel.dto.RoomSearch2;
 import hcmute.kltn.Backend.model.hotel.dto.entity.Hotel;
 import hcmute.kltn.Backend.model.hotel.dto.extend.Room;
+import hcmute.kltn.Backend.model.hotel.dto.extend.Room2;
+import hcmute.kltn.Backend.model.hotel.dto.extend.SearchAPI;
 import hcmute.kltn.Backend.model.hotel.repository.HotelRepository;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
+import hcmute.kltn.Backend.util.StringUtil;
 
 @Service
 public class HotelService implements IHotelService{
@@ -44,6 +58,8 @@ public class HotelService implements IHotelService{
     private MongoTemplate mongoTemplate;
 	@Autowired
 	private IEHotelService iEHotelService;
+	@Autowired
+	private IExternalAPIService iExternalAPIService;
 	
 	private String getCollectionName() {
         String collectionName = mongoTemplate.getCollectionName(Hotel.class);
@@ -201,6 +217,73 @@ public class HotelService implements IHotelService{
 		return hotelList;
 	}
 	
+	private String getAllValue(Hotel hotel) {
+		String result = new String();
+		
+		// value of account
+		for (Field itemField : Hotel.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				boolean isList = itemField.getType().isAssignableFrom(List.class);
+				boolean isContact = itemField.getType().isAssignableFrom(Contact.class);
+				boolean isAddress = itemField.getType().isAssignableFrom(Address.class);
+				boolean isSearchAPI = itemField.getType().isAssignableFrom(SearchAPI.class);
+				Object object = itemField.get(hotel);
+				if (object != null && !isList && !isContact && !isAddress && !isSearchAPI) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		// value of base
+		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				Object object = itemField.get(hotel);
+				if (object != null) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+
+		return result;
+	}
+	
+	private List<Hotel> search2(String keyword) {
+		// init tour List
+		List<Hotel> hotelList = new ArrayList<>();
+		hotelList = hotelRepository.findAll();
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+
+		if (keyword != null && !keyword.isEmpty()) {
+			if (hotelList != null) {
+				List<Hotel> hotelListClone = new ArrayList<>();
+				hotelListClone.addAll(hotelList);
+				for (Hotel itemHotel : hotelListClone) {
+					String keywordNew = StringUtil.getNormalAlphabet(keyword);
+					String fieldNew = StringUtil.getNormalAlphabet(getAllValue(itemHotel));
+					
+					if (!fieldNew.contains(keywordNew)) {
+						hotelList.remove(itemHotel);
+						if (hotelList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		return hotelList;
+	}
+	
 	private HotelDTO getHotelDTO(Hotel hotel) {
 		HotelDTO hotelDTONew = new HotelDTO();
 		modelMapper.map(hotel, hotelDTONew);
@@ -352,6 +435,137 @@ public class HotelService implements IHotelService{
 			}
 		}
 		return room;
+	}
+
+	@Override
+	public List<Room2> searchRoom2(RoomSearch2 roomSearch) {
+		Hotel hotel = new Hotel();
+		hotel = getDetail(roomSearch.getHotelId());
+		
+		String url = hotel.getSearchAPI().getUrl();
+		HashMap<String, String> header = new HashMap<>();
+		HashMap<String, String> param = new HashMap<>();
+		ApiCallResponse apiCallResponse = new ApiCallResponse();
+		apiCallResponse = iExternalAPIService.get(url, header, param);
+
+		return null;
+	}
+
+	@Override
+	public List<HotelDTO> listHotelSearch(String keyword) {
+		List<Hotel> hotelList = new ArrayList<>();
+		hotelList.addAll(search2(keyword));
+		
+		return getHotelDTOList(hotelList);
+	}
+
+	@Override
+	public List<HotelDTO> listHotelFilter(HashMap<String, String> filter, List<HotelDTO> hotelDTOList) {
+		List<HotelDTO> hotelDTOListClone = new ArrayList<>();
+		hotelDTOListClone.addAll(hotelDTOList);
+		for (HotelDTO itemHotelDTO : hotelDTOListClone) {
+			filter.forEach((fieldName, fieldValue) -> {
+				// filter of account class
+				for (Field itemField : HotelDTO.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of account
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemHotelDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								hotelDTOList.remove(itemHotelDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+				// filter of base class
+				for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of base
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemHotelDTO));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								hotelDTOList.remove(itemHotelDTO);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+			});
+			if (hotelDTOList.size() <= 0) {
+				break;
+			}
+		}
+		
+		return hotelDTOList;
+	}
+
+	@Override
+	public List<HotelDTO> listHotelSort(Sort sort, List<HotelDTO> hotelDTOList) {
+		Collections.sort(hotelDTOList, new Comparator<HotelDTO>() {
+            @Override
+            public int compare(HotelDTO hotelDTO1, HotelDTO hotelDTO2) {
+            	int result = 0;
+            	
+            	// sort of account class
+        		for (Field itemField : HotelDTO.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of account
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(hotelDTO1));
+		            		String string2 = String.valueOf(itemField.get(hotelDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		// sort of base class
+        		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of base
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(hotelDTO1));
+		            		String string2 = String.valueOf(itemField.get(hotelDTO2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		if (sort.getOrder().equals("asc")) {
+
+            	} else if (sort.getOrder().equals("desc")) {
+            		result = -result;
+            	} else {
+            		result = 0;
+            	}
+            	
+            	return result;
+            }
+        });
+		
+		return hotelDTOList;
 	}
 
 }

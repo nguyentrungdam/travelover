@@ -15,5 +15,7 @@ public class CustomerInformation {
 	private String gender;
 	private String email;
 	private String phoneNumber;
+	private String frontIDImageUrl; 
+	private String backIDImageUrl; 
 	private List<Member> member;
 }

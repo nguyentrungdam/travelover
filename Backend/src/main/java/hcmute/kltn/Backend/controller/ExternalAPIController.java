@@ -20,6 +20,7 @@ import com.google.gson.JsonObject;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.base.externalAPI.dto.ApiCallResponse;
+import hcmute.kltn.Backend.model.base.externalAPI.dto.ApiPostReq;
 import hcmute.kltn.Backend.model.base.externalAPI.dto.Header;
 import hcmute.kltn.Backend.model.base.externalAPI.service.IExternalAPIService;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
@@ -54,6 +55,29 @@ public class ExternalAPIController {
 			@RequestParam HashMap<String, String> header,
 			@RequestParam HashMap<String, String> param) {
 		ApiCallResponse object = iExternalAPIService.get(url, header, param);
+		
+		if (object.getStatus() == HttpStatus.OK) {
+			return iResponseObjectService.success(new Response() {
+				{
+					setMessage("Call external api with GET method successfully");
+					setData(object.getBody());
+				}
+			});
+		}
+
+		// handle fail
+		ResponseObject responseObject = new ResponseObject();
+		responseObject.setStatus("failed");
+		responseObject.setMessage("There is an error occurring during API call");
+		responseObject.setData(object.getBody());
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+	}
+	
+	@RequestMapping(value = "/post", method = RequestMethod.POST)
+	@Operation(summary = "Call external api with POST method")
+	ResponseEntity<ResponseObject> post(
+			@RequestBody ApiPostReq ApiPostReq) {
+		ApiCallResponse object = iExternalAPIService.post(ApiPostReq.getUrl(), ApiPostReq.getHeader(), ApiPostReq.getParam());
 		
 		if (object.getStatus() == HttpStatus.OK) {
 			return iResponseObjectService.success(new Response() {

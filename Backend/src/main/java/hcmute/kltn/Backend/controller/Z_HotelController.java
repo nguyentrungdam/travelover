@@ -1,6 +1,9 @@
 package hcmute.kltn.Backend.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import hcmute.kltn.Backend.model.base.Pagination;
+import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
@@ -21,9 +25,11 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room2;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -109,12 +115,19 @@ public class Z_HotelController {
 		
 		List<EHotel> eHotelList = iEHotelService.getAllEHotel();
 		
+		// default sort
+		Sort sort = new Sort();
+		sort.setSortBy("createdAt2");
+		sort.setOrder("desc");
+		List<EHotel> eHotelListNew = new ArrayList<>();
+		eHotelListNew.addAll(iEHotelService.listEHotelSort(sort, eHotelList));
+		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Get All Enterprise Hotel successfully");
 				setPageSize(pagination.getPageSize());
 				setPageNumber(pagination.getPageNumber());
-				setData(eHotelList);
+				setData(eHotelListNew);
 			}
 		});
 	}
@@ -133,6 +146,48 @@ public class Z_HotelController {
 		});
 	}
 	
+	private final String listEHotelSearchDesc = "Search hotel bằng keyword, search trên bảng hotel "
+			+ "- filter: nhập dạng 'tên field': 'giá trị' (thêm bao nhiêu field tùy ý, "
+			+ "khi filter sẽ tìm đúng tên field và xem giá trị từ account có chứa giá trị nhập vào)\n\n"
+			+ "- - 'hotelDescription': 'Khách sạn',\n\n"
+			+ "- - 'createdAt2': '2023-12'\n\n"
+			+ "- sort: nhập tên field và kiểu sort có 2 kiểu là asc hoặc desc (chỉ sort theo 1 cột)";
+	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
+	@Operation(
+			tags = "Z Enterprise Hotels", 
+			summary = "Search ehotel for admin page - ADMIN / STAFF", 
+			description = listEHotelSearchDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> listEHotelSearch(
+			@RequestParam(required = false) String keyword,
+			@RequestParam HashMap<String, String> filter,
+			@ModelAttribute Sort sort,
+			@ModelAttribute Pagination pagination) {
+		List<EHotel> eHotelDTOList = iEHotelService.listEHotelSearch(keyword);
+		List<EHotel> eHotelDTOFilterList = iEHotelService.listEHotelFilter(filter, eHotelDTOList);
+		if (sort == null) {
+			sort = new Sort();
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		} else if (sort.getSortBy() == null) {
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		} else if (sort.getSortBy().isEmpty()) {
+			sort.setSortBy("createdAt2");
+			sort.setOrder("desc");
+		}
+		List<EHotel> eHotelDTOSortList = iEHotelService.listEHotelSort(sort, eHotelDTOFilterList);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search ehotel for admin page successfully");
+				setPageSize(pagination.getPageSize());
+				setPageNumber(pagination.getPageNumber());
+				setData(eHotelDTOSortList);
+			}
+		});
+	}
+	
 	@RequestMapping(value = "/room/search", method = RequestMethod.GET)
 	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room - ADMIN")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
@@ -145,6 +200,21 @@ public class Z_HotelController {
 			{
 				setMessage("Search room successfully");
 				setData(roomList);
+			}
+		});
+	}
+	
+	@RequestMapping(value = "/room/search2", method = RequestMethod.GET)
+	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room 2 - ADMIN")
+	ResponseEntity<ResponseObject> searchRoom2(@ModelAttribute RoomSearch roomSearch) {
+//		System.out.println("room search = " + roomSearch);
+		
+		List<RoomSearchRes> roomMap = iEHotelService.searchRoom2(roomSearch);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search room 2 successfully");
+				setData(roomMap);
 			}
 		});
 	}

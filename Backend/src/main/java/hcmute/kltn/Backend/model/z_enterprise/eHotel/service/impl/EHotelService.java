@@ -20,12 +20,17 @@ import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.base.BaseEntity;
+import hcmute.kltn.Backend.model.base.Sort;
+import hcmute.kltn.Backend.model.base.extend.Address;
+import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.OrderDetail;
@@ -36,6 +41,7 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
 import hcmute.kltn.Backend.util.IntegerUtil;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
+import hcmute.kltn.Backend.util.StringUtil;
 
 @Service
 public class EHotelService implements IEHotelService{
@@ -197,6 +203,71 @@ public class EHotelService implements IEHotelService{
 		return eHotelList;
 	}
 	
+	private String getAllValue(EHotel eHotel) {
+		String result = new String();
+		
+		// value of account
+		for (Field itemField : EHotel.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				boolean isList = itemField.getType().isAssignableFrom(List.class);
+				boolean isAddress = itemField.getType().isAssignableFrom(Address.class);
+				Object object = itemField.get(eHotel);
+				if (object != null && !isList && !isAddress) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		// value of base
+		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+			itemField.setAccessible(true);
+			try {
+				// check type
+				Object object = itemField.get(eHotel);
+				if (object != null) {
+					result += String.valueOf(object) + " ";
+				} 
+			} catch (Exception e) {
+				
+			}
+		}
+
+		return result;
+	}
+	
+	private List<EHotel> search2(String keyword) {
+		// init tour List
+		List<EHotel> eHotelList = new ArrayList<>();
+		eHotelList = eHotelRepository.findAll();
+		if (keyword != null) {
+			keyword = keyword.trim();
+		}
+
+		if (keyword != null && !keyword.isEmpty()) {
+			if (eHotelList != null) {
+				List<EHotel> eHotelListClone = new ArrayList<>();
+				eHotelListClone.addAll(eHotelList);
+				for (EHotel itemEHotel : eHotelListClone) {
+					String keywordNew = StringUtil.getNormalAlphabet(keyword);
+					String fieldNew = StringUtil.getNormalAlphabet(getAllValue(itemEHotel));
+					
+					if (!fieldNew.contains(keywordNew)) {
+						eHotelList.remove(itemEHotel);
+						if (eHotelList.size() <= 0) {
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		return eHotelList;
+	}
+	
 	private Room2 genRoom(String type, int rating) {
 		Map<String, String> nameMap = new HashMap<>();
 		nameMap.put("1", "Phòng tiêu chuẩn giường đơn");
@@ -211,6 +282,20 @@ public class EHotelService implements IEHotelService{
 		nameMap.put("10", "Phòng tiêu chuẩn gia đình");
 		nameMap.put("11", "Phòng tiện nghi gia đình");
 		nameMap.put("12", "Phòng rộng rãi gia đình");
+		
+		Map<String, String> typeMap = new HashMap<>();
+		typeMap.put("1", "1");
+		typeMap.put("2", "2");
+		typeMap.put("3", "3");
+		typeMap.put("4", "4");
+		typeMap.put("5", "5");
+		typeMap.put("6", "6");
+		typeMap.put("7", "7");
+		typeMap.put("8", "8");
+		typeMap.put("9", "9");
+		typeMap.put("10", "10");
+		typeMap.put("11", "11");
+		typeMap.put("12", "1");
 		
 		Map<String, List<String>> bedMap = new HashMap<>();
 		bedMap.put("1", Arrays.asList("1 Giường đơn"));
@@ -291,6 +376,7 @@ public class EHotelService implements IEHotelService{
 		
 		Room2 room = new Room2();
 		room.setName(nameMap.get(type));
+		room.setType(typeMap.get(type));
 		room.setBed(bedMap.get(type));
 		room.setStandardNumberOfAdult(standardNumberOfAdultMap.get(type));
 		room.setMaximumNumberOfChildren(maximumNumberOfChildrenMap.get(type));
@@ -617,8 +703,362 @@ public class EHotelService implements IEHotelService{
 	}
 
 	@Override
-	public List<Room2> searchRoom2(RoomSearch roomSearch) {
+	public List<RoomSearchRes> searchRoom2(RoomSearch roomSearch) {		
+		// A = số người lớn
+		// R = số phòng
+		// Thực hiện tìm R phòng cho A người
+		// 1. A / R = P (lấy số nguyên)
+		// 2. Tìm 1 phòng chứa được P người, (nếu không có thì không tìm được phòng nào --> dừng)
+		// 3. A - P = A1, R - 1 = R1 (nếu A1 = 0 thì dừng và trả kết quả)
+		// 4. Thực hiện tìm R1 phòng cho A1 người (tới đây thì lặp lại cho tới khi hết thì thôi)
 		
-		return null;
+		// check number of adult and number of room
+		if (roomSearch.getNumberOfAdult() < roomSearch.getNumberOfRoom()) {
+			throw new CustomException("The number of adults must be greater than or equal to the number of rooms");
+		}
+		
+		// get room list
+		EHotel eHotel = new EHotel();
+		eHotel = getDetail(roomSearch.getEHotelId());
+		List<Room2> roomList = new ArrayList<>();
+		roomList.addAll(eHotel.getRoom2());
+		if (roomList.isEmpty()) {
+			throw new CustomException("No suitable room found");
+		}
+		
+		Map<List<String>, Map<Room2, List<String>>> roomMap = new HashMap<>();
+		
+		// find room
+		int numberOfAdult = roomSearch.getNumberOfAdult();
+		int numberOfRoom = roomSearch.getNumberOfRoom();
+		int personPerRoom = (int) numberOfAdult / numberOfRoom;
+		int index = 1;
+		while (numberOfAdult > 0) {
+			Map<Room2, List<String>> roomIdMap = new HashMap<>();
+
+			for (Room2 itemRoom : roomList) {
+				String[] actualNumberOfAdultSplit = itemRoom.getActualNumberOfAdult().split("-");
+				int minPerson = Integer.valueOf(actualNumberOfAdultSplit[0]);
+				int maxPerson = Integer.valueOf(actualNumberOfAdultSplit[1]);
+				if (minPerson <= personPerRoom && personPerRoom <= maxPerson && itemRoom.getStatus() == true) {
+					// check exists in roomIdMap
+					boolean check = false;
+					Map<Room2, List<String>> roomIdMapClone = new HashMap<>();
+					roomIdMapClone.putAll(roomIdMap);
+					for (Map.Entry<Room2, List<String>> itemRoomId : roomIdMapClone.entrySet()) {
+						Room2 key = itemRoomId.getKey ();
+						List<String> value = itemRoomId.getValue ();
+						
+						if (key.getType().equals(itemRoom.getType())) {
+							List<String> roomIdList = new ArrayList<>();
+							roomIdList.addAll(value);
+							roomIdList.add(itemRoom.getRoomId());
+							roomIdMap.replace(key, roomIdList);
+							check = true;
+							break;
+						}
+					}
+					
+					// create new in roomIdMap
+					if (check == false) {
+						List<String> roomIdList = new ArrayList<>();
+						roomIdList.add(itemRoom.getRoomId());
+						roomIdMap.put(itemRoom, roomIdList);
+					}
+				}
+			}
+			if (roomIdMap.isEmpty()) {
+				throw new CustomException("No suitable room found");
+			}
+			List<String> key = new ArrayList<>();
+			key.add(String.valueOf(index));
+			key.add(String.valueOf(personPerRoom));
+			roomMap.put(key, roomIdMap);
+			index++;
+			
+			numberOfAdult -= personPerRoom;
+			if (numberOfAdult <= 0) {
+				break;
+			}
+			numberOfRoom -= 1;
+			personPerRoom = (int) numberOfAdult / numberOfRoom;
+		}
+		
+		// get standard room = person per room
+		Map<List<String>, Map<Room2, List<String>>> roomMapClone = new HashMap<>();
+		roomMapClone.putAll(roomMap);
+		for (Map.Entry<List<String>, Map<Room2, List<String>>> itemRoom : roomMapClone.entrySet()) {
+			List<String> key = itemRoom.getKey ();
+			Map<Room2, List<String>> value = itemRoom.getValue ();
+			
+			Map<Room2, List<String>> valueNew = new HashMap<>();
+			valueNew.putAll(value);
+			
+			for (Map.Entry<Room2, List<String>> itemValue : value.entrySet()) {
+				Room2 keyOfValue = itemValue.getKey ();
+				List<String> valueOfValue = itemValue.getValue ();
+				
+				if (keyOfValue.getStandardNumberOfAdult() != Integer.valueOf(key.get(1))) {
+					valueNew.remove(keyOfValue);
+					
+				}
+			}
+			roomMap.replace(key, valueNew);
+		}
+		
+		// get key
+		Map<String, List<String>> keyMap = new HashMap<>();
+		index = 1;
+		for (Map.Entry<List<String>, Map<Room2, List<String>>> itemRoom : roomMap.entrySet()) {
+			List<String> key = itemRoom.getKey ();
+			keyMap.put(String.valueOf(index), key);
+			index += 1;
+		}
+		
+		System.out.println("roomMap = " + roomMap);
+		
+		// check empty
+		if (roomMap.get(keyMap.get(String.valueOf(1))).isEmpty()) {
+			throw new CustomException("No suitable room found");
+		}
+		
+		// create options room
+		Map<String, List<Room2>> roomResultMap = new HashMap<>();
+		index = 1;
+		for (Map.Entry<Room2, List<String>> itemRoom : roomMap.get(keyMap.get(String.valueOf(1))).entrySet()) {
+			Room2 key = itemRoom.getKey();
+			List<String> value = itemRoom.getValue();
+			
+			List<Room2> roomResultList = new ArrayList<>();
+			roomResultList.add(key);
+			
+			roomResultMap.put(String.valueOf(index), roomResultList);
+			index += 1;
+		}
+		if (roomSearch.getNumberOfRoom() > 1) {
+			for (int i = 2; i <= roomSearch.getNumberOfRoom(); i ++) {
+				index = 1;
+				Map<String, List<Room2>> roomResultMapClone = new HashMap<>();
+				roomResultMapClone.putAll(roomResultMap);
+				for (Map.Entry<String, List<Room2>> itemRoomResult : roomResultMapClone.entrySet()) {
+					String keyResult = itemRoomResult.getKey();
+					List<Room2> valueResult = itemRoomResult.getValue();
+					
+					// check empty
+					if (roomMap.get(keyMap.get(String.valueOf(i))).isEmpty()) {
+						throw new CustomException("No suitable room found");
+					}
+					
+					for (Map.Entry<Room2, List<String>> itemRoom : roomMap.get(keyMap.get(String.valueOf(i))).entrySet()) {
+						Room2 keyRoom = itemRoom.getKey();
+						List<String> valueRoom = itemRoom.getValue();
+
+						List<Room2> roomResultList = new ArrayList<>();
+						roomResultList.addAll(valueResult);
+						
+						// get roomId
+						String roomId = null;
+						for (String itemString : valueRoom) {
+							roomId = itemString;
+							for (Room2 itemRoom2 : roomResultList) {
+								if (itemRoom2.getRoomId().equals(itemString)) {
+									roomId = null;
+									break;
+								} 
+							}
+							if (roomId != null) {
+								break;
+							}
+						}
+						if (roomId == null) {
+							throw new CustomException("No suitable room found");
+						}
+						
+						Room2 room2 = new Room2();
+						modelMapper.map(keyRoom, room2);
+						room2.setRoomId(roomId);
+						roomResultList.add(room2);
+						
+						roomResultMap.put(String.valueOf(index), roomResultList);
+						index += 1;
+					}
+				}
+			}
+		}
+		
+		// delete exists room
+		Map<String, List<Room2>> roomResultMapClone = new HashMap<>();
+		roomResultMapClone.putAll(roomResultMap);
+		int index1 = 1;
+		for (Map.Entry<String, List<Room2>> itemRoomResult : roomResultMapClone.entrySet()) {
+			String keyRoomResult = itemRoomResult.getKey();
+			List<Room2> valueRoomResult = itemRoomResult.getValue();
+			
+			int index2 = 1;
+			for (Map.Entry<String, List<Room2>> itemRoomResult2 : roomResultMapClone.entrySet()) {
+				String keyRoomResult2 = itemRoomResult2.getKey();
+				List<Room2> valueRoomResult2 = itemRoomResult2.getValue();
+				
+				if (index2 > index1) {
+					int RoomResultSize = valueRoomResult.size();
+					for (Room2 itemRoom : valueRoomResult) {
+						for (Room2 itemRoom2 : valueRoomResult2) {
+							if (itemRoom.getRoomId().equals(itemRoom2.getRoomId())) {
+								RoomResultSize -= 1;
+							}
+						}
+					}
+					if (RoomResultSize == 0) {
+						roomResultMap.remove(keyRoomResult2);
+					}
+				}
+				index2 += 1;
+			}
+			index1 += 1;
+		}
+		
+		List<RoomSearchRes> roomSearchResList = new ArrayList<>();
+		for (Map.Entry<String, List<Room2>> itemRoomResult : roomResultMap.entrySet()) {
+			String keyRoomResult = itemRoomResult.getKey();
+			List<Room2> valueRoomResult = itemRoomResult.getValue();
+			
+			int totalPrice = 0;
+			for (Room2 itemRoom: valueRoomResult) {
+				totalPrice += itemRoom.getPrice();
+			}
+			
+			RoomSearchRes roomSearchRes = new RoomSearchRes();
+			roomSearchRes.setRoom(valueRoomResult);
+			roomSearchRes.setTotalPrice(totalPrice);
+			roomSearchResList.add(roomSearchRes);
+		}
+		
+		// sort list tour by total price value
+		Collections.sort(roomSearchResList, new Comparator<RoomSearchRes>() {
+            @Override
+            public int compare(RoomSearchRes roomSearchRes1, RoomSearchRes roomSearchRes2) {
+            	int result = Integer.compare(roomSearchRes1.getTotalPrice(), roomSearchRes2.getTotalPrice());
+                return result;
+            }
+        });
+		
+		return roomSearchResList;
+	}
+
+	@Override
+	public List<EHotel> listEHotelSearch(String keyword) {
+		List<EHotel> eHotelList = new ArrayList<>();
+		eHotelList.addAll(search2(keyword));
+		
+		return eHotelList;
+	}
+
+	@Override
+	public List<EHotel> listEHotelFilter(HashMap<String, String> filter, List<EHotel> eHotelList) {
+		List<EHotel> eHotelListClone = new ArrayList<>();
+		eHotelListClone.addAll(eHotelList);
+		for (EHotel itemEHotel : eHotelListClone) {
+			filter.forEach((fieldName, fieldValue) -> {
+				// filter of account class
+				for (Field itemField : EHotel.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of account
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemEHotel));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								eHotelList.remove(itemEHotel);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+				// filter of base class
+				for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+					itemField.setAccessible(true);
+					// field of base
+					if (itemField.getName().equals(fieldName)) {
+						try {
+							String value = String.valueOf(itemField.get(itemEHotel));
+							String valueNew = StringUtil.getNormalAlphabet(value);
+							String fieldValueNew = StringUtil.getNormalAlphabet(fieldValue);
+							if (!valueNew.contains(fieldValueNew)) {
+								eHotelList.remove(itemEHotel);
+								break;
+							}
+						} catch (Exception e) {
+							
+						}
+					}
+				}
+				
+			});
+			if (eHotelList.size() <= 0) {
+				break;
+			}
+		}
+		
+		return eHotelList;
+	}
+
+	@Override
+	public List<EHotel> listEHotelSort(Sort sort, List<EHotel> eHotelList) {
+		Collections.sort(eHotelList, new Comparator<EHotel>() {
+            @Override
+            public int compare(EHotel eHotel1, EHotel eHotel2) {
+            	int result = 0;
+            	
+            	// sort of account class
+        		for (Field itemField : EHotel.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of account
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(eHotel1));
+		            		String string2 = String.valueOf(itemField.get(eHotel2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		// sort of base class
+        		for (Field itemField : BaseEntity.class.getDeclaredFields()) {
+        			itemField.setAccessible(true);
+        			// field of base
+    				if (sort.getSortBy().equals(itemField.getName())) {
+    					try {
+		            		String string1 = String.valueOf(itemField.get(eHotel1));
+		            		String string2 = String.valueOf(itemField.get(eHotel2));
+		            		result = string1.compareTo(string2);
+		            	} catch (Exception e) {
+		            		result = 0;
+						}
+    					
+    					break;
+    				}
+    			}
+        		
+        		if (sort.getOrder().equals("asc")) {
+
+            	} else if (sort.getOrder().equals("desc")) {
+            		result = -result;
+            	} else {
+            		result = 0;
+            	}
+            	
+            	return result;
+            }
+        });
+		
+		return eHotelList;
 	}
 }
