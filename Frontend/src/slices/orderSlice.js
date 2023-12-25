@@ -56,6 +56,17 @@ export const getOrderCheck = createAsyncThunk(
     }
   }
 );
+export const searchOrderAdmin = createAsyncThunk(
+  "prders/list/search",
+  async (order, { rejectWithValue }) => {
+    try {
+      const response = await ordersApi.searchOrderAdmin(order);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const orderSlice = createSlice({
   name: "order",
   initialState: {
@@ -123,6 +134,18 @@ export const orderSlice = createSlice({
       state.loading = false;
       state.status = action.payload.data.data;
       console.log(state.status);
+    },
+    [searchOrderAdmin.pending]: (state) => {
+      state.loading = true;
+    },
+    [searchOrderAdmin.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [searchOrderAdmin.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.orders = action.payload.data.data;
+      state.totalData = action.payload.data.totalData;
     },
   },
 });

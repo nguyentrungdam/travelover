@@ -21,6 +21,11 @@ const discountsApi = {
     const url = "/discounts/list";
     return axios.get(url);
   },
+
+  searchDiscountAdmin: (discount) => {
+    const url = `/discounts/list/search?keyword=${discount.keyword}&minOrder=${discount.minOrder}&createdAt2=${discount.createdAt2}&discountValue=${discount.discountValue}&sortBy=${discount.sortBy}&order=${discount.order}`;
+    return axios.get(url);
+  },
 };
 
 export default discountsApi;

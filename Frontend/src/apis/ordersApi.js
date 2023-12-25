@@ -21,6 +21,10 @@ const ordersApi = {
     const url = `/orders/detail?orderId=${orderId}`;
     return axios.get(url);
   },
+  searchOrderAdmin: (order) => {
+    const url = `/orders/list/search?keyword=${order.keyword}&fullName=${order.fullName}&finalPrice=${order.finalPrice}&createdAt2=${order.createdAt2}&orderStatus=${order.orderStatus}&sortBy=${order.sortBy}&order=${order.order}`;
+    return axios.get(url);
+  },
 };
 
 export default ordersApi;

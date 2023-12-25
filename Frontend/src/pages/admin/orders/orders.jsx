@@ -6,9 +6,11 @@ import Loading from "../../../components/Loading/Loading";
 import {
   getAllOrders,
   getOrderDetail,
+  searchOrderAdmin,
   updateOrder,
 } from "../../../slices/orderSlice";
 import {
+  convertDateFormat,
   formatCurrencyWithoutD,
   formatDate,
   formatDateAndHour,
@@ -18,6 +20,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 const columns = [
   { field: "stt", headerName: "STT", width: 40, type: "string" },
   {
@@ -78,12 +82,18 @@ const OrderList = () => {
   const dispatch = useDispatch();
   const { loading, orders, order } = useSelector((state) => state.order);
   const [showModal, setShowModal] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("1");
   const [orderId, setOrderId] = useState("");
-  // const checkDiscount = (discount) => {
-  //   if (discount > 0) return true;
-  //   return false;
-  // };
+  const [keyWord, setKeyWord] = useState("");
+  const [sort, setSort] = useState({ sortBy: "createdAt2", order: "asc" });
+  const [fields, setFields] = useState([{ field: "minOrder", value: "" }]);
+  const [currentField, setCurrentField] = useState("");
+  const [currentInputValue, setCurrentInputValue] = useState("");
+  const [showMultiSearchModal, setShowMultiSearchModal] = useState(false);
+  const [createdAtInput, setCreatedAtInput] = useState("");
+  const [cancellationMessage, setCancellationMessage] = useState("");
+  const [cancellationDiscountCode, setCancellationDiscountCode] = useState("");
+  const [showModalCancel, setShowModalCancel] = useState(false);
 
   const transformedData =
     orders && Array.isArray(orders)
@@ -93,7 +103,7 @@ const OrderList = () => {
           img: item?.orderDetail.tourDetail.thumbnailUrl,
           title: item?.orderDetail.tourDetail.tourTitle,
           finalPrice: formatCurrencyWithoutD(item?.finalPrice) + "đ",
-          // discount: checkDiscount(item?.discount.discountTourValue),
+
           name: item?.customerInformation.fullName,
           status: getVietNameseNameOfProcess(item?.orderStatus),
           createAt: formatDateAndHour(item?.createdAt2),
@@ -106,6 +116,16 @@ const OrderList = () => {
   useEffect(() => {
     dispatch(getAllOrders()).unwrap();
   }, [order.orderStatus]);
+  useEffect(() => {
+    // Reset the values when selectedStatus changes
+    if (selectedStatus === "0") {
+      setShowModalCancel(true);
+    } else {
+      setShowModalCancel(false);
+      setCancellationMessage("");
+      setCancellationDiscountCode("");
+    }
+  }, [selectedStatus]);
   console.log(orders);
   const handleUpdateOrderStatus = (orderId) => {
     setOrderId(orderId);
@@ -114,6 +134,7 @@ const OrderList = () => {
   };
   const openModal = () => {
     setShowModal(true);
+    setSelectedStatus("1");
     document.body.classList.add("modal-open");
   };
   const closeModal = () => {
@@ -125,6 +146,7 @@ const OrderList = () => {
       closeModal();
     }
   };
+
   const handleViewDetail = (tourId) => {
     navigate(`/tours-list/${tourId}`);
     document.body.classList.remove("modal-open");
@@ -132,9 +154,16 @@ const OrderList = () => {
   const handleSaveStatus = async () => {
     console.log(orderId);
     console.log(selectedStatus);
+    console.log(cancellationMessage);
+    console.log(cancellationDiscountCode);
     try {
       await dispatch(
-        updateOrder({ orderId: orderId, status: selectedStatus })
+        updateOrder({
+          orderId: orderId,
+          status: selectedStatus,
+          message: cancellationMessage,
+          discountCode: cancellationDiscountCode,
+        })
       ).unwrap();
       notify(1);
     } catch (error) {
@@ -160,6 +189,85 @@ const OrderList = () => {
       }
     });
   };
+
+  //!xử lý multi search
+  const openMultiSearchModal = () => {
+    setShowMultiSearchModal(true);
+    document.body.classList.add("modal-open");
+  };
+  const handleOverlayClick2 = (e) => {
+    if (e.target.classList.contains("modal-overlay3")) {
+      closeMultiSearchModal();
+    }
+  };
+  const closeMultiSearchModal = () => {
+    setShowMultiSearchModal(false);
+    document.body.classList.remove("modal-open");
+    resetValues();
+  };
+  const handleAddSelect = () => {
+    setFields((prevFields) => [
+      ...prevFields,
+      { field: currentField, value: currentInputValue },
+    ]);
+    setCurrentField("");
+    setCurrentInputValue("");
+  };
+  const handleSelectChange = (index, value) => {
+    setFields((prevFields) => {
+      const updatedFields = [...prevFields];
+      updatedFields[index].field = value;
+      return updatedFields;
+    });
+  };
+  const handleInputChange = (index, value) => {
+    setFields((prevFields) => {
+      const updatedFields = [...prevFields];
+      updatedFields[index].value = value;
+      return updatedFields;
+    });
+  };
+
+  const handleMultiSearch = () => {
+    console.log(keyWord);
+    console.log(fields);
+    console.log(sort);
+    const convertedDate = convertDateFormat(createdAtInput);
+    console.log(convertedDate);
+
+    try {
+      console.log(1);
+      const searchParams = {
+        keyword: keyWord,
+        fullName:
+          fields.find((field) => field.field === "fullName")?.value || "",
+        finalPrice:
+          fields.find((field) => field.field === "finalPrice")?.value || "",
+        orderStatus:
+          fields.find((field) => field.field === "orderStatus")?.value || "",
+        sortBy: sort.sortBy,
+        order: sort.order,
+      };
+
+      if (convertedDate !== undefined) {
+        searchParams.createdAt2 = convertedDate;
+      }
+
+      dispatch(searchOrderAdmin(searchParams)).unwrap();
+      console.log(2);
+      closeMultiSearchModal();
+    } catch (error) {
+      // notify(4);
+    }
+  };
+
+  const resetValues = () => {
+    setKeyWord("");
+    setFields([{ field: "minOrder", value: "" }]);
+    setCurrentField("");
+    setCurrentInputValue("");
+    setSort({ sortBy: "", order: "" });
+  };
   console.log(order);
   return (
     <div className="products vh-100">
@@ -173,6 +281,13 @@ const OrderList = () => {
         <Loading isTable />
       ) : (
         <>
+          <div
+            className="btn-block1 w-15 mb-2 ms-0"
+            onClick={openMultiSearchModal}
+          >
+            Tìm Kiếm...
+            <FontAwesomeIcon className=" ms-1" icon={faMagnifyingGlass} />
+          </div>
           <DataTable
             slug="orders-list"
             columns={columns}
@@ -198,7 +313,10 @@ const OrderList = () => {
                   <div className="row gx-3 mb-3">
                     <div className="col-md-4">
                       <div>
-                        Trạng thái: <span>{order.orderStatus}</span>
+                        Trạng thái:{" "}
+                        <span>
+                          {getVietNameseNameOfProcess(order.orderStatus)}
+                        </span>
                       </div>
                       <div>
                         Ngày sửa gần nhất:{" "}
@@ -337,19 +455,145 @@ const OrderList = () => {
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
                   >
-                    <option value="0">Đã hủy</option>
                     <option value="1">Đang xử lý</option>
                     <option value="2">Đã xác nhận</option>
                     <option value="3">Trong chuyến đi</option>
                     <option value="4">Hoàn thành</option>
+                    <option value="0">Hủy</option>
                   </select>
                 </div>
+                {showModalCancel && (
+                  <div className="col-md-6  wrap-modal-addtour">
+                    <label htmlFor="cancellationMessage">
+                      Lý do hủy đơn <b className="b-red">*</b>
+                    </label>
+                    <input
+                      type="text"
+                      id="cancellationMessage"
+                      className="form-control"
+                      value={cancellationMessage}
+                      onChange={(e) => setCancellationMessage(e.target.value)}
+                    />
+                    <label htmlFor="cancellationDiscountCode">
+                      Mã giảm giá <b className="b-red">*</b>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control w-50"
+                      id="cancellationDiscountCode"
+                      value={cancellationDiscountCode}
+                      onChange={(e) =>
+                        setCancellationDiscountCode(e.target.value)
+                      }
+                    />
+                  </div>
+                )}
                 <button
                   className="btn btn-primary wrap-modal-addtour mt-2"
                   onClick={handleSaveStatus}
                 >
                   Lưu
                 </button>
+              </div>
+            </div>
+          )}
+          {showMultiSearchModal && (
+            <div className="modal-overlay3" onClick={handleOverlayClick2}>
+              <div className="modal2 col-md-3">
+                <div className="d-flex wrap-modal-addtour">
+                  <h5 className="card-header">Tìm kiếm</h5>
+                  <button
+                    className="close-btn2"
+                    onClick={closeMultiSearchModal}
+                  >
+                    X
+                  </button>
+                </div>
+                <div className="mt-3 ">
+                  <input
+                    className="form-control mb-2 "
+                    type="text"
+                    placeholder="Nhập từ khóa"
+                    value={keyWord}
+                    onChange={(e) => setKeyWord(e.target.value)}
+                  />
+                  <button className="btn btn-primary" onClick={handleAddSelect}>
+                    Thêm Lựa Chọn
+                  </button>
+                  {fields.map((field, index) => (
+                    <div key={index} className="my-2">
+                      <select
+                        className="me-2 p-1 mb-2"
+                        value={field.field}
+                        onChange={(e) =>
+                          handleSelectChange(index, e.target.value)
+                        }
+                      >
+                        <option value="createdAt2">Ngày tạo</option>
+                        <option value="finalPrice">Giá</option>
+                        <option value="fullName">Tên khách hàng</option>
+                        <option value="orderStatus">Trạng thái</option>
+                      </select>
+                      {field.field === "createdAt2" ? (
+                        <input
+                          className="form-control w-50"
+                          type="text"
+                          value={createdAtInput}
+                          onChange={(e) => {
+                            setCreatedAtInput(e.target.value);
+                          }}
+                        />
+                      ) : (
+                        <input
+                          className="form-control w-50"
+                          type="text"
+                          value={field.value}
+                          onChange={(e) =>
+                            handleInputChange(index, e.target.value)
+                          }
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  <label className="small mb-1 me-2">Sắp xếp: </label>
+                  <div className="d-flex">
+                    <select
+                      className="me-2 p-1 mb-2"
+                      value={sort.sortBy}
+                      onChange={(e) =>
+                        setSort((prevSort) => ({
+                          ...prevSort,
+                          sortBy: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="createdAt2">Ngày tạo</option>
+                      <option value="finalPrice">Giá</option>
+                      <option value="fullName">Tên khách hàng</option>
+                      <option value="orderStatus">Trạng thái</option>
+                    </select>
+                    <select
+                      className="me-2 p-1 mb-2"
+                      value={sort.order}
+                      onChange={(e) =>
+                        setSort((prevSort) => ({
+                          ...prevSort,
+                          order: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="asc">Tăng </option>
+                      <option value="desc">Giảm</option>
+                    </select>
+                  </div>
+                  <button
+                    className="btn btn-primary mt-2"
+                    onClick={handleMultiSearch}
+                  >
+                    Tìm Kiếm
+                  </button>
+                </div>
               </div>
             </div>
           )}
