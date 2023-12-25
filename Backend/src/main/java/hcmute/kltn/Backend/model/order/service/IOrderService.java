@@ -17,6 +17,7 @@ public interface IOrderService {
 	public OrderDTO updateOrderPayment(OrderPaymentUpdate orderPaymentUpdate);
 	public OrderDTO updateOrderStatus(OrderStatusUpdate orderStatusUpdate);
 	public OrderDTO getDetailOrder(String orderId);
+	public OrderDTO getDetailOrderNotCheckCreate(String orderId);
 	
 	public List<OrderDTO> getAllOrder();
 	public List<OrderDTO> searchOrder(String keyword);

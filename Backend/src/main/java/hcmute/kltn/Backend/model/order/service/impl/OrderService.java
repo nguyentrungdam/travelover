@@ -238,6 +238,7 @@ public class OrderService implements IOrderService{
 	}
 	
 	private String getAllValue(Order order) {
+		System.out.println("order value = " + order.toString());
 		String result = new String();
 		
 		// value of account
@@ -807,5 +808,12 @@ public class OrderService implements IOrderService{
         });
 		
 		return orderDTOList;
+	}
+
+	@Override
+	public OrderDTO getDetailOrderNotCheckCreate(String orderId) {
+		Order order = getDetail(orderId);
+
+		return getOrderDTO(order);
 	}
 }

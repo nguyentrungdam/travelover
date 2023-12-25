@@ -87,7 +87,7 @@ public class PaymentController {
 		vnPaymentDTO.setOrderId(orderId);
 		
 		OrderDTO orderDTO = new OrderDTO();
-		orderDTO = iOrderService.getDetailOrder(orderId);
+		orderDTO = iOrderService.getDetailOrderNotCheckCreate(orderId);
 		vnPaymentDTO.setCreatedBy(orderDTO.getCreatedBy());
 		vnPaymentDTO.setLastModifiedBy(orderDTO.getLastModifiedBy());
 		
@@ -109,8 +109,6 @@ public class PaymentController {
 			iOrderService.updateOrderPayment(prderPaymentUpdate);
 			
 			// Send email 
-
-			
 			AccountDTO accountDTO = new AccountDTO();
 			accountDTO = iAccountService.getDetailAccount(orderDTO.getCreatedBy());
 			EmailDTO emailDTO = iEmailService.getInfoOrderSuccess(orderDTO, accountDTO.getFirstName());
