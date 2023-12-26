@@ -1,13 +1,18 @@
 import "./tour.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCalendarDay,
+  faCalendarDays,
+  faCartShopping,
   faCircleArrowLeft,
   faCircleArrowRight,
   faCircleXmark,
   faLocationDot,
+  faMagnifyingGlass,
+  faPeopleGroup,
   faTicket,
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
 import { photos, servicesData, tripDays } from "../../../assets/data/dataAdmin";
@@ -21,12 +26,19 @@ import {
   saveToLocalStorage,
   validateOriginalDate,
 } from "../../../utils/validate";
+import { addDays, format } from "date-fns";
+import { vi } from "date-fns/locale";
+import DatePicker from "react-datepicker";
+import { hotels } from "../../../assets/data/tours";
+import { getZHotelRoomSearch } from "../../../slices/zhotelSlice";
+import Loading from "../../../components/Loading/Loading";
 
 const TourDetail = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, tours } = useSelector((state) => state.tour);
+  const { tours } = useSelector((state) => state.tour);
+  const { loading, zrooms } = useSelector((state) => state.hotelz);
   const { tourId } = useParams();
   const [slideNumber, setSlideNumber] = useState(0);
   const [open, setOpen] = useState(false);
@@ -58,7 +70,7 @@ const TourDetail = () => {
     ).unwrap();
   }, []);
 
-  console.log(tours);
+  // console.log(tours);
   const handleOrder = (tourId) => {
     navigate(`/tours/tour-booking/${tourId}`, {
       state: {
@@ -87,7 +99,6 @@ const TourDetail = () => {
     setOpen(false);
     document.body.classList.remove("modal-open1");
   };
-
   const handleMove = (direction) => {
     let newSlideNumber;
 
@@ -101,9 +112,13 @@ const TourDetail = () => {
 
     setSlideNumber(newSlideNumber);
   };
-  const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
-    return accumulator + currentRoom.price;
-  }, 0);
+
+  const totalRoom = tours[0]?.hotel?.room?.reduce(
+    (accumulator, currentRoom) => {
+      return accumulator + currentRoom.price;
+    },
+    0
+  );
   //tách dòng description
   const maxDescriptionLength = 300;
   const tourDescription = tours[0]?.tour?.tourDescription;
@@ -119,6 +134,95 @@ const TourDetail = () => {
       </span>
     ));
   };
+  //! xử lý search room
+  const tomorrow = addDays(new Date(), 1);
+  const tomorrow2 = addDays(new Date(), 2);
+  const [openOptions, setOpenOptions] = useState(false);
+  const optionsRef = useRef(null);
+  const [selectedDate2, setSelectedDate2] = useState(tomorrow);
+  const [selectedDate3, setSelectedDate3] = useState(tomorrow2);
+  const [startDate2, setStartDate2] = useState(format(tomorrow, "yyyy-MM-dd"));
+  const [endDate2, setEndDate2] = useState(format(tomorrow2, "yyyy-MM-dd"));
+  const [numberOfAdult2, setNumberOfAdult2] = useState(1);
+  const [numberOfChildren2, setNumberOfChildren2] = useState(0);
+  const [numberOfRoom2, setNumberOfRoom2] = useState(1);
+  const [showHotel, setShowHotel] = useState(true);
+  const [showRoom, setShowRoom] = useState(false);
+
+  const handleSearch = () => {
+    console.log(startDate2);
+    console.log(endDate2);
+    console.log(numberOfAdult2);
+    console.log(numberOfChildren2);
+    console.log(numberOfRoom2);
+    setShowHotel(true);
+    setShowRoom(false);
+  };
+  const handleDateChange = (date) => {
+    const formattedDisplayDate = format(date, "yyyy-MM-dd");
+    setSelectedDate2(date);
+    setStartDate2(formattedDisplayDate);
+  };
+  const handleDateChange2 = (date) => {
+    const formattedDisplayDate = format(date, "yyyy-MM-dd");
+    setSelectedDate3(date);
+    setEndDate2(formattedDisplayDate);
+  };
+
+  const handleOption = (category, operation) => {
+    if (operation === "decrease") {
+      if (category === "adults" && numberOfAdult2 > 1) {
+        setNumberOfAdult2(numberOfAdult2 - 1);
+      } else if (category === "children" && numberOfChildren2 > 0) {
+        setNumberOfChildren2(numberOfChildren2 - 1);
+      } else if (category === "rooms" && numberOfRoom2 > 1) {
+        setNumberOfRoom2(numberOfRoom2 - 1);
+      }
+    } else if (operation === "increase") {
+      if (category === "adults") {
+        setNumberOfAdult2(numberOfAdult2 + 1);
+      } else if (category === "children") {
+        setNumberOfChildren2(numberOfChildren2 + 1);
+      } else if (category === "rooms" && numberOfRoom2 < numberOfAdult2) {
+        setNumberOfRoom2(numberOfRoom2 + 1);
+      }
+    }
+  };
+
+  const handleClickOutside = (event) => {
+    if (optionsRef.current && !optionsRef.current.contains(event.target)) {
+      setOpenOptions(false);
+    }
+  };
+  const handlePeopleClick = (e) => {
+    e.stopPropagation(); // Ngăn chặn sự kiện click từ lan truyền lên
+    setOpenOptions(!openOptions);
+  };
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+  const handleBookHotel = (id) => {
+    const res = dispatch(
+      getZHotelRoomSearch({
+        startDate: startDate2,
+        endDate: endDate2,
+        numberOfAdult: numberOfAdult2,
+        numberOfChildren: numberOfChildren2,
+        numberOfRoom: numberOfRoom2,
+        eHotelId: id,
+      })
+    ).unwrap();
+    console.log(res);
+    setShowHotel(false);
+    setShowRoom(true);
+  };
+  const handleBookRoom = (id) => {
+    console.log("room id: " + id);
+  };
+  console.log(zrooms);
   return (
     <div>
       <ScrollToTop />
@@ -272,8 +376,9 @@ const TourDetail = () => {
                     alt=""
                   />
                   <label>Khách sạn</label>
-                  <p>{tours[0]?.hotel?.hotelName} </p>
-                  <p>
+                  <p>Vạn Phát Riverside Hotel </p>
+                  {/* <p>{tours[0]?.hotel?.hotelName} </p> */}
+                  {/* <p>
                     Tổng số phòng:{" "}
                     <button
                       className="btn-view-room"
@@ -281,7 +386,7 @@ const TourDetail = () => {
                     >
                       {tours[0]?.hotel?.room.length}
                     </button>
-                  </p>
+                  </p> */}
                   {showRoomDetails && (
                     <div>
                       {/* Hiển thị thông tin chi tiết của các phòng */}
@@ -296,6 +401,282 @@ const TourDetail = () => {
                   )}
                 </div>
               </div>
+              <div className="search__bar mb-4 position-relative">
+                <div className="headerSearch w-100">
+                  <div className="headerSearchItem form__group-fast">
+                    <FontAwesomeIcon
+                      icon={faCalendarDay}
+                      className="icon-search"
+                    />
+                    <div className="headerSearch-date">
+                      <h5>Ngày đi </h5>
+                      <DatePicker
+                        id="datepicker"
+                        className="datepicker "
+                        selected={selectedDate2}
+                        onChange={handleDateChange}
+                        locale={vi} // Thiết lập ngôn ngữ Tiếng Việt
+                        dateFormat="dd-MM-yyyy" // Định dạng ngày tháng
+                        minDate={tomorrow} // Chỉ cho phép chọn ngày từ ngày mai trở đi
+                      />
+                    </div>
+                  </div>
+                  <div className="headerSearchItem form__group-fast">
+                    <FontAwesomeIcon
+                      icon={faCalendarDay}
+                      className="icon-search"
+                    />
+                    <div className="headerSearch-date">
+                      <h5>Ngày về </h5>
+                      <DatePicker
+                        id="datepicker"
+                        className="datepicker "
+                        selected={selectedDate3}
+                        onChange={handleDateChange2}
+                        locale={vi}
+                        dateFormat="dd-MM-yyyy"
+                        minDate={tomorrow2}
+                      />
+                    </div>
+                  </div>
+                  <div className="headerSearchItem headerSearchItem1 ">
+                    <FontAwesomeIcon
+                      icon={faPeopleGroup}
+                      className="icon-search"
+                    />
+                    <div className="headerSearch-location w280">
+                      <h5>Số người</h5>
+                      <span
+                        onClick={handlePeopleClick}
+                        className="headerSearchText"
+                      >
+                        {numberOfAdult2} người lớn, {numberOfChildren2} trẻ em,{" "}
+                        {numberOfRoom2} phòng
+                      </span>
+                      {openOptions && (
+                        <div className="options" ref={optionsRef}>
+                          <div className="optionItem">
+                            <span className="optionText">Người lớn </span>
+                            <div className="optionCounter">
+                              <button
+                                disabled={numberOfAdult2 <= 1}
+                                className="optionCounterButton"
+                                onClick={() =>
+                                  handleOption("adults", "decrease")
+                                }
+                              >
+                                -
+                              </button>
+                              <span className="optionCounterNumber">
+                                {numberOfAdult2}
+                              </span>
+                              <button
+                                className="optionCounterButton"
+                                onClick={() =>
+                                  handleOption("adults", "increase")
+                                }
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          <div className="optionItem">
+                            <span className="optionText">Trẻ em </span>
+                            <div className="optionCounter">
+                              <button
+                                disabled={numberOfChildren2 < 1}
+                                className="optionCounterButton"
+                                onClick={() =>
+                                  handleOption("children", "decrease")
+                                }
+                              >
+                                -
+                              </button>
+                              <span className="optionCounterNumber">
+                                {numberOfChildren2}
+                              </span>
+                              <button
+                                className="optionCounterButton"
+                                onClick={() =>
+                                  handleOption("children", "increase")
+                                }
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          <div className="optionItem">
+                            <span className="optionText">Số phòng </span>
+                            <div className="optionCounter">
+                              <button
+                                disabled={numberOfRoom2 <= 1}
+                                className="optionCounterButton"
+                                onClick={() =>
+                                  handleOption("rooms", "decrease")
+                                }
+                              >
+                                -
+                              </button>
+                              <span className="optionCounterNumber">
+                                {numberOfRoom2}
+                              </span>
+                              <button
+                                className="optionCounterButton"
+                                onClick={() =>
+                                  handleOption("rooms", "increase")
+                                }
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div
+                    className="search__icon me-3"
+                    type="submit"
+                    onClick={handleSearch}
+                  >
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
+                  </div>
+                </div>
+              </div>
+              <div className="position-relative">
+                {loading && <Loading noContainer />}
+              </div>
+              {!loading && showHotel && (
+                <div className="list-hotels py-2">
+                  {hotels.map((hotel) => (
+                    <div
+                      key={hotel.id}
+                      className="item-hotel row mx-0 mb-4 wrapper-borderless animate__fadeInUp animate__animated"
+                      id={hotel.id}
+                    >
+                      <div className="col-md-4 p-0">
+                        <img
+                          className="avatar-hotel cursor-pointer"
+                          alt="avatar-hotel"
+                          src={hotel.image}
+                        />
+                      </div>
+                      <div className="col-md-8 p-0">
+                        <div className="p-3">
+                          <div className="hotel-name mb-2 cursor-pointer">
+                            {hotel.name}
+                          </div>
+                          <div className="d-sm-flex align-items-center justify-content-between">
+                            <div>
+                              {Array.from(
+                                { length: hotel.stars },
+                                (_, index) => (
+                                  <img
+                                    key={index}
+                                    className="star-for-hotel"
+                                    src="/star.svg"
+                                    alt=""
+                                  />
+                                )
+                              )}
+                              <div className="hotel-type mt-3">
+                                <img
+                                  src="/hotel-type.svg"
+                                  alt="hotel-type"
+                                  className="w-15px"
+                                />
+                                &nbsp; {hotel.type}
+                              </div>
+                            </div>
+                            <div className="mt-sm-0 mt-2">
+                              <div className="title-unit-money mb-1">
+                                Giá mỗi đêm từ
+                              </div>
+                              <div className="unit-money-vnd unit-money-new">
+                                {hotel.price}&nbsp;₫
+                              </div>
+                            </div>
+                          </div>
+                          <div className="address d-sm-flex align-items-center justify-content-between mt-4">
+                            <div className="wrap-hotel-address pe-3">
+                              <img
+                                src="/mapViolet.svg"
+                                alt="mapViolet.svg"
+                                className="w-20px"
+                              />
+                              <span>{hotel.address}</span>
+                            </div>
+                            <div className="group-btn flex-shrink-0 d-flex mt-sm-0 mt-2">
+                              <button
+                                id={hotel.id}
+                                className="btn-add-to-cart "
+                                onClick={() => handleBookHotel(hotel.id)}
+                              >
+                                <FontAwesomeIcon
+                                  className="me-1"
+                                  icon={faCartShopping}
+                                />
+                                <span className="px-1">Chọn Phòng</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!loading && showRoom && (
+                <div className="list-hotels py-2 col-md-11">
+                  {zrooms?.map((room, index) => (
+                    <div
+                      key={index + 1}
+                      className="item-hotel row mx-0 mb-4 wrapper-borderless animate__fadeInUp animate__animated"
+                    >
+                      <div className="col-md-9 p-0">
+                        {room.room.map((roomDetail) => (
+                          <div className=" mb-2" key={roomDetail.roomId}>
+                            <div className="hotel-name">{roomDetail.name}</div>
+                            <div className=" mb-2">
+                              {roomDetail.bed.join(" - ")}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="col-md-3 p-0">
+                        <div className="p-3">
+                          <div className="d-sm-flex align-items-center justify-content-between">
+                            <div className="mt-sm-0 mt-2">
+                              <div className="title-unit-money mb-1">
+                                Giá mỗi đêm
+                              </div>
+                              <div className="unit-money-vnd unit-money-new">
+                                {formatCurrencyWithoutD(room.totalPrice)}&nbsp;₫
+                              </div>
+                            </div>
+                          </div>
+                          <div className="address d-sm-flex align-items-center justify-content-between mt-4">
+                            <div className="group-btn flex-shrink-0 d-flex mt-sm-0 mt-2">
+                              <button
+                                id={room.roomId}
+                                className="btn-add-to-cart "
+                                onClick={() => handleBookRoom(room.roomId)}
+                              >
+                                <FontAwesomeIcon
+                                  className="me-1"
+                                  icon={faCartShopping}
+                                />
+                                <span className="px-1">Chọn Phòng</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
               <h5>Chính sách và điều khoản</h5>
               <FormatLine text={tours[0]?.tour?.termAndCondition} />
             </div>
@@ -432,7 +813,7 @@ const TourDetail = () => {
                   </div>
                 </div>
                 <div className="col-md-8 col-12 right timeline-section">
-                  {tours[0]?.tour?.tourDetailList.map((day, index) => (
+                  {tours[0]?.tour?.schedule.map((day, index) => (
                     <div key={index}>
                       <h3 id={`day-0${index + 1}`}>{day.title}</h3>
                       <div className="excerpt">
@@ -440,6 +821,11 @@ const TourDetail = () => {
                         <div style={{ textAlign: "justify" }}>
                           {day.description}
                         </div>
+                        <img
+                          src={day.imageUrl}
+                          alt={day.title}
+                          className="w-100"
+                        />
                       </div>
                     </div>
                   ))}

@@ -62,15 +62,15 @@ export const menuEnterprise = [
       {
         id: 1,
         title: "Hotels",
-        url: "/hotel-z",
+        url: "/hotelz",
         icon: "/hotel.svg",
       },
-      {
-        id: 2,
-        title: "Order",
-        url: "/order-z",
-        icon: "/order.svg",
-      },
+      // {
+      //   id: 2,
+      //   title: "Order",
+      //   url: "/orderz",
+      //   icon: "/order.svg",
+      // },
     ],
   },
 ];

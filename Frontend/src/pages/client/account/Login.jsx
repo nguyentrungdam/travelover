@@ -65,7 +65,7 @@ const Login = () => {
               res.data.status === "ok" &&
               res?.data?.data.role === "ENTERPRISE"
             ) {
-              navigate("/hotel-z");
+              navigate("/hotelz");
             }
           }, 1500);
         }
