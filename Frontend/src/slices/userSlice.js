@@ -23,6 +23,19 @@ export const updateRole = createAsyncThunk(
     }
   }
 );
+export const searchUser = createAsyncThunk(
+  "accounts/list/search",
+  async (user, { rejectWithValue }) => {
+    console.log(1);
+    try {
+      const response = await userApi.searchUser(user);
+      console.log(response);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -43,6 +56,17 @@ export const userSlice = createSlice({
     [getAllUsers.fulfilled]: (state, action) => {
       state.loading = false;
       state.isAuthenticated = true;
+      state.users = action.payload.data.data;
+    },
+    [searchUser.pending]: (state) => {
+      state.loading = true;
+    },
+    [searchUser.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [searchUser.fulfilled]: (state, action) => {
+      state.loading = false;
       state.users = action.payload.data.data;
     },
   },

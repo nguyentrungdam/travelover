@@ -33,6 +33,8 @@ import TourGuide from "./pages/client/tourGuide/TourGuide";
 import TourGuideDetail from "./pages/client/tourGuide/TourGuideDetail/TourGuideDetail";
 import { blogDataDetail } from "./assets/data/tours";
 import ResetPassword from "./pages/client/account/ResetPassword";
+import AddHotelZ from "./pages/enterprise/add-hotelZ/AddHotelZ";
+import UpdateHotelZ from "./pages/enterprise/update-hotelZ/UpdateHotelZ";
 
 function App() {
   const { isAuthenticated, role } = useSelector((state) => state.account);
@@ -99,7 +101,9 @@ function App() {
 
       {/* enterprise  */}
       <Route path="/" element={<LayoutAdmin />}>
-        <Route path="hotel-z" element={<ZHotel />} />
+        <Route path="hotelz" element={<ZHotel />} />
+        <Route path="hotelz/add-new" element={<AddHotelZ />} />
+        <Route path="hotelz/:id" element={<UpdateHotelZ />} />
       </Route>
 
       {/* <Route path="users">

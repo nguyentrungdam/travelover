@@ -96,6 +96,7 @@ const ResetPassword = () => {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    console.log(email);
     console.log(otp);
     console.log(newPassword);
     try {
@@ -120,6 +121,13 @@ const ResetPassword = () => {
     return new Promise((resolve) => {
       if (prop === 1) {
         toast.success("Gửi OTP thành công! 👌", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
+      } else if (prop === 3) {
+        toast.success("Đặt lại mật khẩu thành công! 👌", {
           position: toast.POSITION.TOP_RIGHT,
           autoClose: 1000,
           pauseOnHover: true,

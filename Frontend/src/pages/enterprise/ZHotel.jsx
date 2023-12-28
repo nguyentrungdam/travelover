@@ -6,7 +6,7 @@ import { getAllHotelz } from "../../slices/zhotelSlice";
 import Loading from "../../components/Loading/Loading";
 
 const columns = [
-  { field: "stt", headerName: "ID", width: 40, type: "string" },
+  { field: "stt", headerName: "STT", width: 40, type: "string" },
   {
     field: "id",
     type: "string",
@@ -16,13 +16,26 @@ const columns = [
   {
     field: "title",
     type: "string",
-    headerName: "Hotel Title",
-    width: 400,
+    headerName: "Tên khách sạn",
+    width: 200,
+  },
+  {
+    field: "stars",
+    type: "string",
+    headerName: "Số sao",
+    width: 120,
   },
   {
     field: "rooms",
     type: "string",
-    headerName: "Rooms",
+    headerName: "Số phòng",
+    width: 120,
+  },
+
+  {
+    field: "phoneNumber",
+    type: "string",
+    headerName: "Số điện thoại",
     width: 120,
   },
 ];
@@ -35,8 +48,10 @@ const ZHotel = () => {
       ? zhotels.map((item, index) => ({
           stt: index + 1,
           id: item?.eHotelId,
-          title: item.eHotelName,
-          rooms: item.room.length,
+          title: item?.eHotelName,
+          rooms: item?.room?.length || item?.room2?.length,
+          stars: item?.numberOfStarRating || 1,
+          phoneNumber: item?.phoneNumber || "0399999999",
         }))
       : [];
 
@@ -48,13 +63,13 @@ const ZHotel = () => {
   return (
     <div className="products vh-100">
       <div className="info">
-        <h1>E-Hotels</h1>
-        <a href="/tours-list/add-new">Add New E-Hotel</a>
+        <h1>Khách Sạn</h1>
+        <a href="/hotelz/add-new">Thêm khách sạn mới</a>
       </div>
       {loading ? (
         <Loading isTable />
       ) : (
-        <DataTable slug="tours-list" columns={columns} rows={transformedData} />
+        <DataTable slug="hotelz" columns={columns} rows={transformedData} />
       )}
     </div>
   );

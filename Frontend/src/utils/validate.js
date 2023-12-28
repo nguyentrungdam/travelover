@@ -80,6 +80,17 @@ export function formatDateAndHour(inputDateTime) {
 
   return formattedDateTimeFinal;
 }
+export function convertDateFormat(inputDate) {
+  // Kiểm tra nếu inputDate là rỗng, trả về giá trị mặc định
+  if (!inputDate) {
+    return ""; // hoặc giá trị mặc định khác nếu cần
+  }
+
+  // Tách tháng và năm từ chuỗi đầu vào
+  const [month, year] = inputDate.split("-");
+  // Trả về chuỗi đã chuyển đổi
+  return `${year}-${month}`;
+}
 
 export function formatDateToVietnamese(dateString) {
   const daysOfWeek = [

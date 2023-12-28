@@ -59,6 +59,18 @@ export const updateDiscount = createAsyncThunk(
     }
   }
 );
+export const searchDiscountAdmin = createAsyncThunk(
+  "discounts/list/search",
+  async (discount, { rejectWithValue }) => {
+    try {
+      const response = await discountsApi.searchDiscountAdmin(discount);
+      console.log("0009999");
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const discountSlice = createSlice({
   name: "discount",
   initialState: {
@@ -125,6 +137,18 @@ export const discountSlice = createSlice({
     [updateDiscount.fulfilled]: (state, action) => {
       state.loading = false;
       state.discount = action.payload.data.data;
+    },
+    [searchDiscountAdmin.pending]: (state) => {
+      state.loading = true;
+    },
+    [searchDiscountAdmin.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [searchDiscountAdmin.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.discounts = action.payload.data.data;
+      state.totalData = action.payload.data.totalData;
     },
   },
 });

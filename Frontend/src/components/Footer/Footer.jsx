@@ -21,12 +21,12 @@ const quick__links = [
     display: "Trang Chủ",
   },
   {
-    path: "/about",
-    display: "Thông Tin",
+    path: "/introduce",
+    display: "Giới Thiệu",
   },
   {
-    path: "/tours",
-    display: "Chuyến Đi",
+    path: "/tour-guide",
+    display: "Cẩm Nang Du Lịch",
   },
 ];
 

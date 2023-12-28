@@ -327,4 +327,40 @@ export const blogDataDetail = [
       "Gây ấn tượng trong lòng du khách bởi thiên đường biển xinh đẹp cùng địa danh nổi tiếng để sống ảo và nghỉ dưỡng, Quy Nhơn luôn là điểm đến hàng đầu của nhiều du khách vào dịp Tết. Cùng “bỏ túi” những địa điểm du lịch Quy Nhơn Tết 2024 đáng trải nghiệm nhất dưới đây nhé. Sơ hữu cảnh quan thiên nhiên tuyệt đẹp với thời tiết thuận lợi quanh năm, Quy Nhơn luôn là điểm đến “hot” vào các tháng trong năm. Tuy nhiên, nếu lựa chọn dịp Tết để du lịch Quy Nhơn cũng là một lựa chọn tuyệt vời bởi, thời tiết ở Quy Nhơn vào dịp Tết mát mẻ, trời nắng đẹp và ít mưa, thích hợp để tham quan, tắm biển, tham gia các trò chơi giải trí hấp dẫn.",
   },
 ];
+export const hotels = [
+  {
+    id: "658a278ef1e7372d0979274e",
+    name: "Vạn Phát Riverside Hotel",
+    image:
+      "https://pix8.agoda.net/hotelImages/304309/-1/7a3989d01b7bed78e6b77bcbadd53258.jpg?ca=19&amp;ce=1",
+    stars: 4,
+    type: "Khách sạn",
+    price: "1.100.000",
+    address:
+      "số 2 đường Nguyễn Văn Cừ (cồn Khương), phường Cái Khế, quận Ninh Kiều, thành phố Cần Thơ., Cần Thơ, Cần Thơ, Việt Nam",
+  },
+  {
+    id: "658a27c1f1e7372d0979274f",
+    name: "Iris Hotel Cần Thơ",
+    image:
+      "https://pix8.agoda.net/hotelImages/568/568125/568125_14041015460019033004.jpg?ca=2&amp;ce=1",
+    stars: 4,
+    type: "Khách sạn",
+    price: "1.250.000",
+    address:
+      "Số 224, Đường 30/4, Phường Xuân Khánh, Quận Ninh Kiều, Thành Phố Cần Thơ, Cần Thơ, Cần Thơ, Việt Nam",
+  },
+  {
+    id: "658a27f8f1e7372d09792750",
+    name: "Sheraton Cần Thơ",
+    image:
+      "https://pix8.agoda.net/hotelImages/1519798/-1/2ef8d4933ba430a44e608f1ed5fb64a3.jpg?ca=9&amp;ce=1",
+    stars: 5,
+    type: "Khách sạn",
+    price: "1.500.000",
+    address:
+      "Số 209, Đường 30/4, Ninh Kiều, Cần Thơ, Việt Nam, Cần Thơ, Cần Thơ, Việt Nam",
+  },
+  // Add more hotel entries here...
+];
 export default tours;

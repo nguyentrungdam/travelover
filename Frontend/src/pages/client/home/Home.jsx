@@ -32,6 +32,16 @@ const Home = () => {
   }, []);
   return (
     <>
+      <section className="py-0">
+        <div className="announcement">
+          <a href="#hot-sale" className="announcement__link">
+            <span className="announcement__text">
+              Siêu sale giáng sinh, nhanh tay áp mã{" "}
+              <span className="text-voucher">NOEL200K</span> số lượng có hạn!{" "}
+            </span>
+          </a>
+        </div>
+      </section>
       <Header />
       <section className="padding-top-0">
         <Container>
@@ -88,7 +98,7 @@ const Home = () => {
         </Container>
       </section>
 
-      <section>
+      <section id="hot-sale">
         <Container>
           <Row className="position-relative">
             <Col lg="12" className="mb-5">

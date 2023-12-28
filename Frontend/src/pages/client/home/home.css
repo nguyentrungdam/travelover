@@ -182,3 +182,38 @@
   color: transparent;
   display: inline-block;
 }
+
+.announcement {
+  color: #fff;
+  max-height: 100px;
+  transition: 100px 0.3s cubic-bezier(0, 0, 0.38, 1);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  background-image: url(https://st.quantrimang.com/photos/image/2017/10/31/thiep-giang-sinh-28.jpg);
+  background-size: 360px;
+}
+
+.announcement__link {
+  display: block;
+  text-decoration: none;
+  background: 0;
+  color: #fff;
+}
+
+.announcement__text {
+  padding: 6px 20px 5px;
+  font-size: 0.9em;
+  font-weight: 500;
+  display: block;
+  transition: opacity 0.75s ease;
+  text-align: center;
+  max-width: max-content;
+  margin: 0 auto;
+  background-color: linear-gradient(to right, #bc1316, #930207);
+}
+.text-voucher {
+  color: #fd9e29;
+  font-weight: bold;
+  font-size: 1.4rem;
+  line-height: 1.4rem;
+}
