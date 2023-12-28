@@ -3,7 +3,6 @@ package hcmute.kltn.Backend.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,20 +20,19 @@ import hcmute.kltn.Backend.model.base.response.dto.Response;
 import hcmute.kltn.Backend.model.base.response.dto.ResponseObject;
 import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTOSimple;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
-import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderUpdate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderStatusUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelUpdate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.Location;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
-import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room2;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
-import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "/api/v1/ehotels")
@@ -52,7 +50,7 @@ public class Z_HotelController {
 			+ "- 'numberOfStarRating': '' (giá trị từ 1 đến 5)\n\n"
 			+ "Khi gọi create sẽ tự tạo ra danh sách phòng dựa trên số sao đánh giá (biến phòng mới là room2)";
 	@RequestMapping(value = "/create", method = RequestMethod.POST)
-	@Operation(tags = "Z Enterprise Hotels", summary = "Create Hotel - ADMIN", description = createHotelDescription)
+	@Operation(tags = "Z Enterprise Hotels", summary = "Create Hotel - ENTERPRISE", description = createHotelDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> createEHotel(
 			@RequestBody EHotelCreate eHotelCreate) {
@@ -74,7 +72,7 @@ public class Z_HotelController {
 			+ "- 'address': ''\n"
 			+ "- 'room': ''\n";
 	@RequestMapping(value = "/update", method = RequestMethod.PUT)
-	@Operation(tags = "Z Enterprise Hotels", summary = "Update Hotel - ADMIN", description = updateHotelDescription)
+	@Operation(tags = "Z Enterprise Hotels", summary = "Update Hotel - ENTERPRISE", description = updateHotelDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> updateEHotel(
 			@RequestBody EHotelUpdate eHotelUpdate) {
@@ -92,12 +90,17 @@ public class Z_HotelController {
 	private final String detailHotelDescription = "Các field bắt buộc phải nhập:\n\n"
 			+ "- 'hotelId': ''\n";
 	@RequestMapping(value = "/detail", method = RequestMethod.GET)
-	@Operation(tags = "Z Enterprise Hotels", summary = "Get Hotel detail- ADMIN", description = detailHotelDescription)
+	@Operation(tags = "Z Enterprise Hotels", summary = "Get Hotel detail- ENTERPRISE", description = detailHotelDescription)
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getEHotelDetail(
 			@RequestParam String eHotelId) {
 		
 		EHotel eHotel = iEHotelService.getDetailEHotel(eHotelId);
+//		try {
+//			EntityUtil.readFields(eHotel);
+//		} catch (Exception e) {
+//			throw new TryCatchException(e);
+//		}
 		
 		return iResponseObjectService.success(new Response() {
 			{
@@ -108,7 +111,7 @@ public class Z_HotelController {
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	@Operation(tags = {"Z Enterprise Hotels"}, summary = "Get all EHotel - ADMIN")
+	@Operation(tags = {"Z Enterprise Hotels"}, summary = "Get all EHotel - ENTERPRISE")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getAllEHotel(
 			@ModelAttribute Pagination pagination) {
@@ -133,7 +136,7 @@ public class Z_HotelController {
 	}
 	
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
-	@Operation(tags = "Z Enterprise Hotels", summary = "Search hotel by keyword- ADMIN")
+	@Operation(tags = "Z Enterprise Hotels", summary = "Search hotel by keyword- ENTERPRISE")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> searchEHotel(@RequestParam String keyword) {
 		List<EHotel> eHotelList = iEHotelService.searchEHotel(keyword);
@@ -155,7 +158,7 @@ public class Z_HotelController {
 	@RequestMapping(value = "/list/search", method = RequestMethod.GET)
 	@Operation(
 			tags = "Z Enterprise Hotels", 
-			summary = "Search ehotel for admin page - ADMIN / STAFF", 
+			summary = "Search ehotel for admin page - ENTERPRISE", 
 			description = listEHotelSearchDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
 	ResponseEntity<ResponseObject> listEHotelSearch(
@@ -189,7 +192,7 @@ public class Z_HotelController {
 	}
 	
 	@RequestMapping(value = "/room/search", method = RequestMethod.GET)
-	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room - ADMIN")
+	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> searchRoom(@ModelAttribute RoomSearch roomSearch) {
 //		System.out.println("room search = " + roomSearch);
@@ -205,7 +208,7 @@ public class Z_HotelController {
 	}
 	
 	@RequestMapping(value = "/room/search2", method = RequestMethod.GET)
-	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room 2 - ADMIN")
+	@Operation(tags = "Z Enterprise Hotels - Room", summary = "Search room 2")
 	ResponseEntity<ResponseObject> searchRoom2(@ModelAttribute RoomSearch roomSearch) {
 //		System.out.println("room search = " + roomSearch);
 		
@@ -219,8 +222,12 @@ public class Z_HotelController {
 		});
 	}
 	
+	private final String createOrderEHotelDesc = "Field roomId nhập dạng list<string> gồm các roomId";
 	@RequestMapping(value = "/order/create", method = RequestMethod.POST)
-	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Create Order Hotel - ADMIN")
+	@Operation(
+			tags = "Z Enterprise Hotels - Order", 
+			summary = "Create Order Hotel - ENTERPRISE",
+			description = createOrderEHotelDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> createOrderEHotel(
 			@RequestBody EHotelOrderCreate eHotelOrderCreate) {
@@ -235,27 +242,36 @@ public class Z_HotelController {
 		});
 	}
 	
-	@RequestMapping(value = "/order/update", method = RequestMethod.PUT)
-	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Update Order Hotel - ADMIN")
+	private final String updateOrderStatusDesc = "Các giá trị cho orderStatus (nhập số)\n\n"
+			+ "- 0: cancel\n\n"
+			+ "- 1: pending\n\n"
+			+ "- 2: confirmed\n\n"
+			+ "- 3: finished\n\n";
+	@RequestMapping(value = "/order/status/update", method = RequestMethod.PUT)
+	@Operation(
+			tags = "Z Enterprise Hotels - Order", 
+			summary = "Update Order status Hotel - ENTERPRISE", 
+			description = updateOrderStatusDesc)
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
-	ResponseEntity<ResponseObject> updateOrderEHotel(
-			@RequestBody EHotelOrderUpdate eHotelOrderUpdate) {
+	ResponseEntity<ResponseObject> updateOrderStatus(
+			@RequestBody EHotelOrderStatusUpdate eHotelOrderStatusUpdate) {
 		
-		Order order = iEHotelService.updateOrder(eHotelOrderUpdate);
+		Order order = iEHotelService.updateOrderStatus(eHotelOrderStatusUpdate);
 		
 		return iResponseObjectService.success(new Response() {
 			{
-				setMessage("Create Order Enterprise Hotel successfully");
+				setMessage("Update Order status Hotel successfully");
 				setData(order);
 			}
 		});
 	}
 	
 	@RequestMapping(value = "/order/detail", method = RequestMethod.GET)
-	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Get one Order - ADMIN")
+	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Get one Order - ENTERPRISE")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getOneOrder(
-			@RequestBody String eHotelId, String orderId) {
+			@RequestParam String eHotelId, 
+			@RequestParam String orderId) {
 		
 		Order order = iEHotelService.getOneOrder(eHotelId, orderId);
 		
@@ -268,10 +284,10 @@ public class Z_HotelController {
 	}
 	
 	@RequestMapping(value = "/order/list", method = RequestMethod.GET)
-	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Get all Order - ADMIN")
+	@Operation(tags = "Z Enterprise Hotels - Order", summary = "Get all Order - ENTERPRISE")
 	@PreAuthorize("hasAnyRole('ROLE_ENTERPRISE')")
 	ResponseEntity<ResponseObject> getAllOrder(
-			@RequestBody String eHotelId) {
+			@RequestParam String eHotelId) {
 		
 		List<Order> order = iEHotelService.getAllOrder(eHotelId);
 		
@@ -279,6 +295,26 @@ public class Z_HotelController {
 			{
 				setMessage("Get all Order successfully");
 				setData(order);
+			}
+		});
+	}
+	
+	private final String searchEHotelByLocationDesc = "Tìm EHotel dựa trên 3 cấp\n\n"
+			+ "- search province thì bỏ trống disctrict và commune\n\n"
+			+ "- search tới cấp district thì phải có province, bỏ trống commune\n\n"
+			+ "- search tới cấp commune thì phải có đầy đủ 3 giá trị\n\n";
+	@RequestMapping(value = "/location/search", method = RequestMethod.GET)
+	@Operation(
+			tags = "Z Enterprise Hotels", 
+			summary = "Search hotel by location",
+			description = searchEHotelByLocationDesc)
+	ResponseEntity<ResponseObject> searchEHotelByLocation(@ModelAttribute Location location) {
+		List<EHotelDTOSimple> eHotelDTOSimpleList = iEHotelService.searchEHotelByLocation(location);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search hotel by location successfully");
+				setData(eHotelDTOSimpleList);
 			}
 		});
 	}

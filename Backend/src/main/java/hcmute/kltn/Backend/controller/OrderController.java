@@ -33,19 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/orders")
 @Tag(
 		name = "Orders", 
-		description = "APIs for managing orders\n\n"
-				+ "__24/12/2023__\n\n"
-				+ "__1:20PM__\n\n"
-				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
-				+ "Tạo mới: tạo api list/search cho admin lúc load danh sách order, có filter và sort sẵn trong đây\n\n"
-				+ "Cập nhật: đã thêm 2 field frontIDImageUrl và backIDImageUrl trong phần CustomerInformation "
-				+ "và Member để lưu đường dẫn đến hình ảnh cccd "
-				+ "(cân nhắc có nên dùng hay không vì t thấy trang booking họ cũng không yêu cầu cccd)\n\n"
-				+ "Cập nhật: Thêm 2 field là message và discountCode cho api status/update để xử lý tình huống "
-				+ "admin hủy đơn hàng (sẽ thông báo và hoàn tiền)\n\n"
-				+ "- field message (khi hủy đơn mới cần nhập): nhập lý do đơn hàng bị hủy\n"
-				+ "- field discountCode (khi có mã giảm giá đền bù thì mới cần nhập): nhập mã giảm giá "
-				+ "đền bù cho đơn hàng bị hủy",
+		description = "APIs for managing orders\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")

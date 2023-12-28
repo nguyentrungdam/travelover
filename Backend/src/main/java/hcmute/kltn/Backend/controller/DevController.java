@@ -22,14 +22,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Devs", 
 		description = "APIs for managing devs\n\n"
-				+ "__24/12/2023__\n\n"
-				+ "__1:20PM__\n\n"
+				+ "__28/12/2023__\n\n"
+				+ "__1:15PM__\n\n"
 				+ "__Z Enterprise Hotels (api cho bên thứ 3 enterprise)__\n\n"
-				+ "Cập nhật: ehotels/create theo hướng tự động\n\n"
-				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
-				+ "Thông tin: khi gọi api list/search sẽ sắp xếp mặc định theo ngày tạo mới nhất\n\n"
-				+ "Thông tin: đã có api room/saerch2 để search hotel, thông tin search ra sẽ như api này trả về, "
-				+ "khả năng trước mắt là dùng luôn api này để search enterprise hotel chứ không qua cái hotel được nha",
+				+ "Tạo mới: api order/create để tạo đơn hàng giả lập trường hợp bên thứ 3 "
+				+ "có các phòng đã được đặt vào thời điểm tour cần đi\n\n"
+				+ "Tạo mới: api order/status/update để cập nhật trạng thái đơn hàng cho bên thứ 3\n\n"
+				+ "Tạo mới: api location/search để tìm ra hotel dựa trên 3 cấp "
+				+ "(search province thì district bổ trống, search district bắt buộc phải có province)\n\n"
+				+ "- Dùng lúc vào xem chi tiết tour sau khi search từ trang chủ, dùng api này để tìm ra các "
+				+ "ehotel phù hợp rồi tiếp tục dùng api searchRoom2 để tìm phòng phù hợp\n\n"
+				+ "- Tạm thời trên FE gán như vậy xem có gặp bất cập gì không rồi từ từ t chỉnh sau cho phù hợp\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/176XCXAx04e66xHKIOnL2V1smcR2fiEGo/view?usp=sharing")

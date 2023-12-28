@@ -29,6 +29,7 @@ import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayRefund;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPaymentDTO;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.entity.VNPayment;
 import hcmute.kltn.Backend.model.payment.vnpay.service.IVNPayService;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,6 +57,8 @@ public class PaymentController {
 	private IEmailService iEmailService;
 	@Autowired
 	private IAccountService iAccountService;
+	@Autowired
+	private IEHotelService iEHotelService;
 	
 	@RequestMapping(value = "/vnpay/forward", method = RequestMethod.GET)
     public void processData(HttpServletResponse response, HttpServletRequest request
@@ -121,6 +124,10 @@ public class PaymentController {
 				emailDTO2.setTo(orderDTO.getCustomerInformation().getEmail());
 				iEmailService.sendMail(emailDTO2);
 			}
+			
+			// create order for enterprise
+//			Order order = new Order();
+//			iEHotelService.createOrder(order);
 		}
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web

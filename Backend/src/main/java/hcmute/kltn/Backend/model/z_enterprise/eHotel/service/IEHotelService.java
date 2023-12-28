@@ -6,9 +6,12 @@ import java.util.Map;
 
 import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTOSimple;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderStatusUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelUpdate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.Location;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
@@ -24,9 +27,11 @@ public interface IEHotelService {
 	public Order createOrder(EHotelOrderCreate eHotelOrderCreate);
 	public Order updateOrder(EHotelOrderUpdate eHotelOrderUpdate);
 	public Order getOneOrder(String eHotelId, String orderId);
+	public Order updateOrderStatus(EHotelOrderStatusUpdate eHotelOrderStatusUpdate);
 	
 	public List<EHotel> getAllEHotel();
 	public List<EHotel> searchEHotel(String keyword);
+	public List<EHotelDTOSimple> searchEHotelByLocation(Location location);
 	public List<EHotel> listEHotelSearch(String keyword);
 	public List<EHotel> listEHotelFilter(HashMap<String, String> filter, List<EHotel> eHotelList);
 	public List<EHotel> listEHotelSort(Sort sort, List<EHotel> eHotelList);

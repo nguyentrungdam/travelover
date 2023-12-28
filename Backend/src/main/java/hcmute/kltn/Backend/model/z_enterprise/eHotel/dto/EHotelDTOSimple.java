@@ -1,10 +1,9 @@
 package hcmute.kltn.Backend.model.z_enterprise.eHotel.dto;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.OrderDetail;
+import hcmute.kltn.Backend.model.base.extend.Address;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,12 +11,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EHotelOrderUpdate {
+public class EHotelDTOSimple {
 	@JsonProperty("eHotelId")
 	private String eHotelId;
-	private String orderId;
-	private String companyId;
-	private List<OrderDetail> orderDetail;
-	private String paymentStatus;
-	private String orderStatus;
+	@JsonProperty("eHotelName")
+	private String eHotelName; // not null
+	private String description;
+	private String phoneNumber;
+	private Address address;
+	private int numberOfStarRating;
 }

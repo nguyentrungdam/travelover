@@ -26,9 +26,12 @@ import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTOSimple;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderCreate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderStatusUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelOrderUpdate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelUpdate;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.Location;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
@@ -387,6 +390,20 @@ public class EHotelService implements IEHotelService{
 		return room;
 	}
 	
+	private String getOrderStatus(String index) {
+		HashMap<String, String> orderStatusMap = new HashMap<>();
+		orderStatusMap.put("0", "cancel");
+		orderStatusMap.put("1", "pending");
+		orderStatusMap.put("2", "confirmed");
+		orderStatusMap.put("3", "finished");
+		
+		String orderStatus = orderStatusMap.get(index);
+		if (orderStatus == null || orderStatus.equals("")) {
+			throw new CustomException("Cannot find order status " + index);
+		}
+		return orderStatus;
+	}
+	
 	@Override
 	public EHotel createEHotel(EHotelCreate eHotelCreate) {
 		// mapping hotelDTO
@@ -453,37 +470,46 @@ public class EHotelService implements IEHotelService{
 		// get order from db with hotel
 		EHotel eHotel = getDetail(eHotelOrder.getEHotelId());
 		List<Order> orderList = eHotel.getOrder();
+		if (orderList == null) {
+			orderList = new ArrayList<Order>();
+		}
 		
 		Order order = new Order();
 		modelMapper.map(eHotelOrder, order);
 		
 		// insert order detail into order
 		List<OrderDetail> orderDetailList = new ArrayList();
-		OrderDetail orderDetail = new OrderDetail();
+		
 		for(String itemRoomId : eHotelOrder.getRoomId()) {
-			for(Room itemRoom : eHotel.getRoom()) {
-				if(itemRoomId.equals(itemRoom.getRoomId())) {
-					orderDetail.setRoomId(itemRoom.getRoomId());
-					orderDetail.setCapacity(itemRoom.getCapacity());
-					orderDetail.setPrice(itemRoom.getPrice());
+			OrderDetail orderDetail = new OrderDetail();
+			for(Room2 itemRoom2 : eHotel.getRoom2()) {
+				if(itemRoomId.equals(itemRoom2.getRoomId())) {
+					modelMapper.map(itemRoom2, orderDetail);
 					orderDetailList.add(orderDetail);
 					break;
 				}
 			}
-			if(itemRoomId != orderDetail.getRoomId()) {
+			if(!itemRoomId.equals(orderDetail.getRoomId())) {
 				throw new CustomException("Cannot find room id " + itemRoomId);
 			}
 		}
 		order.setOrderDetail(orderDetailList);
 		
 		// set default value
+//		int indexOrderList = 1;
+//		if (orderList != null) {
+//			indexOrderList = orderList.size() + 1;
+//		} 
 		int indexOrderList = orderList.size() + 1;
+
 		order.setOrderId(String.valueOf(indexOrderList));
+		int numberOfDay = LocalDateUtil.numberOfDayBetween(order.getStartDate(), order.getEndDate());
 		int totalPrice = 0;
 		for(OrderDetail itemOrderDetail : order.getOrderDetail()) {
-			totalPrice += itemOrderDetail.getPrice();
+			totalPrice += itemOrderDetail.getPrice() * numberOfDay;
 		}
 		order.setTotalPrice(totalPrice);
+		order.setOrderStatus("pending");
 		
 		// create order
 		orderList.add(order);
@@ -570,8 +596,6 @@ public class EHotelService implements IEHotelService{
 		
 		return eHotel.getOrder();
 	}
-
-	
 
 	@Override
 	public List<Room> searchRoom(RoomSearch roomSearch) {
@@ -724,6 +748,43 @@ public class EHotelService implements IEHotelService{
 		roomList.addAll(eHotel.getRoom2());
 		if (roomList.isEmpty()) {
 			throw new CustomException("No suitable room found");
+		}
+		
+		// check order
+		if(eHotel.getOrder() != null) {
+			// get all Order with startDate and endDate
+			List<Order> orderList = new ArrayList<>();
+			for(Order itemOrder : eHotel.getOrder()) {
+				if((itemOrder.getStartDate().isBefore(roomSearch.getEndDate()) || itemOrder.getStartDate().isEqual(roomSearch.getEndDate())) 
+						&& (itemOrder.getEndDate().isAfter(roomSearch.getStartDate()) || itemOrder.getEndDate().isEqual(roomSearch.getStartDate()))
+						&& (!itemOrder.getOrderStatus().equals("cancel"))) {
+					orderList.add(itemOrder);
+				}
+			}
+			
+			// get all roomId with startDate and endDate
+			List<String> roomIdList = new ArrayList<>();
+			for(Order itemOrder : orderList) {
+				for(OrderDetail itemOrderDetail : itemOrder.getOrderDetail()) {
+					roomIdList.add(itemOrderDetail.getRoomId());
+				}
+			}
+			
+			// search with startDate
+			List<Room2> roomListClone = new ArrayList<>();
+			roomListClone.clear();
+			roomListClone.addAll(roomList);
+			for(Room2 itemRoom2 : roomListClone) {
+				for(String itemRoomId : roomIdList) {
+					if(itemRoomId.equals(itemRoom2.getRoomId())) {
+						roomList.remove(itemRoom2);
+						break;
+					}
+				}
+				if(roomList.size() == 0) {
+					break;
+				}
+			}
 		}
 		
 		Map<List<String>, Map<Room2, List<String>>> roomMap = new HashMap<>();
@@ -1060,5 +1121,101 @@ public class EHotelService implements IEHotelService{
         });
 		
 		return eHotelList;
+	}
+
+	@Override
+	public Order updateOrderStatus(EHotelOrderStatusUpdate eHotelOrderStatusUpdate) {
+		// get ehotel
+		EHotel eHotel = new EHotel();
+		eHotel = getDetail(eHotelOrderStatusUpdate.getEHotelId());
+		
+		// get order list
+		List<Order> orderList = new ArrayList<>();
+		orderList.addAll(eHotel.getOrder());
+		
+		// get order status
+		String orderStatus = getOrderStatus(eHotelOrderStatusUpdate.getOrderStatus());
+		
+		if (orderStatus.equals("cancel")) {
+			throw new CustomException("Can't update status for canceled orders");
+		}
+		if (orderStatus.equals("finished")) {
+			throw new CustomException("Can't update status for finished orders");
+		}
+		
+		for (Order itemOrder : eHotel.getOrder()) {
+			if (itemOrder.getOrderId().equals(eHotelOrderStatusUpdate.getOrderId())) {
+				Order order = new Order();
+				modelMapper.map(itemOrder, order);
+				order.setOrderStatus(orderStatus);
+				orderList.set(eHotel.getOrder().indexOf(itemOrder), order);
+				eHotel.setOrder(orderList);
+				
+				// set default value
+				String accountId = iAccountDetailService.getCurrentAccount().getAccountId();
+				LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+				eHotel.setLastModifiedBy(accountId);
+				eHotel.setLastModifiedAt2(currentDate);
+				
+				eHotelRepository.save(eHotel);
+				
+				return order;
+			}
+		}
+		
+		throw new CustomException("Cannot find order " + eHotelOrderStatusUpdate.getOrderId());
+	}
+
+	
+	@Override
+	public List<EHotelDTOSimple> searchEHotelByLocation(Location location) {
+		List<EHotel> eHotelList = new ArrayList<>();
+		eHotelList.addAll(getAll());
+		
+		List<EHotel> eHotelListClone = new ArrayList<>();
+		eHotelListClone.addAll(eHotelList);
+		
+		for (EHotel itemEHotel : eHotelListClone) {
+			if (itemEHotel.getAddress() != null) {
+				if (location.getProvince() != null && !location.getProvince().equals("")) {
+					if (!itemEHotel.getAddress().getProvince().equals(location.getProvince())) {
+						eHotelList.remove(itemEHotel);
+						if (eHotelList.size() <= 0) {
+							break;
+						}
+					} else if (location.getDistrict() != null && !location.getDistrict().equals("")) {
+						if (!itemEHotel.getAddress().getDistrict().equals(location.getDistrict())) {
+							eHotelList.remove(itemEHotel);
+							if (eHotelList.size() <= 0) {
+								break;
+							}
+						} else if (location.getCommune() != null && !location.getCommune().equals("")) {
+							if (!itemEHotel.getAddress().getCommune().equals(location.getCommune())) {
+								eHotelList.remove(itemEHotel);
+								if (eHotelList.size() <= 0) {
+									break;
+								}
+							} 
+						}
+					}
+				}
+			} else {
+				eHotelList.remove(itemEHotel);
+				if (eHotelList.size() <= 0) {
+					break;
+				}
+			}
+
+		}
+		
+		List<EHotelDTOSimple> eHotelDTOSimpleList = new ArrayList<>();
+		for (EHotel itemEHotel : eHotelList) {
+			EHotelDTOSimple eHotelDTOSimple = new EHotelDTOSimple();
+			modelMapper.map(itemEHotel, eHotelDTOSimple);
+			eHotelDTOSimpleList.add(eHotelDTOSimple);
+		}
+		
+		
+		return eHotelDTOSimpleList;
 	}
 }

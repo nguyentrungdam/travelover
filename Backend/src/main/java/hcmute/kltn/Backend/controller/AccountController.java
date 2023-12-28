@@ -38,12 +38,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/accounts")
 @Tag(
 		name = "Accounts", 
-		description = "APIs for managing accounts\n\n"
-				+ "__24/12/2023__\n\n"
-				+ "__1:20PM__\n\n"
-				+ "Thông tin: khi gọi api list đã sắp xếp theo ngày tạo mới nhất\n\n"
-				+ "Tạo mới: tạo api list/search cho admin lúc load danh sách account, có filter và sort sẵn trong đây\n\n"
-				+ "Lưu ý: test lại về password xem đã chạy ok chưa",
+		description = "APIs for managing accounts\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1XJgZ6J5RRIIl2k17FIpC890iZYTD6mGk/view?usp=sharing")
