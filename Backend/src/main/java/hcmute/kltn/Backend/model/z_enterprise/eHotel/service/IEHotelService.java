@@ -2,7 +2,6 @@ package hcmute.kltn.Backend.model.z_enterprise.eHotel.service;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;

@@ -26,6 +26,7 @@ import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
 import hcmute.kltn.Backend.model.tour.dto.TourSearch;
 import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
+import hcmute.kltn.Backend.model.tour.dto.TourSearchRes2;
 import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
@@ -39,7 +40,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/tours")
 @Tag(
 		name = "Tours", 
-		description = "APIs for managing tours\n\n",
+		description = "APIs for managing tours\n\n"
+				+ "__31/12/2023__\n\n"
+				+ "__9:15AM__\n\n"
+				+ "Cập nhật: Khi gọi api search2 sẽ trả về list object\n\n"
+				+ "- Trong 1 object này sẽ có 1 tour và list hotel\n\n"
+				+ "- Trong 1 hotel sẽ có thông tin hotel và list option\n\n"
+				+ "- Trong 1 option sẽ có list Room và giá\n\n"
+				+ "(Dùng cho search trang chủ, chỉnh sửa các giá trị lúc xem chi tiết tour và search lại, "
+				+ "chỉnh sửa các giá trị lúc tạo đơn hàng và search lại)",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")
@@ -312,6 +321,53 @@ public class TourController {
 			{
 				setMessage("Clone tour successfully");
 				setData(tourDTO);
+			}
+		});
+	}
+	
+	private final String searchTour2Desc = "Các field bắt buộc phải nhập (áp dụng cho Pagination):\n"
+			+ "- 'pageSize': ''\n"
+			+ "- 'pageNumber': ''\n\n"
+			+ "pageSize: Số lượng item có trong 1 trang\n\n"
+			+ "pageNumber: Trang hiện tại\n\n"
+			+ "Các trường hợp sử dụng\n"
+			+ "- Không phân trang: pageSize = 0, pageNumber = 0\n"
+			+ "- - pageSize = 0\n"
+			+ "- - pageNumber = 0\n"
+			+ "- Có phân trang: \n"
+			+ "- - pageSize > 0\n"
+			+ "- - pageNumber > 0\n"
+			+ "- Lấy trang cuối cùng: \n"
+			+ "- - pageSize > 0\n"
+			+ "- - pageNumber = -1\n\n"
+			+ "tourFilter: không dùng thì không truyền gì hết\n"
+			+ "- - minPrice >= 0\n"
+			+ "- - maxPrice >= minPrice\n"
+			+ "- - 1 <= ratingFilter <= 5\n\n"
+			+ "tourSort: không dùng thì không truyền gì hết (chưa xử lý promotion)\n"
+			+ "- - sortBy = 1 trong 3 loại là popular, price, promotion\n"
+			+ "- - order = 1 trong 2 loại là asc, desc\n";
+	@RequestMapping(value = "/search2", method = RequestMethod.GET)
+	@Operation(summary = "Search tour", description = searchTour2Desc)
+//	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> searchTour2(
+			@ModelAttribute TourSearch tourSearch,
+			@ModelAttribute TourFilter tourFilter,
+			@ModelAttribute TourSort tourSort,
+			@ModelAttribute Pagination Pagination) {
+		iTourService.updateIsDiscount();
+		List<TourSearchRes2> tourList = iTourService.searchTour2(tourSearch);
+		
+//		List<TourSearchRes> tourFilterList = iTourService.searchFilter(tourFilter, tourList);
+//		
+//		List<TourSearchRes> tourSortList = iTourService.searchSort(tourSort, tourFilterList);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Search tour successfully");
+				setPageSize(Pagination.getPageSize());
+				setPageNumber(Pagination.getPageNumber());
+				setData(tourList);
 			}
 		});
 	}

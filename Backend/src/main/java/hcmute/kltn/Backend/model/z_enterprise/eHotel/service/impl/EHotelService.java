@@ -3,6 +3,7 @@ package hcmute.kltn.Backend.model.z_enterprise.eHotel.service.impl;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +24,6 @@ import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.extend.Address;
-import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelCreate;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTOSimple;
@@ -728,6 +728,7 @@ public class EHotelService implements IEHotelService{
 
 	@Override
 	public List<RoomSearchRes> searchRoom2(RoomSearch roomSearch) {		
+		long numberOfDay = Math.abs(ChronoUnit.DAYS.between(roomSearch.getEndDate(), roomSearch.getStartDate()));
 		// A = số người lớn
 		// R = số phòng
 		// Thực hiện tìm R phòng cho A người
@@ -876,8 +877,6 @@ public class EHotelService implements IEHotelService{
 			index += 1;
 		}
 		
-		System.out.println("roomMap = " + roomMap);
-		
 		// check empty
 		if (roomMap.get(keyMap.get(String.valueOf(1))).isEmpty()) {
 			throw new CustomException("No suitable room found");
@@ -990,6 +989,10 @@ public class EHotelService implements IEHotelService{
 			
 			RoomSearchRes roomSearchRes = new RoomSearchRes();
 			roomSearchRes.setRoom(valueRoomResult);
+			totalPrice = (int)(totalPrice * ((double)numberOfDay + 0.5));
+//			if (totalPrice % 1000 != 0) {
+//				totalPrice += 500;
+//			}
 			roomSearchRes.setTotalPrice(totalPrice);
 			roomSearchResList.add(roomSearchRes);
 		}

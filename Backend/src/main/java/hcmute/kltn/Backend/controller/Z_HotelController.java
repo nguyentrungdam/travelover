@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import hcmute.kltn.Backend.exception.TryCatchException;
 import hcmute.kltn.Backend.model.base.Pagination;
 import hcmute.kltn.Backend.model.base.Sort;
 import hcmute.kltn.Backend.model.base.response.dto.Response;
@@ -31,6 +32,7 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Order;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+import hcmute.kltn.Backend.util.EntityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -96,11 +98,6 @@ public class Z_HotelController {
 			@RequestParam String eHotelId) {
 		
 		EHotel eHotel = iEHotelService.getDetailEHotel(eHotelId);
-//		try {
-//			EntityUtil.readFields(eHotel);
-//		} catch (Exception e) {
-//			throw new TryCatchException(e);
-//		}
 		
 		return iResponseObjectService.success(new Response() {
 			{

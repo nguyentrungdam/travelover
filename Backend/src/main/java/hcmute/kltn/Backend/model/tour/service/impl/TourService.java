@@ -43,13 +43,17 @@ import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.dto.TourFilter;
 import hcmute.kltn.Backend.model.tour.dto.TourSearch;
 import hcmute.kltn.Backend.model.tour.dto.TourSearchRes;
+import hcmute.kltn.Backend.model.tour.dto.TourSearchRes2;
 import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
+import hcmute.kltn.Backend.model.tour.dto.extend.Hotel2;
+import hcmute.kltn.Backend.model.tour.dto.extend.Option;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
+import hcmute.kltn.Backend.model.tour.dto.extend.Room2;
 import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
@@ -57,6 +61,10 @@ import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 import hcmute.kltn.Backend.util.StringUtil;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTOSimple;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.Location;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
 
 @Service
 public class TourService implements ITourService{
@@ -76,6 +84,8 @@ public class TourService implements ITourService{
 	private IImageService iImageService;
 	@Autowired
 	private IVideoService iVideoService;
+	@Autowired
+	private IEHotelService IEHotelService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -1281,5 +1291,174 @@ public class TourService implements ITourService{
 		tourRepository.save(tour);
 		
 		return getTourDTO(tour);
+	}
+
+	
+	@Override
+	public List<TourSearchRes2> searchTour2(TourSearch tourSearch) {
+		// search with keyword
+		List<Tour> tourList = new ArrayList<>();
+		List<Tour> tourListClone = new ArrayList<>();
+		int totalPriceNotDiscount = 0;
+		int totalPrice = 0;
+		
+		if(tourSearch.getKeyword() != null) {
+			tourList = search(tourSearch.getKeyword());
+			
+			// filter with status = true
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for (Tour itemTour : tourListClone) {
+				if (itemTour.getStatus() == false) {
+					tourList.remove(itemTour);
+					if (tourList.size() <= 0) {
+						break;
+					}
+				}
+			}
+			
+		} else {
+			tourList = tourRepository.findAllByStatus(true);
+		}
+		
+		// search with province
+		if(tourSearch.getProvince() != null && !tourSearch.getProvince().equals("")) {
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
+				if(!itemTour.getAddress().getProvince().equals(tourSearch.getProvince())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with district
+		if(tourSearch.getDistrict() != null && !tourSearch.getDistrict().equals("")) {
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
+				if(!itemTour.getAddress().getDistrict().equals(tourSearch.getDistrict())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with commune
+		if(tourSearch.getCommune() != null && !tourSearch.getCommune().equals("")) {
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
+				if(!itemTour.getAddress().getCommune().equals(tourSearch.getCommune())) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with number of day
+		
+		if(tourSearch.getNumberOfDay() != null && !tourSearch.getNumberOfDay().equals("")) {
+			String[] noDaySplit = tourSearch.getNumberOfDay().split("-");
+			int startDay = Integer.parseInt(noDaySplit[0]);
+			int endDay = Integer.parseInt(noDaySplit[1]);
+			tourListClone.clear();
+			tourListClone.addAll(tourList);
+			for(Tour itemTour : tourListClone) {
+				if(itemTour.getNumberOfDay() < startDay || itemTour.getNumberOfDay() > endDay) {
+					tourList.remove(itemTour);
+					if(tourList.size() == 0) {
+						break;
+					}
+				}
+			}
+		}
+		
+		// search with start date
+		
+		// search with number of people
+		
+		// create result
+		List<TourSearchRes2> tourSearchRes2List = new ArrayList<>(); 
+		for(Tour itemTour : tourList) {
+			// create 1 tourSearchRes2
+			TourSearchRes2 tourSearchRes2 = new TourSearchRes2();
+			
+			// create tour
+			Tour tour = new Tour();
+			modelMapper.map(itemTour, tour);
+			tourSearchRes2.setTour(tour);
+			
+			// create hotel2 list
+			List<Hotel2> hotel2List = new ArrayList<>();
+			// search ehotel location
+			Location location = new Location();
+			location.setProvince(itemTour.getAddress().getProvince());
+			location.setDistrict(itemTour.getAddress().getDistrict());
+			List<EHotelDTOSimple> eHotelList = new ArrayList<>();
+			eHotelList.addAll(IEHotelService.searchEHotelByLocation(location));
+			for (EHotelDTOSimple itemEHotelDTOSimple : eHotelList) {
+				// create hotel2
+				Hotel2 hotel2 = new Hotel2();
+				modelMapper.map(itemEHotelDTOSimple, hotel2);
+				
+				// create optionRoom List
+				List<Option> optionRoomList = new ArrayList<>();
+				// search room2
+				hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch roomSearch 
+				= new hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearch();
+				roomSearch.setEHotelId(itemEHotelDTOSimple.getEHotelId());
+				roomSearch.setStartDate(tourSearch.getStartDate());
+				roomSearch.setEndDate(tourSearch.getStartDate().plusDays(itemTour.getNumberOfDay() - 1));
+				roomSearch.setNumberOfAdult(tourSearch.getNumberOfAdult());
+				roomSearch.setNumberOfChildren(tourSearch.getNumberOfChildren());
+				roomSearch.setNumberOfRoom(tourSearch.getNumberOfRoom());
+				
+				List<RoomSearchRes> RoomSearchResList = new ArrayList<>();
+				try {
+					RoomSearchResList.addAll(IEHotelService.searchRoom2(roomSearch));
+				} catch (Exception e) {
+					
+				}
+				if (!RoomSearchResList.isEmpty()) {
+					for (RoomSearchRes itemRoomSearchRes : RoomSearchResList) {
+						// create optionRoom
+						Option option = new Option();
+						// create room2 list
+						List<Room2> room2List = new ArrayList<>();
+						for (hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room2 itemRoom2 : itemRoomSearchRes.getRoom()) {
+							Room2 room2 = new Room2();
+							modelMapper.map(itemRoom2, room2);
+							room2List.add(room2);
+						}
+						option.setRoomList(room2List);
+						option.setTotalPriceNotDiscount(itemRoomSearchRes.getTotalPrice());
+						option.setTotalPrice(itemRoomSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+						optionRoomList.add(option);
+					}
+				}
+
+				hotel2.setOptionList(optionRoomList);
+				
+				if (!optionRoomList.isEmpty()) {
+					hotel2List.add(hotel2);
+				}
+				
+			}
+
+			tourSearchRes2.setHotelList(hotel2List);
+			
+			// add tourSearchRes2
+			tourSearchRes2List.add(tourSearchRes2);
+		}
+
+		return tourSearchRes2List;
 	}
 }
