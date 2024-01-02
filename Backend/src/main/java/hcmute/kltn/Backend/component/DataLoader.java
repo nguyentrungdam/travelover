@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
 import hcmute.kltn.Backend.model.account.service.IAccountService;
+import hcmute.kltn.Backend.model.commission.dto.CommissionDTO;
+import hcmute.kltn.Backend.model.commission.service.ICommissionService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 
@@ -21,6 +23,8 @@ public class DataLoader implements CommandLineRunner {
 	private IGeneratorSequenceService iGeneratorSequenceService;
 	@Autowired
 	private IAccountService iAccountService;
+	@Autowired
+	private ICommissionService iCommissionService;
 	
 	private static final Logger logger = LoggerFactory.getLogger(DataLoader.class);
 	
@@ -128,6 +132,18 @@ public class DataLoader implements CommandLineRunner {
 					+ "CollectionName = VNPayment, Prefix = VNP, Description = VNPayment collection");
 		} 
 		
+		GeneratorSequenceDTO genGenSeqCommission = new GeneratorSequenceDTO();
+		genGenSeqCommission.setCollectionName("commission");
+		genGenSeqCommission.setPrefix("CMS");
+		genGenSeqCommission.setNumber(0);
+		genGenSeqCommission.setDescription("Commission collection");
+		initCheck = iGeneratorSequenceService.initData(genGenSeqCommission);
+		
+		if (initCheck) {
+			logger.info("Success to gen data for Generator Sequence collection: "
+					+ "CollectionName = Commission, Prefix = CMS, Description = Commission collection");
+		}
+		
 		// GEN DATA FOR ACCOUNT TABLE
 		// FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = SUPER_ADMIN
 		
@@ -143,6 +159,17 @@ public class DataLoader implements CommandLineRunner {
 					+ "FirstName = dev, LastName = dev, Email = dev@gmail.com, Password = 123456, Role = ADMIN");
 		} 
 		
+		// gen commission
+		List<CommissionDTO> commissionDTOList = new ArrayList<>();
+		commissionDTOList.addAll(iCommissionService.getAllCommission());
+		if (commissionDTOList.isEmpty()) {
+			CommissionDTO commissionDTO = new CommissionDTO();
+			commissionDTO.setName("Default Commission");
+			commissionDTO.setRate(10);
+			
+			CommissionDTO commissionDTONew = new CommissionDTO();
+			iCommissionService.initData(commissionDTO);
+		}
 
     	String linkServer = "http://localhost:" + portServer + "/swagger-ui/index.html";
 		

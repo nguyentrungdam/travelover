@@ -355,15 +355,27 @@ public class EmailService implements IEmailService{
 		
 		String subject = "Đơn hàng " + orderId + " đã đặt thành công";
 		
-		String imageUrlTest = "https://th.bing.com/th/id/R.cacf2bd1c7a1bd05586301e49b0acc50?rik=8%2fqFSqnfOfPuwQ&riu=http%3a%2f%2fwwwnc.cdc.gov%2ftravel%2fimages%2ftravel-industry-air.jpg&ehk=KJKAlgrvTGmg2OgSI1Zs3jpyaeYaBMu6r5GBA1AvGYc%3d&risl=&pid=ImgRaw&r=0";
+		String imageUrlTest = "https://lh3.googleusercontent.com/fife/AGXqzDmA1yn8_OjW4y3HT69VMvLAA9Y07D6eavy2mYn9d4DlIhc9vvgEA7OwSpuYmlBb77Q5cmOO-Y7lQV9QaEXDNp1MEsizU2hRC4g3hRRIzZaFAu-T4dyuCPx_nER1_trhqFx-lGmeYzxKy8lCqKKehJrh92agGr8beAJJSPWl7kGCXdZHUVjN4oGRDpG_o0lniT6AjqhHnvfU9TK-K_vydhv7N-hyqZAOcAeZ1zreN559Wu1h8J8pByv5cMQ659oBJHjpZtmReKcymA5mtHKDiYKUC6gJX-UzMxhN9VpiGCCiGJpqDDftA9EbAdHXvkG0iVbJO50dnpjnvLndw3bk_39Ih17FGvjmm32GStTVVCCO-eB2ROH4wFnZ4zsWi8qhNvs1eUEI-qXXacFwor0oVgUopB8GKV1BxnIyUqrSNejIdkZalo4HWE-Bb_99SH1ohbE6hI43koF4eUCbhvM0qcs0RvL7fC9h5QT7YreVwx_Mvw2Py25s9blmsC2-yfCo-6wV--v-ikc0GVa7xAI11ABoQmyVx0fS3op17BrIiXKHr-4S_oXIONCu3RSrTbgcJ3v_THrExYI3jSgJAIAispHrZMIbEfUqJjLhSf8u4gWSsCJ5aZFU9rDmJaCTIoXPlKTB47ytKRglT5nM9UItph3bPIXXIGNzQg800q_-46XnSihlnFeQDGCuXHSkfkUTi4BhOvUEbEuKh3vAPdnbjqwK9cVQg45FQpwWQknmKoYt9i4EF_3Ij7jtTZv0yaOOY1Hcsif0TQfDEypB91SsT2WuFidr1tvY74Z7xz88p7-CDKAJII7FJe9xQCbIu6-VR2Uyd2kUnHdTeYiHVw5kBd80H9_Chl1aLqlWNpx-XeuFg9dmT0DJkhD8D0ZXrVevfxpYAL-TGobnrMqkE34lKwd5GtNRyfFt4CTlXLXOJF368f49iG6deXjJs6u1dn6TU3aZsOFcxvDODY8WQusSaC-Kn-LaFYrgjF5NQNBGILKeIwL7MPKrDA=w2432-h1364";
 		
 		String htmlDiscount = ""
+				+ "        <hr>\r\n"
+				+ "        <table>\r\n"
+				+ "            <tr>\r\n"
+				+ "                <th>Tổng tiền:</th>\r\n"
+				+ "                <th>" + totalPrice + "đ</th>\r\n"
+				+ "            </tr>\r\n"
 				+ "            <tr>\r\n"
 				+ "                <th>Giảm giá:</th>\r\n"
 				+ "                <th>-" + discountPrice + "đ</th>\r\n"
 				+ "            </tr>\r\n";
 		if (orderDTO.getDiscount().getDiscountCodeValue() == 0) {
-			htmlDiscount = "";
+			htmlDiscount = ""
+				+ "        <hr>\r\n"
+				+ "        <table>\r\n"
+				+ "            <tr>\r\n"
+				+ "                <th>Tổng tiền:</th>\r\n"
+				+ "                <th>" + finalPrice + "đ</th>\r\n"
+				+ "            </tr>\r\n";
 		}
 		
 		String html = "<!DOCTYPE html>\r\n"
@@ -495,12 +507,12 @@ public class EmailService implements IEmailService{
 				+ roomList
 				+ "        </table>\r\n"
 				+ "        \r\n"
-				+ "        <hr>\r\n"
-				+ "        <table>\r\n"
-				+ "            <tr>\r\n"
-				+ "                <th>Tổng tiền:</th>\r\n"
-				+ "                <th>" + totalPrice + "đ</th>\r\n"
-				+ "            </tr>\r\n"
+//				+ "        <hr>\r\n"
+//				+ "        <table>\r\n"
+//				+ "            <tr>\r\n"
+//				+ "                <th>Tổng tiền:</th>\r\n"
+//				+ "                <th>" + totalPrice + "đ</th>\r\n"
+//				+ "            </tr>\r\n"
 				+ htmlDiscount
 				+ "        </table>\r\n"
 				+ "        \r\n"
@@ -528,7 +540,8 @@ public class EmailService implements IEmailService{
 				+ "        <p>Đội ngũ Travelover</p>\r\n"
 				+ "        \r\n"
 				+ "        <br>\r\n"
-				+ "        <p>Bạn có thắc mắc? Liên hệ chúng tôi <a href=\"https://drive.google.com/file/d/1K1GGav53I5sX8iiTPkLJWMh4R4_PD_XY/view?usp=sharing\">[tại đây]</a> .</p>\r\n"
+//				+ "        <p>Bạn có thắc mắc? Liên hệ chúng tôi <a href=\"https://drive.google.com/file/d/1K1GGav53I5sX8iiTPkLJWMh4R4_PD_XY/view?usp=sharing\">[tại đây]</a> .</p>\r\n"
+				+ "        <p>Bạn có thắc mắc? Liên hệ chúng tôi.</p>\r\n"
 				+ "        \r\n"
 				+ "    </div>\r\n"
 				+ "</body>\r\n"

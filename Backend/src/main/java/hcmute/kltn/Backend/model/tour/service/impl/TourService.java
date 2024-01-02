@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
-import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,23 +17,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
-import hcmute.kltn.Backend.model.account.dto.extend.ResetPassword;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.base.video.service.IVideoService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
-import hcmute.kltn.Backend.model.generatorSequence.dto.entity.GeneratorSequence;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
-import hcmute.kltn.Backend.model.province.dto.LocationDTO;
-import hcmute.kltn.Backend.model.province.dto.ProvinceDTO;
-import hcmute.kltn.Backend.model.province.dto.entity.Province;
-import hcmute.kltn.Backend.model.province.service.IProvinceService;
-import hcmute.kltn.Backend.model.tour.dto.Place;
 import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
 import hcmute.kltn.Backend.model.tour.dto.TourClone;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
@@ -1456,7 +1447,15 @@ public class TourService implements ITourService{
 				}
 				
 			}
-
+			// sort hotel2 list by price
+			Collections.sort(hotel2List, new Comparator<Hotel2>() {
+	            @Override
+	            public int compare(Hotel2 hotel1, Hotel2 hotel2) {
+	            	int result = Integer.compare(hotel1.getOptionList().get(0).getTotalPrice(), hotel2.getOptionList().get(0).getTotalPrice());
+	                return result;
+	            }
+	        });
+			
 			tourSearchRes2.setHotelList(hotel2List);
 			
 			// vehicle
@@ -1527,6 +1526,14 @@ public class TourService implements ITourService{
 					vehicleList.add(vehicle);
 				}
 			}
+			// sort vehicle list by price
+			Collections.sort(vehicleList, new Comparator<Vehicle>() {
+	            @Override
+	            public int compare(Vehicle vehicle1, Vehicle vehicle2) {
+	            	int result = Integer.compare(vehicle1.getOptionList().get(0).getTotalPrice(), vehicle2.getOptionList().get(0).getTotalPrice());
+	                return result;
+	            }
+	        });
 			
 			tourSearchRes2.setVehicleList(vehicleList);
 			
@@ -1535,6 +1542,15 @@ public class TourService implements ITourService{
 				tourSearchRes2List.add(tourSearchRes2);
 			}
 		}
+		
+		// sort tour search list by price
+//		Collections.sort(tourSearchRes2List, new Comparator<TourSearchRes2>() {
+//            @Override
+//            public int compare(TourSearchRes2 tourSearchRes1, TourSearchRes2 tourSearchRes2) {
+//            	int result = Integer.compare(tourSearchRes1.getTourPrice(), tourSearchRes2.getTourPrice());
+//                return result;
+//            }
+//        });
 
 		return tourSearchRes2List;
 	}

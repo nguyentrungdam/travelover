@@ -125,9 +125,11 @@ public class PaymentController {
 				iEmailService.sendMail(emailDTO2);
 			}
 			
-			// create order for enterprise
+			// create order for enterprise hotel
 //			Order order = new Order();
 //			iEHotelService.createOrder(order);
+			
+			// create order for enterprise vehicle
 		}
 
         // Sau khi xử lý dữ liệu, chuyển hướng đến trang web

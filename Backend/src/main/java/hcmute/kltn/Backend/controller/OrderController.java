@@ -33,7 +33,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/orders")
 @Tag(
 		name = "Orders", 
-		description = "APIs for managing orders\n\n",
+		description = "APIs for managing orders\n\n"
+				+ "__03/01/2024__\n\n"
+				+ "__1:40AM__\n\n"
+				+ "Cập nhật: api order create đã fix để hoạt động lại, phải nhập thêm vehicleId và coachIdList nha",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
