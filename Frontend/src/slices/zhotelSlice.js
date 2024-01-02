@@ -3,7 +3,7 @@ import zhotelApi from "../apis/zhotelApi";
 
 export const getAllHotelz = createAsyncThunk(
   "ehotels/list",
-  async (rejectWithValue) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await zhotelApi.getAllHotelz();
       return response;
@@ -28,6 +28,39 @@ export const getZHotelDetail = createAsyncThunk(
   async (eHotelId, { rejectWithValue }) => {
     try {
       const response = await zhotelApi.getZHotelDetail(eHotelId);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const getZOrderDetail = createAsyncThunk(
+  "ehotels/order/detail",
+  async (orderInfo, { rejectWithValue }) => {
+    try {
+      const response = await zhotelApi.getZOrderDetail(orderInfo);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const updateZOrder = createAsyncThunk(
+  "ehotels/order/status/update",
+  async (orderInfo, { rejectWithValue }) => {
+    try {
+      const response = await zhotelApi.updateZOrder(orderInfo);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const getAllOrderz = createAsyncThunk(
+  "ehotels/order/list",
+  async (eHotelId, { rejectWithValue }) => {
+    try {
+      const response = await zhotelApi.getAllOrderz(eHotelId);
       return response;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -63,6 +96,9 @@ export const zhotelSlice = createSlice({
     zhotel: {},
     zrooms: [],
     zroom: {},
+    zorders: [],
+    zorder: {},
+    totalData: 0,
     loading: false,
     error: null,
   },
@@ -102,6 +138,29 @@ export const zhotelSlice = createSlice({
       state.loading = false;
       state.zhotel = action.payload.data.data;
     },
+    [getZOrderDetail.pending]: (state) => {
+      state.loading = true;
+    },
+    [getZOrderDetail.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [getZOrderDetail.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.zorder = action.payload.data.data;
+    },
+    [getAllOrderz.pending]: (state) => {
+      state.loading = true;
+    },
+    [getAllOrderz.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [getAllOrderz.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.zorders = action.payload.data.data;
+      state.totalData = action.payload.data.totalData;
+    },
     [updateZHotel.pending]: (state) => {
       state.loading = true;
     },
@@ -123,6 +182,17 @@ export const zhotelSlice = createSlice({
     [getZHotelRoomSearch.fulfilled]: (state, action) => {
       state.loading = false;
       state.zrooms = action.payload.data.data;
+    },
+    [updateZOrder.pending]: (state) => {
+      state.loading = true;
+    },
+    [updateZOrder.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [updateZOrder.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.zorder = action.payload.data.data;
     },
   },
 });

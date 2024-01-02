@@ -2,7 +2,6 @@ import "./tour.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarDay,
-  faCalendarDays,
   faCartShopping,
   faCircleArrowLeft,
   faCircleArrowRight,
@@ -15,11 +14,10 @@ import {
 import { useEffect, useRef, useState } from "react";
 import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
-import { photos, servicesData, tripDays } from "../../../assets/data/dataAdmin";
 import ScrollToTop from "../../../shared/ScrollToTop";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { searchTour } from "../../../slices/tourSlice";
+import { searchTour2 } from "../../../slices/tourSlice";
 import {
   FormatLine,
   formatCurrencyWithoutD,
@@ -50,13 +48,12 @@ const TourDetail = () => {
   const numberOfAdult = state ? state.numberOfAdult : 1;
   const numberOfChildren = state ? state.numberOfChildren : 1;
   const numberOfRoom = state ? state.numberOfRoom : 1;
-  const [showRoomDetails, setShowRoomDetails] = useState(false);
   const [activeDay, setActiveDay] = useState(null);
-
+  console.log(state);
   useEffect(() => {
     window.scrollTo(0, 0);
     const res = dispatch(
-      searchTour({
+      searchTour2({
         keyword: tourId,
         province,
         startDate,
@@ -70,7 +67,7 @@ const TourDetail = () => {
     ).unwrap();
   }, []);
 
-  // console.log(tours);
+  console.log(tours);
   const handleOrder = (tourId) => {
     navigate(`/tours/tour-booking/${tourId}`, {
       state: {
@@ -157,6 +154,19 @@ const TourDetail = () => {
     console.log(numberOfRoom2);
     setShowHotel(true);
     setShowRoom(false);
+    dispatch(
+      searchTour2({
+        keyword: tourId,
+        province,
+        startDate: startDate2,
+        numberOfDay,
+        numberOfAdult: numberOfAdult2,
+        numberOfChildren: numberOfChildren2,
+        numberOfRoom: numberOfRoom2,
+        pageSize: 1,
+        pageNumber: 1,
+      })
+    ).unwrap();
   };
   const handleDateChange = (date) => {
     const formattedDisplayDate = format(date, "yyyy-MM-dd");
@@ -198,12 +208,14 @@ const TourDetail = () => {
     e.stopPropagation(); // Ngăn chặn sự kiện click từ lan truyền lên
     setOpenOptions(!openOptions);
   };
+
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
   const handleBookHotel = (id) => {
     const res = dispatch(
       getZHotelRoomSearch({
@@ -377,28 +389,6 @@ const TourDetail = () => {
                   />
                   <label>Khách sạn</label>
                   <p>Vạn Phát Riverside Hotel </p>
-                  {/* <p>{tours[0]?.hotel?.hotelName} </p> */}
-                  {/* <p>
-                    Tổng số phòng:{" "}
-                    <button
-                      className="btn-view-room"
-                      onClick={() => setShowRoomDetails(!showRoomDetails)}
-                    >
-                      {tours[0]?.hotel?.room.length}
-                    </button>
-                  </p> */}
-                  {showRoomDetails && (
-                    <div>
-                      {/* Hiển thị thông tin chi tiết của các phòng */}
-                      {tours[0]?.hotel?.room.map((room, index) => (
-                        <div key={index}>
-                          <p>
-                            Phòng {index + 1} tối đa {room.capacity} người.
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
               <div className="search__bar mb-4 position-relative">
@@ -549,28 +539,28 @@ const TourDetail = () => {
               </div>
               {!loading && showHotel && (
                 <div className="list-hotels py-2">
-                  {hotels.map((hotel) => (
+                  {tours[0]?.hotelList.map((hotel, index) => (
                     <div
-                      key={hotel.id}
+                      key={hotel.ehotelId}
                       className="item-hotel row mx-0 mb-4 wrapper-borderless animate__fadeInUp animate__animated"
-                      id={hotel.id}
+                      id={hotel.ehotelId}
                     >
                       <div className="col-md-4 p-0">
                         <img
                           className="avatar-hotel cursor-pointer"
                           alt="avatar-hotel"
-                          src={hotel.image}
+                          src={hotels[index]?.image}
                         />
                       </div>
                       <div className="col-md-8 p-0">
                         <div className="p-3">
                           <div className="hotel-name mb-2 cursor-pointer">
-                            {hotel.name}
+                            {hotel.ehotelName}
                           </div>
                           <div className="d-sm-flex align-items-center justify-content-between">
                             <div>
                               {Array.from(
-                                { length: hotel.stars },
+                                { length: hotel.numberOfStarRating },
                                 (_, index) => (
                                   <img
                                     key={index}
@@ -586,7 +576,8 @@ const TourDetail = () => {
                                   alt="hotel-type"
                                   className="w-15px"
                                 />
-                                &nbsp; {hotel.type}
+                                &nbsp; Khách sạn
+                                {/* &nbsp; {hotel.type} */}
                               </div>
                             </div>
                             <div className="mt-sm-0 mt-2">
@@ -594,7 +585,10 @@ const TourDetail = () => {
                                 Giá mỗi đêm từ
                               </div>
                               <div className="unit-money-vnd unit-money-new">
-                                {hotel.price}&nbsp;₫
+                                {formatCurrencyWithoutD(
+                                  hotel.optionList[0].totalPrice
+                                )}
+                                &nbsp;₫
                               </div>
                             </div>
                           </div>
@@ -605,13 +599,18 @@ const TourDetail = () => {
                                 alt="mapViolet.svg"
                                 className="w-20px"
                               />
-                              <span>{hotel.address}</span>
+                              <span>
+                                {hotel.address.moreLocation},{" "}
+                                {hotel.address.commune},{" "}
+                                {hotel.address.district},{" "}
+                                {hotel.address.province},
+                              </span>
                             </div>
                             <div className="group-btn flex-shrink-0 d-flex mt-sm-0 mt-2">
                               <button
-                                id={hotel.id}
+                                id={hotel.ehotelId}
                                 className="btn-add-to-cart "
-                                onClick={() => handleBookHotel(hotel.id)}
+                                onClick={() => handleBookHotel(hotel.ehotelId)}
                               >
                                 <FontAwesomeIcon
                                   className="me-1"
@@ -637,9 +636,24 @@ const TourDetail = () => {
                       <div className="col-md-9 p-0">
                         {room.room.map((roomDetail) => (
                           <div className=" mb-2" key={roomDetail.roomId}>
-                            <div className="hotel-name">{roomDetail.name}</div>
+                            <div>
+                              Phòng số:{" "}
+                              <span className="hotel-name">
+                                {roomDetail.roomId}
+                              </span>
+                            </div>
+                            <div>
+                              Loại phòng:{" "}
+                              <span className="hotel-name">
+                                {roomDetail.name}
+                              </span>
+                            </div>
+
                             <div className=" mb-2">
-                              {roomDetail.bed.join(" - ")}
+                              Gồm:{" "}
+                              <span className="hotel-name">
+                                {roomDetail.bed.join(" - ")}
+                              </span>
                             </div>
                           </div>
                         ))}

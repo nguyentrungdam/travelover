@@ -29,7 +29,7 @@
   height: 0;
 }
 
-.slider {
+.slider2 {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -41,7 +41,7 @@
   transition: 0.4s;
 }
 
-.slider:before {
+.slider2:before {
   position: absolute;
   content: "";
   height: 16px;
@@ -53,14 +53,14 @@
   transition: 0.4s;
 }
 
-input:checked + .slider {
+input:checked + .slider2 {
   background-color: #2196f3;
 }
 
-input:focus + .slider {
+input:focus + .slider2 {
   box-shadow: 0 0 1px #2196f3;
 }
 
-input:checked + .slider:before {
+input:checked + .slider2:before {
   transform: translateX(20px);
 }

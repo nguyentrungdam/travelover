@@ -35,6 +35,7 @@ import { blogDataDetail } from "./assets/data/tours";
 import ResetPassword from "./pages/client/account/ResetPassword";
 import AddHotelZ from "./pages/enterprise/add-hotelZ/AddHotelZ";
 import UpdateHotelZ from "./pages/enterprise/update-hotelZ/UpdateHotelZ";
+import OrderZList from "./pages/enterprise/orderZ/orders";
 
 function App() {
   const { isAuthenticated, role } = useSelector((state) => state.account);
@@ -104,6 +105,7 @@ function App() {
         <Route path="hotelz" element={<ZHotel />} />
         <Route path="hotelz/add-new" element={<AddHotelZ />} />
         <Route path="hotelz/:id" element={<UpdateHotelZ />} />
+        <Route path="orderz" element={<OrderZList />} />
       </Route>
 
       {/* <Route path="users">
