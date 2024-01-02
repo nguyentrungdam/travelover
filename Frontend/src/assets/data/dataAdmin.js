@@ -57,7 +57,7 @@ export const menu = [
 export const menuEnterprise = [
   {
     id: 1,
-    title: "List",
+    title: "Danh sách",
     listItems: [
       {
         id: 1,
@@ -70,6 +70,12 @@ export const menuEnterprise = [
         title: "Đơn Hàng",
         url: "/orderz",
         icon: "/order.svg",
+      },
+      {
+        id: 3,
+        title: "Nhà Xe",
+        url: "/vehiclez",
+        icon: "/car.svg",
       },
     ],
   },

@@ -2,23 +2,28 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import LocationSelect from "../../admin/tours/add-tour/LocationSelect";
-import { getZHotelDetail, updateZHotel } from "../../../slices/zhotelSlice";
+import LocationSelect from "../../../admin/tours/add-tour/LocationSelect";
+import {
+  createZVehicle,
+  getZVehicleDetail,
+  updateZVehicle,
+} from "../../../../slices/zvehicleSlice";
 import { useParams } from "react-router-dom";
 
-const UpdateHotelZ = () => {
+const UpdateVehicleZ = () => {
   const dispatch = useDispatch();
-  const { zhotel } = useSelector((state) => state.hotelz);
+  const { zvehicle } = useSelector((state) => state.vehiclez);
   const { id } = useParams();
   useEffect(() => {
-    dispatch(getZHotelDetail(id)).unwrap();
+    dispatch(getZVehicleDetail(id)).unwrap();
   }, []);
-  console.log(zhotel);
+  console.log(zvehicle);
   const [formData, setFormData] = useState({
-    eHotelName: "",
+    eVehicleName: "",
     description: "",
     phoneNumber: "",
     numberOfStarRating: "",
+    routes: [],
     moreLocation: "",
   });
   const [selectedLocation, setSelectedLocation] = useState({
@@ -26,10 +31,14 @@ const UpdateHotelZ = () => {
     district: "",
     commune: "",
   });
-
+  const [selectedProvince, setSelectedProvince] = useState("");
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
+  const handleSelectLocation2 = (location) => {
+    setSelectedProvince(location);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -37,64 +46,92 @@ const UpdateHotelZ = () => {
       [name]: value,
     });
   };
-
+  const handleSaveProvince = () => {
+    if (selectedProvince) {
+      setFormData({
+        ...formData,
+        routes: [...formData.routes, selectedProvince],
+      });
+    }
+    setSelectedProvince("");
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Tạo đối tượng FormData
     const formDataObject = new FormData();
     // Thêm các trường dữ liệu vào formDataObject
-    formDataObject.append("eHotelId", zhotel?.eHotelId);
+    formDataObject.append("eVehicleId", id);
     formDataObject.append(
-      "eHotelName",
-      formData.eHotelName || zhotel?.eHotelName
+      "eVehicleName",
+      formData.eVehicleName || zvehicle.eVehicleName
     );
-    formDataObject.append(
-      "description",
-      formData.description || zhotel?.description
-    );
+    // formDataObject.append(
+    //   "description",
+    //   formData.description || zvehicle.description
+    // );
     formDataObject.append(
       "phoneNumber",
-      formData.phoneNumber || zhotel?.phoneNumber
+      formData.phoneNumber || zvehicle.phoneNumber
     );
     // formDataObject.append(
     //   "numberOfStarRating",
-    //   formData.numberOfStarRating || zhotel?.numberOfStarRating
+    //   formData.numberOfStarRating || zvehicle.numberOfStarRating
     // );
+
+    // formData.routes.forEach((route, index) => {
+    //   formDataObject.append(`route[${index}]`, route || zvehicle?.route[index]);
+    // });
+
     // Thêm địa chỉ
     formDataObject.append(
       "address[province]",
-      selectedLocation.province || zhotel?.address?.province
+      selectedLocation.province || zvehicle.address.province
     );
     formDataObject.append(
       "address[district]",
-      selectedLocation.district || zhotel?.address?.district
+      selectedLocation.district || zvehicle.address.district
     );
     formDataObject.append(
       "address[commune]",
-      selectedLocation.commune || zhotel?.address?.commune
+      selectedLocation.commune || zvehicle.address.commune
     );
     formDataObject.append(
       "address[moreLocation]",
-      formData.moreLocation || zhotel?.address?.moreLocation
+      formData.moreLocation || zvehicle.address.moreLocation
     );
+
     // Gửi formDataObject lên API hoặc xử lý dữ liệu tại đây
     for (const [name, value] of formDataObject.entries()) {
       console.log(name, ":", value);
     }
+
+    setFormData({
+      eVehicleName: "",
+      description: "",
+      phoneNumber: "",
+      numberOfStarRating: "",
+      moreLocation: "",
+      routes: [],
+    });
+
     try {
-      const res = await dispatch(updateZHotel(formDataObject)).unwrap();
+      const res = await dispatch(updateZVehicle(formDataObject)).unwrap();
       console.log(res);
       if (res.data.status === "ok") {
         notify(1);
-        window.location.reload();
+        console.log(zvehicle);
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 1000);
       }
     } catch (err) {
       notify(2);
     }
   };
+
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Thêm khách sạn thành công! 👌", {
+      toast.success("Cập nhật nhà xe thành công! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
@@ -111,16 +148,16 @@ const UpdateHotelZ = () => {
   return (
     <div className="vh-100">
       <div className="info ">
-        <h1>Cập Nhật Khách Sạn</h1>
+        <h1>Cập Nhật Tuyến Xe</h1>
       </div>
       <div className="row row-1">
         <div className="col-xl-8">
           <div className="card mb-4">
             <div className="d-flex justify-content-between border-bottom-1">
               <div className="card-header border-bottom-none">
-                Thông tin khách sạn
+                Thông tin nhà xe
               </div>
-              <a href="/hotelz">
+              <a href="/vehiclez">
                 <div className="btn btn-danger"> X</div>
               </a>
             </div>
@@ -128,27 +165,26 @@ const UpdateHotelZ = () => {
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12">
-                    <label className="small mb-1">Tên khách sạn</label>
+                    <label className="small mb-1">Tên nhà xe</label>
                     <input
-                      name="eHotelName"
-                      defaultValue={zhotel.eHotelName}
+                      name="eVehicleName"
+                      defaultValue={zvehicle.eVehicleName}
                       className="form-control"
                       type="text"
-                      placeholder="Tên khách sạn..."
+                      placeholder="Tên tuyến xe..."
                       onChange={handleChange}
                     />
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  <label className="small mb-1">Address</label>
+                  <label className="small mb-1">Địa chỉ</label>
                   <LocationSelect
                     english
                     onSelectLocation={handleSelectLocation}
                   />
-
                   <div className="mt-2">
                     <input
-                      defaultValue={zhotel.address?.moreLocation}
+                      defaultValue={zvehicle.address?.moreLocation}
                       name="moreLocation"
                       className="form-control"
                       type="text"
@@ -158,22 +194,22 @@ const UpdateHotelZ = () => {
                   </div>
                 </div>
                 <div className="row gx-3 mb-3">
-                  <div className="col-md-8">
+                  {/* <div className="col-md-8">
                     <label className="small mb-1">Mô tả</label>
                     <textarea
-                      defaultValue={zhotel.description}
+                      defaultValue={zvehicle.description}
                       name="description"
                       className="form-control"
                       onChange={handleChange}
                       placeholder="Mô tả..."
                       rows="4"
                     />
-                  </div>
+                  </div> */}
 
                   <div className="col-md-4">
                     {/* <label className="small mb-1">Số sao</label>
                     <input
-                      defaultValue={zhotel.numberOfStarRating}
+                      defaultValue={zvehicle.numberOfStarRating}
                       name="numberOfStarRating"
                       className="form-control"
                       onChange={handleChange}
@@ -181,7 +217,7 @@ const UpdateHotelZ = () => {
                     /> */}
                     <label className="small mb-1 mt-2">Số điện thoại</label>
                     <input
-                      defaultValue={zhotel.phoneNumber}
+                      defaultValue={zvehicle.phoneNumber}
                       name="phoneNumber"
                       className="form-control"
                       onChange={handleChange}
@@ -189,13 +225,40 @@ const UpdateHotelZ = () => {
                     />
                   </div>
                 </div>
-
+                {/* <div className="row gx-3 mb-3  ">
+                  <div className="col-md-12">
+                    <label className="small mb-1">Tuyến đường</label>
+                    <div className="d-flex align-items-center col-md-12">
+                      <LocationSelect
+                        onSelectLocation2={handleSelectLocation2}
+                        pickProvince
+                        searchProvince2
+                      />
+                      <div
+                        className="btn btn-primary ms-2"
+                        onClick={handleSaveProvince}
+                      >
+                        Xác nhận
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="row gx-3 mb-5">
+                  <div className="col-md-12">
+                    <label className="small mb-1">Danh sách tỉnh</label>
+                    <div className="form-control h-100">
+                      {zvehicle?.route?.join(", ") +
+                        ", " +
+                        formData?.routes?.join(", ")}
+                    </div>
+                  </div>
+                </div> */}
                 <button
                   className="btn btn-primary"
                   type="button"
                   onClick={handleSubmit}
                 >
-                  Cập Nhật
+                  Cập Nhật Nhà Xe
                 </button>
               </form>
             </div>
@@ -207,4 +270,4 @@ const UpdateHotelZ = () => {
   );
 };
 
-export default UpdateHotelZ;
+export default UpdateVehicleZ;

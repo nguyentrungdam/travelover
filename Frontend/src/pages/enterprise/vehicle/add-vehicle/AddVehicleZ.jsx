@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
-import LocationSelect from "../../admin/tours/add-tour/LocationSelect";
-import { createZHotel } from "../../../slices/zhotelSlice";
+import LocationSelect from "../../../admin/tours/add-tour/LocationSelect";
+import { createZVehicle } from "../../../../slices/zvehicleSlice";
 
-const AddHotelZ = () => {
+const AddVehicleZ = () => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    ehotelName: "",
+    eVehicleName: "",
     description: "",
     phoneNumber: "",
     numberOfStarRating: "",
+    routes: [],
     moreLocation: "",
   });
   const [selectedLocation, setSelectedLocation] = useState({
@@ -19,10 +20,14 @@ const AddHotelZ = () => {
     district: "",
     commune: "",
   });
-
+  const [selectedProvince, setSelectedProvince] = useState("");
   const handleSelectLocation = (location) => {
     setSelectedLocation(location);
   };
+  const handleSelectLocation2 = (location) => {
+    setSelectedProvince(location);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -30,40 +35,68 @@ const AddHotelZ = () => {
       [name]: value,
     });
   };
-  console.log(formData);
-
+  const handleSaveProvince = () => {
+    if (selectedProvince) {
+      setFormData({
+        ...formData,
+        routes: [...formData.routes, selectedProvince],
+      });
+    }
+    setSelectedProvince("");
+  };
+  console.log(formData.routes);
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     // Tạo đối tượng FormData
     const formDataObject = new FormData();
     // Thêm các trường dữ liệu vào formDataObject
-    formDataObject.append("eHotelName", formData.ehotelName);
+    formDataObject.append("eVehicleName", formData.eVehicleName);
     formDataObject.append("description", formData.description);
     formDataObject.append("phoneNumber", formData.phoneNumber);
     formDataObject.append("numberOfStarRating", formData.numberOfStarRating);
+
+    formData.routes.forEach((route, index) => {
+      formDataObject.append(`route[${index}]`, route);
+    });
+
     // Thêm địa chỉ
     formDataObject.append("address[province]", selectedLocation.province);
     formDataObject.append("address[district]", selectedLocation.district);
     formDataObject.append("address[commune]", selectedLocation.commune);
     formDataObject.append("address[moreLocation]", formData.moreLocation);
+
     // Gửi formDataObject lên API hoặc xử lý dữ liệu tại đây
     for (const [name, value] of formDataObject.entries()) {
       console.log(name, ":", value);
     }
+
+    setFormData({
+      eVehicleName: "",
+      description: "",
+      phoneNumber: "",
+      numberOfStarRating: "",
+      moreLocation: "",
+      routes: [],
+    });
+
     try {
-      const res = await dispatch(createZHotel(formDataObject)).unwrap();
+      const res = await dispatch(createZVehicle(formDataObject)).unwrap();
       console.log(res);
       if (res.data.status === "ok") {
         notify(1);
-        window.location.reload();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       }
     } catch (err) {
       notify(2);
     }
   };
+
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Thêm khách sạn thành công! 👌", {
+      toast.success("Thêm nhà xe thành công! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,
@@ -80,16 +113,16 @@ const AddHotelZ = () => {
   return (
     <div className="vh-100">
       <div className="info ">
-        <h1>Tạo Khách Sạn</h1>
+        <h1>Tạo Tuyến Xe</h1>
       </div>
       <div className="row row-1">
         <div className="col-xl-8">
           <div className="card mb-4">
             <div className="d-flex justify-content-between border-bottom-1">
               <div className="card-header border-bottom-none">
-                Thông tin khách sạn
+                Thông tin nhà xe
               </div>
-              <a href="/hotelz">
+              <a href="/vehiclez">
                 <div className="btn btn-danger"> X</div>
               </a>
             </div>
@@ -97,12 +130,12 @@ const AddHotelZ = () => {
               <form>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12">
-                    <label className="small mb-1">Tên khách sạn</label>
+                    <label className="small mb-1">Tên nhà xe</label>
                     <input
-                      name="ehotelName"
+                      name="eVehicleName"
                       className="form-control"
                       type="text"
-                      placeholder="Tên khách sạn..."
+                      placeholder="Tên tuyến xe..."
                       onChange={handleChange}
                     />
                   </div>
@@ -113,7 +146,6 @@ const AddHotelZ = () => {
                     english
                     onSelectLocation={handleSelectLocation}
                   />
-
                   <div className="mt-2">
                     <input
                       name="moreLocation"
@@ -153,13 +185,38 @@ const AddHotelZ = () => {
                     />
                   </div>
                 </div>
-
+                <div className="row gx-3 mb-3  ">
+                  <div className="col-md-12">
+                    <label className="small mb-1">Tuyến đường</label>
+                    <div className="d-flex align-items-center col-md-12">
+                      <LocationSelect
+                        onSelectLocation2={handleSelectLocation2}
+                        pickProvince
+                        searchProvince2
+                      />
+                      <div
+                        className="btn btn-primary ms-2"
+                        onClick={handleSaveProvince}
+                      >
+                        Xác nhận
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="row gx-3 mb-5">
+                  <div className="col-md-12">
+                    <label className="small mb-1">Danh sách tỉnh</label>
+                    <div className="form-control h-100">
+                      {formData.routes.join(", ")}
+                    </div>
+                  </div>
+                </div>
                 <button
                   className="btn btn-primary"
                   type="button"
                   onClick={handleSubmit}
                 >
-                  Tạo Khách Sạn
+                  Tạo Nhà Xe
                 </button>
               </form>
             </div>
@@ -171,4 +228,4 @@ const AddHotelZ = () => {
   );
 };
 
-export default AddHotelZ;
+export default AddVehicleZ;
