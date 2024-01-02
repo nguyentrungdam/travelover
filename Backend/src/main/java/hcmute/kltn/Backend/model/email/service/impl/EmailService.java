@@ -317,15 +317,16 @@ public class EmailService implements IEmailService{
 			for (Map.Entry<Integer, Integer> itemCountRoomClone : countRoomClone.entrySet()) {
 				Integer key = itemCountRoomClone.getKey();
 				Integer value = itemCountRoomClone.getValue();
-				
-				if (itemHotelDetail.getCapacity() == key) {
+//============================================================================================
+				if (itemHotelDetail.getStandardNumberOfAdult() == key) {
 					countRoom.replace(key, value + 1);
 					break;
 				}
 			}
 			
 			if (countRoom.equals(countRoomClone)) {
-				countRoom.put(itemHotelDetail.getCapacity(), 1);
+//============================================================================================
+				countRoom.put(itemHotelDetail.getStandardNumberOfAdult(), 1);
 			}
 		}
 		

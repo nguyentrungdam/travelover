@@ -3,6 +3,7 @@ package hcmute.kltn.Backend.model.order.service.impl;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -46,12 +47,20 @@ import hcmute.kltn.Backend.model.order.dto.extend.Member;
 import hcmute.kltn.Backend.model.order.dto.extend.OrderDetail;
 import hcmute.kltn.Backend.model.order.dto.extend.Payment;
 import hcmute.kltn.Backend.model.order.dto.extend.VOTourDetail;
+import hcmute.kltn.Backend.model.order.dto.extend.VehicleDetail;
 import hcmute.kltn.Backend.model.order.repository.OrderRepository;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayRefund;
 import hcmute.kltn.Backend.model.payment.vnpay.service.IVNPayService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.extend.Room2;
+import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.EVehicleDTO;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.extend.Coach;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.service.IEVehicleService;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
 import hcmute.kltn.Backend.util.LocalDateUtil;
 import hcmute.kltn.Backend.util.StringUtil;
@@ -78,6 +87,10 @@ public class OrderService implements IOrderService{
 	private IVNPayService iVNPayService;
 	@Autowired
 	private IEmailService iEmailService;
+	@Autowired
+	private IEVehicleService iEVehicleService;
+	@Autowired
+	private IEHotelService iEHotelService;
 	
 	private String getOrderStatus(String orderStatus) {
 		int index = Integer.valueOf(orderStatus);
@@ -384,28 +397,53 @@ public class OrderService implements IOrderService{
 		LocalDate endDate = order.getStartDate().plusDays((long) (tourDTO.getNumberOfDay() - 1));
 		order.setEndDate(endDate);
 		
-		// get hotel information
-		List<HotelDetail> hotelDetailList = new ArrayList<>();
-		orderDetail.setHotelId(orderCreate.getHotelId());
-		HotelDTO hotelDTO = new HotelDTO();
-		hotelDTO = iHotelService.getDetailHotel(orderCreate.getHotelId());
-		for (String itemString : orderCreate.getRoomIdList()) {
-			Room room = new Room();
-			room = iHotelService.getRoomDetail(hotelDTO.getEHotelId(), itemString);
-			HotelDetail hotelDetail = new HotelDetail();
-			hotelDetail.setRoomId(room.getRoomId());
-			hotelDetail.setCapacity(room.getCapacity());
-			hotelDetail.setPrice(room.getPrice());
-			
-			hotelDetailList.add(hotelDetail);
-			
-			// update total price
-			totalPrice += hotelDetail.getPrice() * vOTourDetail.getNumberOfDay();
-		}
+		long numberOfDay = Math.abs(ChronoUnit.DAYS.between(endDate, orderCreate.getStartDate()));
 		
+		// get hotel information
+		EHotel eHotel = new EHotel();
+		eHotel = iEHotelService.getDetailEHotel(orderCreate.getHotelId());
+		List<HotelDetail> hotelDetailList = new ArrayList<>();
+		for (String itemEHotelId : orderCreate.getRoomIdList()) {
+			boolean checkExists = false;
+			
+			for (Room2 itemRoom : eHotel.getRoom2()) {
+				if (itemRoom.getRoomId().equals(itemEHotelId)) {
+					checkExists = true;
+					
+					HotelDetail hotelDetail = new HotelDetail();
+					modelMapper.map(itemRoom, hotelDetail);
+					hotelDetailList.add(hotelDetail);	
+					
+					int totalPriceTemp = (int)(itemRoom.getPrice() * ((double)numberOfDay + 0.5));
+	
+					totalPrice += totalPriceTemp;
+				}
+			}
+			if (checkExists == false) {
+				throw new CustomException("Cannot find room in hotel " + itemEHotelId);
+			}
+		}
+		orderDetail.setHotelId(orderCreate.getHotelId());
 		orderDetail.setHotelDetail(hotelDetailList);
 		
 		// get vehicle information
+		EVehicleDTO eVehicleDTO = new EVehicleDTO();
+		eVehicleDTO = iEVehicleService.getDetailEVehicle(orderCreate.getVehivleId());
+		List<VehicleDetail> vehicleDetailList = new ArrayList<>();
+		for (String itemCoachId : orderCreate.getCoachIdList()) {
+			boolean checkExists = false;
+			for (Coach itemCoach : eVehicleDTO.getCoachList()) {
+				if (itemCoachId.equals(itemCoach.getCoachId())) {
+					checkExists = true;
+					
+					VehicleDetail vehicleDetail = new VehicleDetail();
+					modelMapper.map(itemCoach, vehicleDetail);
+					vehicleDetailList.add(vehicleDetail);
+				}
+			}
+		}
+		orderDetail.setVehicleId(orderCreate.getVehivleId());
+		orderDetail.setVehicleDetail(vehicleDetailList);		
 		
 		// get guider information
 		

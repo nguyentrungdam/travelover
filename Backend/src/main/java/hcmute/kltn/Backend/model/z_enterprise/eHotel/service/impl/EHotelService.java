@@ -1169,7 +1169,6 @@ public class EHotelService implements IEHotelService{
 		throw new CustomException("Cannot find order " + eHotelOrderStatusUpdate.getOrderId());
 	}
 
-	
 	@Override
 	public List<EHotelDTOSimple> searchEHotelByLocation(Location location) {
 		List<EHotel> eHotelList = new ArrayList<>();

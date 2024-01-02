@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TourSearchRes2 {
 	private Tour tour;
+	private int tourPriceNotDiscount;
+	private int tourPrice;
 	private List<Hotel2> hotelList;
 	private List<Vehicle> vehicleList;
 }

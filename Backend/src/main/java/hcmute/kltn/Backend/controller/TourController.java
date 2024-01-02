@@ -46,7 +46,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 				+ "Cập nhật: Thêm field startLocation cho search2 để làm địa điểm bắt đầu để tìm nhà xe phù hợp "
 				+ "(bỏ trống field startLocation hoặc không gửi field này sẽ mặc định điểm xuất phát là "
 				+ "cùng tỉnh với tour)\n\n"
-				+ "Cập nhật: khi search2 sẽ trả về thêm vehicle List tương tự như hotel list",
+				+ "Cập nhật: khi search2 sẽ trả về thêm vehicle List tương tự như hotel list\n\n"
+				+ "__5:25PM__\n\n"
+				+ "Cập nhật: api tour search 2, khi search không có hotel và vehicle nào thì không trả tour, để trống\n\n"
+				+ "Fix: đã fix api tour list-discount-tour",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")

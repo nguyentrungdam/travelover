@@ -22,7 +22,7 @@ public class OrderCreate {
 	private String hotelId;
 	private List<String> roomIdList;
 	private String vehivleId;
-	private List<String> carIdList;
+	private List<String> coachIdList;
 	private String guiderId;
 	private List<String> personIdList;
 	private int numberOfChildren; // not null

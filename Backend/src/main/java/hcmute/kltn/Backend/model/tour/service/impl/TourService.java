@@ -52,6 +52,7 @@ import hcmute.kltn.Backend.model.tour.dto.extend.CoachOption;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel2;
+import hcmute.kltn.Backend.model.tour.dto.extend.OneVehicle;
 import hcmute.kltn.Backend.model.tour.dto.extend.Option;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
@@ -929,68 +930,49 @@ public class TourService implements ITourService{
 		List<TourSearchRes> tourSearchResList = new ArrayList<>();
 		LocalDate today = LocalDateUtil.getDateNow();
 		LocalDate tomorrow = today.plusDays(1);
+		
 		for(Tour itemTour : tourList) {
-			int totalPrice = 0;
-			TourSearchRes tourSearchRes = new TourSearchRes();
-			tourSearchRes.setTour(itemTour);
-			totalPrice += itemTour.getPriceOfAdult();
+			TourSearch tourSearch = new TourSearch();
+			tourSearch.setKeyword(itemTour.getTourId());
+			tourSearch.setStartDate(tomorrow);
+			tourSearch.setNumberOfAdult(1);
+			tourSearch.setNumberOfRoom(1);
 			
-			// search hotel
-			HotelSearch hotelSearch = new HotelSearch();
-			if (itemTour.getAddress() != null) {
-				hotelSearch.setProvince(itemTour.getAddress().getProvince());
-				hotelSearch.setDistrict(itemTour.getAddress().getDistrict());
-			}
-			List<hcmute.kltn.Backend.model.hotel.dto.HotelDTO> hotelDTOList = iHotelService.searchHotel(hotelSearch);
+			List<TourSearchRes2> oneTourSearchResList = new ArrayList<>();
+			oneTourSearchResList.addAll(searchTour2(tourSearch));
 			
-			// search room in hotel
-			for(hcmute.kltn.Backend.model.hotel.dto.HotelDTO itemHotel : hotelDTOList) {
-				RoomSearch roomSearch = new RoomSearch();
-				roomSearch.setEHotelId(itemHotel.getEHotelId());
-				roomSearch.setStartDate(tomorrow);
-				roomSearch.setEndDate(tomorrow.plusDays(itemTour.getNumberOfDay()));
-				roomSearch.setNumberOfAdult(1);
-				roomSearch.setNumberOfRoom(1);
+			if (!oneTourSearchResList.isEmpty()) {
+				// set tour
+				TourSearchRes tourSearchRes = new TourSearchRes();
+				tourSearchRes.setTour(oneTourSearchResList.get(0).getTour());
 				
-				List<hcmute.kltn.Backend.model.hotel.dto.extend.Room> roomList = new ArrayList<>();
-				try {
-					roomList = iHotelService.searchRoom(roomSearch);
-				} catch (Exception e) {
-					
-				}
+				// set hotel
+				Hotel hotel = new Hotel();
+				modelMapper.map(oneTourSearchResList.get(0).getHotelList().get(0), hotel);
+				Option option = new Option();
+				modelMapper.map(oneTourSearchResList.get(0).getHotelList().get(0).getOptionList().get(0), option);
+				tourSearchRes.setHotel(hotel);
 				
-				if(roomList.size() > 0) {
-					// mapping hotel
-					Hotel hotel = new Hotel();
-					modelMapper.map(itemHotel, hotel);
-					
-					// mapping room
-					List<Room> roomListRes = new ArrayList<>();
-					for(hcmute.kltn.Backend.model.hotel.dto.extend.Room itemRoom : roomList) {
-						Room room = new Room();
-						modelMapper.map(itemRoom, room);
-						roomListRes.add(room);
-						totalPrice += room.getPrice() * itemTour.getNumberOfDay();
-					}
-
-					hotel.setRoom(roomListRes);
-					
-					tourSearchRes.setHotel(hotel);
-
-					break;
-				}
-			}
-			int totalPriceNotDiscount = totalPrice;
-			if (itemTour.getDiscount().getIsDiscount() == true) {
-				totalPrice = totalPriceNotDiscount * (100 - itemTour.getDiscount().getDiscountValue()) / 100;
-			}
-			
-			tourSearchRes.setTotalPriceNotDiscount(totalPriceNotDiscount);
-			tourSearchRes.setTotalPrice(totalPrice);
-			
-			if (tourSearchRes.getHotel() != null) {
+				// set vehicle
+				OneVehicle vehicle = new OneVehicle();
+				modelMapper.map(oneTourSearchResList.get(0).getVehicleList().get(0), vehicle);
+				int vehiclePriceNotDiscount = oneTourSearchResList.get(0).getVehicleList().get(0).getOptionList().get(0).getTotalPriceNotDiscount();
+				int vehiclePrice = oneTourSearchResList.get(0).getVehicleList().get(0).getOptionList().get(0).getTotalPrice();
+				tourSearchRes.setVehicle(vehicle);
+				
+				// set price
+				tourSearchRes.setTotalPriceNotDiscount(
+						option.getTotalPriceNotDiscount() 
+						+ oneTourSearchResList.get(0).getTourPriceNotDiscount()
+						+ vehiclePriceNotDiscount);
+				tourSearchRes.setTotalPrice(
+						option.getTotalPrice() 
+						+ oneTourSearchResList.get(0).getTourPrice()
+						+ vehiclePrice);
+				
 				tourSearchResList.add(tourSearchRes);
 			}
+
 		}
 
 		// get 8 item from tour list
@@ -1403,6 +1385,14 @@ public class TourService implements ITourService{
 			Tour tour = new Tour();
 			modelMapper.map(itemTour, tour);
 			tourSearchRes2.setTour(tour);
+			totalPrice = (tourSearch.getNumberOfAdult() * itemTour.getPriceOfAdult())
+							+ (tourSearch.getNumberOfChildren() * itemTour.getPriceOfChildren());
+			tourSearchRes2.setTourPriceNotDiscount(totalPrice);
+			if (itemTour.getDiscount().getIsDiscount() == true) {
+				tourSearchRes2.setTourPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+			} else {
+				tourSearchRes2.setTourPrice(totalPrice);
+			};
 			
 			// create hotel2 list
 			List<Hotel2> hotel2List = new ArrayList<>();
@@ -1448,7 +1438,11 @@ public class TourService implements ITourService{
 						}
 						option.setRoomList(room2List);
 						option.setTotalPriceNotDiscount(itemRoomSearchRes.getTotalPrice());
-						option.setTotalPrice(itemRoomSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+						if (itemTour.getDiscount().getIsDiscount() == true) {
+							option.setTotalPrice(itemRoomSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+						} else {
+							option.setTotalPrice(itemRoomSearchRes.getTotalPrice());
+						}
 						optionRoomList.add(option);
 					}
 				}
@@ -1496,12 +1490,7 @@ public class TourService implements ITourService{
 				
 				List<CoachSearchRes> coachSearchResList = new ArrayList<>();
 				try {
-					System.out.println("coachSearch = " + coachSearch);
-					
 					coachSearchResList.addAll(iEVehicleService.searchCoach(coachSearch));
-					
-					System.out.println("coachSearchResList = " + coachSearchResList);
-					
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
@@ -1520,7 +1509,11 @@ public class TourService implements ITourService{
 						}
 						coachOption.setCoachList(coachList);
 						coachOption.setTotalPriceNotDiscount(itemCoachSearchRes.getTotalPrice());
-						coachOption.setTotalPrice(itemCoachSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+						if (itemTour.getDiscount().getIsDiscount() == true) {
+							coachOption.setTotalPrice(itemCoachSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+						} else {
+							coachOption.setTotalPrice(itemCoachSearchRes.getTotalPrice());
+						}
 						
 						optionCoachList.add(coachOption);
 					}
@@ -1536,7 +1529,9 @@ public class TourService implements ITourService{
 			tourSearchRes2.setVehicleList(vehicleList);
 			
 			// add tourSearchRes2
-			tourSearchRes2List.add(tourSearchRes2);
+			if (!hotel2List.isEmpty() && !vehicleList.isEmpty()) {
+				tourSearchRes2List.add(tourSearchRes2);
+			}
 		}
 
 		return tourSearchRes2List;
