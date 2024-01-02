@@ -47,6 +47,8 @@ import hcmute.kltn.Backend.model.tour.dto.TourSearchRes2;
 import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
+import hcmute.kltn.Backend.model.tour.dto.extend.Coach;
+import hcmute.kltn.Backend.model.tour.dto.extend.CoachOption;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel2;
@@ -56,6 +58,7 @@ import hcmute.kltn.Backend.model.tour.dto.extend.Room;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room2;
 import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
 import hcmute.kltn.Backend.model.tour.dto.extend.TourDetail;
+import hcmute.kltn.Backend.model.tour.dto.extend.Vehicle;
 import hcmute.kltn.Backend.model.tour.repository.TourRepository;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.util.LocalDateTimeUtil;
@@ -65,6 +68,10 @@ import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTOSimple;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.Location;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.RoomSearchRes;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.service.IEHotelService;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.CoachSearch;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.CoachSearchRes;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.EVehicleDTOSimple;
+import hcmute.kltn.Backend.model.z_enterprise.eVehicle.service.IEVehicleService;
 
 @Service
 public class TourService implements ITourService{
@@ -86,6 +93,8 @@ public class TourService implements ITourService{
 	private IVideoService iVideoService;
 	@Autowired
 	private IEHotelService IEHotelService;
+	@Autowired
+	private IEVehicleService iEVehicleService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -1293,7 +1302,6 @@ public class TourService implements ITourService{
 		return getTourDTO(tour);
 	}
 
-	
 	@Override
 	public List<TourSearchRes2> searchTour2(TourSearch tourSearch) {
 		// search with keyword
@@ -1454,6 +1462,78 @@ public class TourService implements ITourService{
 			}
 
 			tourSearchRes2.setHotelList(hotel2List);
+			
+			// vehicle
+			// create hotel2 list
+			List<Vehicle> vehicleList = new ArrayList<>();
+			// search eVehicle location
+			hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.Location locationVehicle 
+				= new hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.Location();
+			
+			if (tourSearch.getStartLocation() != null && !tourSearch.getStartLocation().isEmpty()) {
+				locationVehicle.setStartLocation(tourSearch.getStartLocation());
+			} else {
+				locationVehicle.setStartLocation(itemTour.getAddress().getProvince());
+			}
+			locationVehicle.setEndLocation(itemTour.getAddress().getProvince());
+			List<EVehicleDTOSimple> eVehicleList = new ArrayList<>();
+			eVehicleList.addAll(iEVehicleService.searchEVehicleByLocation(locationVehicle));
+			
+			for (EVehicleDTOSimple itemEVehicleDTOSimple : eVehicleList) {
+				// create vehicle
+				Vehicle vehicle = new Vehicle();
+				modelMapper.map(itemEVehicleDTOSimple, vehicle);
+				
+				// create option list
+				List<CoachOption> optionCoachList = new ArrayList<>();
+				// search coach
+				CoachSearch coachSearch = new CoachSearch();
+				coachSearch.setEVehicleId(itemEVehicleDTOSimple.getEVehicleId());
+				coachSearch.setStartDate(tourSearch.getStartDate());
+				coachSearch.setEndDate(tourSearch.getStartDate().plusDays(itemTour.getNumberOfDay() - 1));
+				coachSearch.setNumberOfPeople(tourSearch.getNumberOfAdult() + tourSearch.getNumberOfChildren());
+				coachSearch.setNumberOfCoach(1);
+				
+				List<CoachSearchRes> coachSearchResList = new ArrayList<>();
+				try {
+					System.out.println("coachSearch = " + coachSearch);
+					
+					coachSearchResList.addAll(iEVehicleService.searchCoach(coachSearch));
+					
+					System.out.println("coachSearchResList = " + coachSearchResList);
+					
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+				if (!coachSearchResList.isEmpty()) {
+					for (CoachSearchRes itemCoachSearchRes : coachSearchResList) {
+						// create optionCoach
+						CoachOption coachOption = new CoachOption();
+						
+						// create coach list
+						List<Coach> coachList = new ArrayList<>();
+						for (hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.extend.Coach itemCoach : itemCoachSearchRes.getCoachList()) {
+							Coach coach = new Coach();
+							modelMapper.map(itemCoach, coach);
+							coachList.add(coach);
+						}
+						coachOption.setCoachList(coachList);
+						coachOption.setTotalPriceNotDiscount(itemCoachSearchRes.getTotalPrice());
+						coachOption.setTotalPrice(itemCoachSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+						
+						optionCoachList.add(coachOption);
+					}
+				}
+				
+				vehicle.setOptionList(optionCoachList);
+				
+				if (!optionCoachList.isEmpty()) {
+					vehicleList.add(vehicle);
+				}
+			}
+			
+			tourSearchRes2.setVehicleList(vehicleList);
 			
 			// add tourSearchRes2
 			tourSearchRes2List.add(tourSearchRes2);

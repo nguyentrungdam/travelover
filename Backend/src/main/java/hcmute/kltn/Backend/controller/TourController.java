@@ -41,14 +41,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(
 		name = "Tours", 
 		description = "APIs for managing tours\n\n"
-				+ "__31/12/2023__\n\n"
-				+ "__9:15AM__\n\n"
-				+ "Cập nhật: Khi gọi api search2 sẽ trả về list object\n\n"
-				+ "- Trong 1 object này sẽ có 1 tour và list hotel\n\n"
-				+ "- Trong 1 hotel sẽ có thông tin hotel và list option\n\n"
-				+ "- Trong 1 option sẽ có list Room và giá\n\n"
-				+ "(Dùng cho search trang chủ, chỉnh sửa các giá trị lúc xem chi tiết tour và search lại, "
-				+ "chỉnh sửa các giá trị lúc tạo đơn hàng và search lại)",
+				+ "__02/01/2024__\n\n"
+				+ "__10:55AM__\n\n"
+				+ "Cập nhật: Thêm field startLocation cho search2 để làm địa điểm bắt đầu để tìm nhà xe phù hợp "
+				+ "(bỏ trống field startLocation hoặc không gửi field này sẽ mặc định điểm xuất phát là "
+				+ "cùng tỉnh với tour)\n\n"
+				+ "Cập nhật: khi search2 sẽ trả về thêm vehicle List tương tự như hotel list",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")

@@ -1,4 +1,4 @@
-package hcmute.kltn.Backend.model.z_enterprise.eVehicle.dto.extend;
+package hcmute.kltn.Backend.model.tour.dto.extend;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

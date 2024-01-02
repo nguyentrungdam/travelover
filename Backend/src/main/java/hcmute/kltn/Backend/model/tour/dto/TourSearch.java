@@ -22,4 +22,5 @@ public class TourSearch {
 	private int numberOfAdult;
 	private int numberOfChildren;
 	private int numberOfRoom;
+	private String startLocation;
 }

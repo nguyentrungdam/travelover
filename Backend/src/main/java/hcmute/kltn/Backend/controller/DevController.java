@@ -21,7 +21,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/devs")
 @Tag(
 		name = "Devs", 
-		description = "APIs for managing devs\n\n",
+		description = "APIs for managing devs\n\n"
+				+ "__02/01/2024__\n\n"
+				+ "__10:55AM__\n\n"
+				+ "__Z Enterprise Vehicles__\n\n"
+				+ "Tạo mới: api create, update, list, detail cho vehicle (chú ý field route là tuyến đường mà nhà xe có thể đi qua, "
+				+ "khi tìm nhà xe sẽ dựa trên địa điểm của tour và địa điểm đón khách để tìm, "
+				+ "nếu có trong danh sách route thì nhà xe phù hợp)",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/176XCXAx04e66xHKIOnL2V1smcR2fiEGo/view?usp=sharing")

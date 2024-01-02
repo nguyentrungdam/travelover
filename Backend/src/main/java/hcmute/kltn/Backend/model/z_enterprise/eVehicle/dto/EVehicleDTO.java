@@ -22,6 +22,7 @@ public class EVehicleDTO extends BaseEntity{
 	private String description;
 	private String phoneNumber;
 	private Address address;
+	private List<String> route; // province list
 	private int numberOfStarRating;
 	private List<Coach> coachList;
 }
