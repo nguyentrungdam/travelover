@@ -29,6 +29,10 @@ const toursApi = {
     const url = `/tours/search?keyword=${tour.keyword}&province=${tour.province}&startDate=${tour.startDate}&numberOfDay=${tour.numberOfDay}&numberOfAdult=${tour.numberOfAdult}&numberOfChildren=${tour.numberOfChildren}&numberOfRoom=${tour.numberOfRoom}&pageSize=${tour.pageSize}&pageNumber=${tour.pageNumber}&minPrice=${tour.minPrice}&maxPrice=${tour.maxPrice}&ratingFilter=${tour.ratingFilter}&sortBy=${tour.sortBy}&order=${tour.order}`;
     return axios.get(url);
   },
+  searchTour2: (tour) => {
+    const url = `/tours/search2?keyword=${tour.keyword}&province=${tour.province}&startDate=${tour.startDate}&numberOfDay=${tour.numberOfDay}&numberOfAdult=${tour.numberOfAdult}&numberOfChildren=${tour.numberOfChildren}&numberOfRoom=${tour.numberOfRoom}&pageSize=${tour.pageSize}&pageNumber=${tour.pageNumber}&minPrice=${tour.minPrice}&maxPrice=${tour.maxPrice}&ratingFilter=${tour.ratingFilter}&sortBy=${tour.sortBy}&order=${tour.order}`;
+    return axios.get(url);
+  },
   searchTourAdmin: (tour) => {
     const url = `/tours/list/search?keyword=${tour.keyword}&isDiscount=${tour.isDiscount}&numberOfDay=${tour.numberOfDay}&numberOfOrdered=${tour.numberOfOrdered}&discountValue=${tour.discountValue}&sortBy=${tour.sortBy}&order=${tour.order}`;
     return axios.get(url);

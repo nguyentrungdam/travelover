@@ -43,7 +43,7 @@ const DataTable = (props) => {
                       props.onSwitchChange(params.row.tourId, params.row.status)
                     }
                   />
-                  <span className="slider round"></span>
+                  <span className="slider2 round"></span>
                 </label>
               </div>
             </>

@@ -33,12 +33,12 @@ export const menu = [
         url: "/tours-list",
         icon: "/travel-list.svg",
       },
-      {
-        id: 3,
-        title: "Khách Sạn",
-        url: "/hotels",
-        icon: "/hotel.svg",
-      },
+      // {
+      //   id: 3,
+      //   title: "Khách Sạn",
+      //   url: "/hotels",
+      //   icon: "/hotel.svg",
+      // },
       {
         id: 4,
         title: "Đơn Hàng",
@@ -61,16 +61,16 @@ export const menuEnterprise = [
     listItems: [
       {
         id: 1,
-        title: "Hotels",
+        title: "Khách Sạn",
         url: "/hotelz",
         icon: "/hotel.svg",
       },
-      // {
-      //   id: 2,
-      //   title: "Order",
-      //   url: "/orderz",
-      //   icon: "/order.svg",
-      // },
+      {
+        id: 2,
+        title: "Đơn Hàng",
+        url: "/orderz",
+        icon: "/order.svg",
+      },
     ],
   },
 ];
@@ -711,25 +711,24 @@ export const photos = [
 
 export const destinations = [
   {
-    title: "Hạ Long",
-    imageUrl:
-      "https://media.travel.com.vn/destination/dg_200827_HA LONG_322052888.jpg",
-    link: "/du-lich-ha-long.aspx",
+    title: "Cần Thơ",
+    imageUrl: "https://media.travel.com.vn/Tour/tfd_220105044735_228319.jpg",
+    province: "Thành phố Cần Thơ",
   },
   {
     title: "Đà Nẵng",
     imageUrl:
       "https://media.travel.com.vn/destination/dg_230628_cau-rong-ve-dem.webp",
-    link: "/du-lich-da-nang.aspx",
+    province: "Thành phố Đà Nẵng",
   },
   {
     title: "Đà Lạt",
     imageUrl: "https://media.travel.com.vn/destination/dg_230628_da-lat.webp",
-    link: "/du-lich-da-lat.aspx",
+    province: "Tỉnh Lâm Đồng",
   },
   {
     title: "Phú Quốc",
     imageUrl: "https://media.travel.com.vn/destination/dg_230628_phu-quoc.webp",
-    link: "/du-lich-phu-quoc.aspx",
+    province: "Tỉnh Kiên Giang",
   },
 ];

@@ -166,7 +166,7 @@ const AddTours = () => {
   };
   const notify = (prop) => {
     if (prop === 1) {
-      toast.success("Cập nhật thành công! 👌", {
+      toast.success("Thêm tour thành công! 👌", {
         position: toast.POSITION.TOP_RIGHT,
         autoClose: 1000,
         pauseOnHover: true,

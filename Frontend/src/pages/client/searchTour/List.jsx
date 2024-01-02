@@ -14,7 +14,7 @@ import {
   validateOriginalDate,
 } from "../../../utils/validate";
 import { useDispatch, useSelector } from "react-redux";
-import { searchTour } from "../../../slices/tourSlice";
+import { searchTour, searchTour2 } from "../../../slices/tourSlice";
 import { vi } from "date-fns/locale";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -37,6 +37,7 @@ const List = () => {
       ? location.state.selectedLocation.province
       : ""
   );
+  const [province2, setProvince2] = useState("");
   const [startDate, setStartDate] = useState(location.state.startDate);
   const [numberOfDay, setNumberOfDay] = useState(location.state.numberOfDay);
   const [numberOfAdult, setNumberOfAdult] = useState(
@@ -64,6 +65,24 @@ const List = () => {
     const newOffset = (event.selected * itemsPerPage) % tours.length;
     setItemOffset(newOffset);
     setNextPage(event.selected + 1);
+    await dispatch(
+      searchTour2({
+        keyword: "",
+        province,
+        startDate,
+        numberOfDay,
+        numberOfAdult,
+        numberOfChildren,
+        numberOfRoom,
+        pageSize: 9,
+        pageNumber: event.selected + 1,
+        minPrice: "",
+        maxPrice: "",
+        ratingFilter: "",
+        sortBy: "price",
+        order: "asc",
+      })
+    ).unwrap();
     window.scrollTo(0, 0);
   };
   console.log(totalData);
@@ -71,7 +90,7 @@ const List = () => {
   useEffect(() => {
     setProvince(location.state.selectedLocation.province);
     const res = dispatch(
-      searchTour({
+      searchTour2({
         keyword: "",
         province,
         startDate,
@@ -88,7 +107,6 @@ const List = () => {
         order: "asc",
       })
     ).unwrap();
-
     const handleScroll = () => {
       if (window.scrollY > 200) {
         setHeaderVisible(false);
@@ -102,6 +120,7 @@ const List = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  console.log(tours);
   const tomorrow = addDays(new Date(), 1);
   const [priceRange, setPriceRange] = useState([0, 100]);
   const handlePriceChange = (value) => {
@@ -165,19 +184,41 @@ const List = () => {
       });
     }
   };
+  const handleClickProvince = (location) => {
+    window.scrollTo(0, 0);
+    setProvince2(location);
+    dispatch(
+      searchTour2({
+        keyword: "",
+        province: location,
+        startDate,
+        numberOfDay,
+        numberOfAdult,
+        numberOfChildren,
+        numberOfRoom,
+        pageSize: 9,
+        pageNumber: 1,
+        minPrice: "",
+        maxPrice: "",
+        ratingFilter: "",
+        sortBy: "price",
+        order: "asc",
+      })
+    ).unwrap();
+  };
   const handleSearch = () => {
     const fetchData = async () => {
-      const res = await dispatch(
-        searchTour({
+      await dispatch(
+        searchTour2({
           keyword: "",
-          province,
+          province: province2 ? province2 : province,
           startDate,
           numberOfDay,
           numberOfAdult,
           numberOfChildren,
           numberOfRoom,
-          pageSize: itemsPerPage,
-          pageNumber: nextPage,
+          pageSize: 9,
+          pageNumber: 1,
           minPrice: `${minPrice}`,
           maxPrice: `${maxPrice}`,
           sortBy: orderBy,
@@ -203,7 +244,11 @@ const List = () => {
                 <div className="tour-search-result__filter__heading  px-1 py-2 d-flex justify-content-between align-items-center">
                   <h5 className="s-title me-1 mt-1 ">Điểm đến: </h5>
                   <LocationSelect
-                    searchProvince={location.state.selectedLocation.province}
+                    searchProvince={
+                      province2
+                        ? province2
+                        : location.state.selectedLocation.province
+                    }
                     onSelectLocation={handleSelectLocation}
                     pickProvince
                   />
@@ -591,23 +636,25 @@ const List = () => {
                 <div className="row row-cols-1 row-cols-md-4 g-4">
                   {destinations.map((destination, index) => (
                     <div className="col" key={index}>
-                      <div className="card destination-item">
+                      <div
+                        className="card destination-item cursor-pointer"
+                        onClick={() =>
+                          handleClickProvince(destination.province)
+                        }
+                      >
                         <div className="mb-3 position-relative destination-item__image">
-                          <a href={destination.link}>
+                          <div>
                             <img
                               src={destination.imageUrl}
                               className="card-img-top1 img-fluid"
                               alt={destination.title}
                             />
-                          </a>
+                          </div>
                         </div>
                         <div className="card-body">
-                          <a
-                            href={destination.link}
-                            className="card-title destination-item__title"
-                          >
+                          <div className="card-title destination-item__title">
                             {destination.title}
-                          </a>
+                          </div>
                         </div>
                       </div>
                     </div>

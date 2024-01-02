@@ -329,38 +329,34 @@ export const blogDataDetail = [
 ];
 export const hotels = [
   {
-    id: "658a278ef1e7372d0979274e",
-    name: "Vạn Phát Riverside Hotel",
+    id: "1",
     image:
       "https://pix8.agoda.net/hotelImages/304309/-1/7a3989d01b7bed78e6b77bcbadd53258.jpg?ca=19&amp;ce=1",
-    stars: 4,
-    type: "Khách sạn",
-    price: "1.100.000",
-    address:
-      "số 2 đường Nguyễn Văn Cừ (cồn Khương), phường Cái Khế, quận Ninh Kiều, thành phố Cần Thơ., Cần Thơ, Cần Thơ, Việt Nam",
   },
   {
-    id: "658a27c1f1e7372d0979274f",
-    name: "Iris Hotel Cần Thơ",
+    id: "2",
     image:
       "https://pix8.agoda.net/hotelImages/568/568125/568125_14041015460019033004.jpg?ca=2&amp;ce=1",
-    stars: 4,
-    type: "Khách sạn",
-    price: "1.250.000",
-    address:
-      "Số 224, Đường 30/4, Phường Xuân Khánh, Quận Ninh Kiều, Thành Phố Cần Thơ, Cần Thơ, Cần Thơ, Việt Nam",
   },
   {
-    id: "658a27f8f1e7372d09792750",
-    name: "Sheraton Cần Thơ",
+    id: "3",
     image:
       "https://pix8.agoda.net/hotelImages/1519798/-1/2ef8d4933ba430a44e608f1ed5fb64a3.jpg?ca=9&amp;ce=1",
-    stars: 5,
-    type: "Khách sạn",
-    price: "1.500.000",
-    address:
-      "Số 209, Đường 30/4, Ninh Kiều, Cần Thơ, Việt Nam, Cần Thơ, Cần Thơ, Việt Nam",
   },
-  // Add more hotel entries here...
+  {
+    id: "4",
+    image:
+      "https://pix8.agoda.net/hotelImages/1158339/-1/9cfe9638c7d9ce5577ec22842c0dd796.jpg?ca=6&ce=1",
+  },
+  {
+    id: "5",
+    image:
+      "https://pix8.agoda.net/hotelImages/3606056/-1/04c5f91f6acae632be5342ccf725acec.jpg?ca=0&ce=1",
+  },
+  {
+    id: "6",
+    image:
+      "https://pix8.agoda.net/hotelImages/1603126/-1/dddd40056d6fdfb944bcddd04a33ba21.jpg?ce=0",
+  },
 ];
 export default tours;
