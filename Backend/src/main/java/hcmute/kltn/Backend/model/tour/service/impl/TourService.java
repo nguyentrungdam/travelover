@@ -52,6 +52,7 @@ import hcmute.kltn.Backend.model.tour.dto.extend.CoachOption;
 import hcmute.kltn.Backend.model.tour.dto.extend.Discount;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.Hotel2;
+import hcmute.kltn.Backend.model.tour.dto.extend.OneHotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.OneVehicle;
 import hcmute.kltn.Backend.model.tour.dto.extend.Option;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
@@ -947,15 +948,17 @@ public class TourService implements ITourService{
 				tourSearchRes.setTour(oneTourSearchResList.get(0).getTour());
 				
 				// set hotel
-				Hotel hotel = new Hotel();
-				modelMapper.map(oneTourSearchResList.get(0).getHotelList().get(0), hotel);
+				OneHotel hotel2 = new OneHotel();
+				modelMapper.map(oneTourSearchResList.get(0).getHotelList().get(0), hotel2);
+				hotel2.setRoomList(oneTourSearchResList.get(0).getHotelList().get(0).getOptionList().get(0).getRoomList());
 				Option option = new Option();
 				modelMapper.map(oneTourSearchResList.get(0).getHotelList().get(0).getOptionList().get(0), option);
-				tourSearchRes.setHotel(hotel);
+				tourSearchRes.setHotel2(hotel2);
 				
 				// set vehicle
 				OneVehicle vehicle = new OneVehicle();
 				modelMapper.map(oneTourSearchResList.get(0).getVehicleList().get(0), vehicle);
+				vehicle.setCoach(oneTourSearchResList.get(0).getVehicleList().get(0).getOptionList().get(0).getCoachList());
 				int vehiclePriceNotDiscount = oneTourSearchResList.get(0).getVehicleList().get(0).getOptionList().get(0).getTotalPriceNotDiscount();
 				int vehiclePrice = oneTourSearchResList.get(0).getVehicleList().get(0).getOptionList().get(0).getTotalPrice();
 				tourSearchRes.setVehicle(vehicle);
@@ -972,7 +975,6 @@ public class TourService implements ITourService{
 				
 				tourSearchResList.add(tourSearchRes);
 			}
-
 		}
 
 		// get 8 item from tour list

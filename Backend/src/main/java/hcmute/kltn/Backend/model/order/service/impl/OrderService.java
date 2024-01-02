@@ -439,6 +439,8 @@ public class OrderService implements IOrderService{
 					VehicleDetail vehicleDetail = new VehicleDetail();
 					modelMapper.map(itemCoach, vehicleDetail);
 					vehicleDetailList.add(vehicleDetail);
+					
+					totalPrice += itemCoach.getPricePerDay() * tourDTO.getNumberOfDay();
 				}
 			}
 		}
