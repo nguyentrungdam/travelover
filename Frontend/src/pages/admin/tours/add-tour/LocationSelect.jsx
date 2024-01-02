@@ -3,8 +3,10 @@ import axios from "axios";
 import "./AddTours.css";
 const LocationSelect = ({
   onSelectLocation,
+  onSelectLocation2,
   pickProvince,
   searchProvince,
+  searchProvince2,
   english,
 }) => {
   const [cities, setCities] = useState([]);
@@ -42,6 +44,9 @@ const LocationSelect = ({
         district: selectedDistrict,
         commune: selectedWard,
       });
+    }
+    if (onSelectLocation2) {
+      onSelectLocation2(selectedCity);
     }
 
     callAPI(host, setCities, 1);
@@ -90,6 +95,8 @@ const LocationSelect = ({
         >
           {searchProvince ? (
             <option value={searchProvince}>{searchProvince}</option>
+          ) : searchProvince2 ? (
+            <option value="">Chọn tuyến đường ?</option>
           ) : (
             <option value="">Nơi bạn muốn đi ?</option>
           )}

@@ -36,6 +36,9 @@ import ResetPassword from "./pages/client/account/ResetPassword";
 import AddHotelZ from "./pages/enterprise/add-hotelZ/AddHotelZ";
 import UpdateHotelZ from "./pages/enterprise/update-hotelZ/UpdateHotelZ";
 import OrderZList from "./pages/enterprise/orderZ/orders";
+import ZVehicle from "./pages/enterprise/vehicle/ZVehicle";
+import AddVehicleZ from "./pages/enterprise/vehicle/add-vehicle/AddVehicleZ";
+import UpdateVehicleZ from "./pages/enterprise/vehicle/update-vehicle/UpdateVehicleZ";
 
 function App() {
   const { isAuthenticated, role } = useSelector((state) => state.account);
@@ -106,6 +109,9 @@ function App() {
         <Route path="hotelz/add-new" element={<AddHotelZ />} />
         <Route path="hotelz/:id" element={<UpdateHotelZ />} />
         <Route path="orderz" element={<OrderZList />} />
+        <Route path="vehiclez" element={<ZVehicle />} />
+        <Route path="vehiclez/add-new" element={<AddVehicleZ />} />
+        <Route path="vehiclez/:id" element={<UpdateVehicleZ />} />
       </Route>
 
       {/* <Route path="users">
