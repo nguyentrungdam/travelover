@@ -266,6 +266,9 @@ const TourBooking = () => {
                         </b>
                       </span>
                       <span>
+                        Số phòng: <b>{roomIdList?.length}</b>
+                      </span>
+                      <span>
                         Nhà xe:{" "}
                         <b>
                           {tours[0]?.vehicleList

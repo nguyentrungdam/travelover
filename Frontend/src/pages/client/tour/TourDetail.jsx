@@ -152,8 +152,8 @@ const TourDetail = () => {
   const [showRoom, setShowRoom] = useState(false);
   const [showVehicle, setShowVehicle] = useState(true);
   const [showCar, setShowCar] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState(tours[0]?.hotelList[0]);
-  const [selectedCar, setSelectedCar] = useState(tours[0]?.vehicleList[0]);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  const [selectedCar, setSelectedCar] = useState(null);
   const [priceRoom, setPriceRoom] = useState(priceRoom2);
   const [priceCar, setPriceCar] = useState(priceCar2);
   console.log(selectedCar);
@@ -456,11 +456,11 @@ const TourDetail = () => {
                       alt=""
                     />
                     <label>Khách sạn</label>
-                    <p>
+                    {/* <p>
                       {tours[0]?.hotelList[0].ehotelName
                         ? tours[0]?.hotelList[0].ehotelName
                         : selectedHotel?.ehotelName}{" "}
-                    </p>
+                    </p> */}
                   </div>
                   <div className="item">
                     <img
@@ -469,11 +469,11 @@ const TourDetail = () => {
                       alt=""
                     />
                     <label>Nhà xe</label>
-                    <p>
+                    {/* <p>
                       {tours[0]?.vehicleList[0].evehicleName
                         ? tours[0]?.vehicleList[0].evehicleName
                         : selectedCar?.evehicleName}{" "}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
                 <div className="search__bar mb-4 position-relative">
@@ -621,7 +621,7 @@ const TourDetail = () => {
                 </div>
                 {!loading && showHotel && (
                   <div className="list-hotels py-2">
-                    {tours[0]?.hotelList.map((hotel, index) => (
+                    {tours[0]?.hotelList?.map((hotel, index) => (
                       <div
                         key={hotel.ehotelId}
                         className="item-hotel row mx-0 mb-4 wrapper-borderless animate__fadeInUp animate__animated"
@@ -827,7 +827,7 @@ const TourDetail = () => {
 
                 <h2 className="tt ">Thông tin nhà xe</h2>
                 {showVehicle &&
-                  tours[0]?.vehicleList.map((vehicle, index) => (
+                  tours[0]?.vehicleList?.map((vehicle, index) => (
                     <div
                       key={vehicle.evehicleId}
                       className=" item-hotel row mx-0 mb-4 wrapper-borderless animate__fadeInUp animate__animated"

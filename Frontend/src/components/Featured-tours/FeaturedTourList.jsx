@@ -27,11 +27,13 @@ const FeaturedTourList = () => {
     console.log(priceCar);
     const roomId = tours[0]?.hotel2?.roomList[0]?.roomId;
     const roomIdList = roomId ? [roomId] : [];
+    console.log(roomId);
+    console.log(roomIdList);
     if (number === 1) {
       navigate(`/tours/tour-detail/${tour.tourId}`, {
         state: {
           province: tour.address.province,
-          startLocation: tour.address.province,
+          startLocation: "",
           startDate: format(tomorrow, "yyyy-MM-dd"),
           numberOfDay: mapDaysToOptionValue(tour.numberOfDay),
           numberOfAdult: 1,
@@ -45,7 +47,7 @@ const FeaturedTourList = () => {
       navigate(`/tours/tour-booking/${tour.tourId}`, {
         state: {
           province: tour.address.province,
-          startLocation: tour.address.province,
+          startLocation: "",
           startDate: format(tomorrow, "yyyy-MM-dd"),
           numberOfDay: mapDaysToOptionValue(tour.numberOfDay),
           numberOfAdult: 1,
@@ -169,13 +171,13 @@ const FeaturedTourList = () => {
                     <p className="tour-item__departure mb-2">
                       Khách sạn:{" "}
                       <span className="font-weight-bold">
-                        {item.hotel?.hotelName}
+                        {item?.hotel2?.ehotelName}
                       </span>
                     </p>
                     <p className="tour-item__departure mb-2">
-                      Số phòng:{" "}
+                      Nhà xe:{" "}
                       <span className="font-weight-bold">
-                        {item.hotel?.room?.length}
+                        {item?.vehicle?.evehicleName}
                       </span>
                     </p>{" "}
                     <p className="tour-item__departure mb-2">
@@ -209,13 +211,14 @@ const FeaturedTourList = () => {
                                   item?.tour,
                                   2,
                                   item?.hotel2?.roomList[0]?.price *
-                                    (item?.tour.numberOfNight + 0.5) *
+                                    (item?.tour?.numberOfNight + 0.5) *
                                     (1 -
-                                      item?.tour.discount.discountValue / 100),
+                                      item?.tour?.discount?.discountValue /
+                                        100),
                                   item?.vehicle?.coach[0]?.pricePerDay *
-                                    item?.tour.numberOfDay *
+                                    item?.tour?.numberOfDay *
                                     (1 -
-                                      item?.tour.discount.discountValue / 100)
+                                      item?.tour?.discount?.discountValue / 100)
                                 )
                               }
                             >

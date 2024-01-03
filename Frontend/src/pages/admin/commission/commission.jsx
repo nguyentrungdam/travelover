@@ -30,10 +30,16 @@ const columns = [
     type: "string",
   },
   {
-    field: "createdAt2",
+    field: "startDate",
     type: "string",
-    headerName: "Ngày tạo",
-    width: 180,
+    headerName: "Ngày bắt đầu",
+    width: 160,
+  },
+  {
+    field: "endDate",
+    type: "string",
+    headerName: "Ngày kết thúc",
+    width: 200,
   },
   {
     field: "rate",
@@ -53,12 +59,6 @@ const columns = [
       );
     },
   },
-  {
-    field: "lastModifiedAt2",
-    type: "string",
-    headerName: "Ngày sửa đổi",
-    width: 200,
-  },
 ];
 
 const CommissionList = () => {
@@ -76,13 +76,16 @@ const CommissionList = () => {
           tourId: item?.commissionId,
           name: item?.name,
           rate: item?.rate,
-          createdAt2: formatDateAndHour(
-            item?.createdAt2 ? item.createdAt2 : new Date()
-          ),
-          lastModifiedAt2: formatDateAndHour(
-            item?.lastModifiedAt2 ? item.lastModifiedAt2 : new Date()
-          ),
-          status: item.status,
+          endDate:
+            item?.status === true
+              ? "Đang dùng"
+              : item?.endDate
+              ? formatDateAndHour(item?.endDate)
+              : "Chưa dùng",
+          startDate: item?.startDate
+            ? formatDateAndHour(item?.startDate)
+            : "Chưa dùng",
+          status: item?.status,
         }))
       : [];
 
@@ -95,7 +98,7 @@ const CommissionList = () => {
     dispatch(getCommissionDetail(commissionId)).unwrap();
     openModal();
   };
-  console.log(commission);
+  // console.log(commission);
   const openModal = () => {
     setShowModal(true);
     document.body.classList.add("modal-open");
