@@ -7,6 +7,7 @@ import hotelzReducer from "../slices/zhotelSlice";
 import vehiclezReducer from "../slices/zvehicleSlice";
 import discountReducer from "../slices/discountSlice";
 import hotelReducer from "../slices/hotelSlice";
+import commissionReducer from "../slices/commissionSlice";
 // import productReducer from "../slices/productSlice";
 // import categoryReducer from "../slices/categorySlice";
 // import cartReducer from "../slices/cartSlice";
@@ -47,6 +48,7 @@ const store = configureStore({
     tour: tourReducer,
     order: orderReducer,
     discount: discountReducer,
+    commission: commissionReducer,
     hotel: hotelReducer,
     hotelz: hotelzReducer,
     vehiclez: vehiclezReducer,

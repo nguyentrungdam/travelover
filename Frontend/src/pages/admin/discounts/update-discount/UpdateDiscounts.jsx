@@ -8,11 +8,7 @@ import {
   updateDiscount,
 } from "../../../../slices/discountSlice";
 import { useParams } from "react-router-dom";
-import {
-  convertDateFormat,
-  formatDate,
-  validateOriginalDate,
-} from "../../../../utils/validate";
+import { formatDate } from "../../../../utils/validate";
 
 const UpdateDiscount = () => {
   const dispatch = useDispatch();
