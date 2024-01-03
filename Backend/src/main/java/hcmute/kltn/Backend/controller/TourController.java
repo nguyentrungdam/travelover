@@ -77,7 +77,6 @@ public class TourController {
 		});
 	}
 
-	
 	private final String updateTourDescription = "Các field bắt buộc phải nhập:\n\n"
 			+ "- 'tourId': ''\n"
 			+ "- 'tourTitle': ''\n"
@@ -353,16 +352,16 @@ public class TourController {
 		iTourService.updateIsDiscount();
 		List<TourSearchRes2> tourList = iTourService.searchTour2(tourSearch);
 		
-//		List<TourSearchRes> tourFilterList = iTourService.searchFilter(tourFilter, tourList);
-//		
-//		List<TourSearchRes> tourSortList = iTourService.searchSort(tourSort, tourFilterList);
+		List<TourSearchRes2> tourFilterList = iTourService.searchFilter2(tourFilter, tourList);
+		
+		List<TourSearchRes2> tourSortList = iTourService.searchSort2(tourSort, tourFilterList);
 		
 		return iResponseObjectService.success(new Response() {
 			{
 				setMessage("Search tour successfully");
 				setPageSize(Pagination.getPageSize());
 				setPageNumber(Pagination.getPageNumber());
-				setData(tourList);
+				setData(tourSortList);
 			}
 		});
 	}

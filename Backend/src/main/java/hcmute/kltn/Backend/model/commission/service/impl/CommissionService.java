@@ -304,4 +304,18 @@ public class CommissionService implements ICommissionService{
 		commissionRepository.save(commission);
 	}
 
+	
+	@Override
+	public CommissionDTO getCurrentCommission() {
+		List<Commission> commissionList = new ArrayList<>();
+		commissionList.addAll(getAll());
+		for (Commission itemCommission : commissionList) {
+			if (itemCommission.getStatus() == true) {
+				return getCommissionDTO(itemCommission);
+			}
+		}
+		
+		return null;
+	}
+
 }

@@ -33,6 +33,8 @@ public interface ITourService {
 	public List<TourSearchRes> getAllDiscountTour();
 	
 	public List<TourSearchRes2> searchTour2(TourSearch tourSearch);
+	public List<TourSearchRes2> searchFilter2(TourFilter tourFilter, List<TourSearchRes2> tourSearchRes2List);
+	public List<TourSearchRes2> searchSort2(TourSort tourSort, List<TourSearchRes2> tourSearchRes2List);
 	
 	public void updateNumberOfOrdered(String tourId);
 	public void updateIsDiscount();

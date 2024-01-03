@@ -30,10 +30,11 @@ public class OrderDTO extends BaseEntity{
 	private int numberOfChildren; // not null
 	private int numberOfAdult; // not null
 	private String note;
-//	private int price; // not null
 	private int totalPrice;
 	private Discount discount;
 	private int finalPrice; // not null
 	private List<Payment> payment; 
-	private String orderStatus; 
+	private Commission commission;
+	private String reasonCancel;
+	private String orderStatus;  
 }

@@ -22,9 +22,12 @@ import hcmute.kltn.Backend.exception.CustomException;
 import hcmute.kltn.Backend.model.account.dto.AccountDTO;
 import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
+import hcmute.kltn.Backend.model.account.service.IAccountService;
 import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.EOrderStatus;
 import hcmute.kltn.Backend.model.base.Sort;
+import hcmute.kltn.Backend.model.commission.dto.CommissionDTO;
+import hcmute.kltn.Backend.model.commission.service.ICommissionService;
 import hcmute.kltn.Backend.model.discount.dto.DiscountDTO;
 import hcmute.kltn.Backend.model.discount.dto.DiscountUpdate;
 import hcmute.kltn.Backend.model.discount.service.IDiscountService;
@@ -34,6 +37,7 @@ import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceSer
 import hcmute.kltn.Backend.model.hotel.dto.HotelDTO;
 import hcmute.kltn.Backend.model.hotel.dto.extend.Room;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
+import hcmute.kltn.Backend.model.order.dto.Commission;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
@@ -91,6 +95,10 @@ public class OrderService implements IOrderService{
 	private IEVehicleService iEVehicleService;
 	@Autowired
 	private IEHotelService iEHotelService;
+	@Autowired
+	private ICommissionService iCommissionService;
+	@Autowired
+	private IAccountService iAccountService;
 	
 	private String getOrderStatus(String orderStatus) {
 		int index = Integer.valueOf(orderStatus);
@@ -399,6 +407,12 @@ public class OrderService implements IOrderService{
 		
 		long numberOfDay = Math.abs(ChronoUnit.DAYS.between(endDate, orderCreate.getStartDate()));
 		
+		// get commission
+		CommissionDTO commissionDTO = new CommissionDTO();
+		commissionDTO = iCommissionService.getCurrentCommission();
+		Commission commission = new Commission();
+		modelMapper.map(commissionDTO, commission);
+		
 		// get hotel information
 		EHotel eHotel = new EHotel();
 		eHotel = iEHotelService.getDetailEHotel(orderCreate.getHotelId());
@@ -448,6 +462,9 @@ public class OrderService implements IOrderService{
 		orderDetail.setVehicleDetail(vehicleDetailList);		
 		
 		// get guider information
+		commission.setOriginalPrice(totalPrice);
+		commission.setProfit(totalPrice * commissionDTO.getRate() / 100);
+		totalPrice = totalPrice * (100 + commissionDTO.getRate()) / 100;
 		
 		order.setTotalPrice(totalPrice);
 		
@@ -476,6 +493,7 @@ public class OrderService implements IOrderService{
 		order.setDiscount(discount);
 		order.setOrderDetail(orderDetail);
 		order.setFinalPrice(totalPrice);
+		order.setCommission(commission);
 		order.setOrderStatus("create");
 //		order.setOrderStatus(getOrderStatus("1"));
 		
@@ -550,6 +568,8 @@ public class OrderService implements IOrderService{
 
 	@Override
 	public OrderDTO updateOrderStatus(OrderStatusUpdate orderStatusUpdate) {
+
+		
 		// get order from database
 		Order order = new Order();
 		order = getDetail(orderStatusUpdate.getOrderId());
@@ -567,6 +587,12 @@ public class OrderService implements IOrderService{
 		if (order.getOrderStatus().equals("finished")) {
 			throw new CustomException("Can't update status for finished orders");
 		}
+		
+		Account account = iAccountDetailService.getCurrentAccount();
+		if (account.getRole().equals("CUSTOMER") && !orderStatus.equals("canceled")) {
+			throw new CustomException("Customers can only cancel");
+		}
+		
 		// check follow status
 		int orderStatusOld = 0;
 		if (!orderStatus.equals("canceled")) {
@@ -592,14 +618,12 @@ public class OrderService implements IOrderService{
 		if (orderStatus.equals("finished")) {
 			iTourService.updateNumberOfOrdered(order.getOrderDetail().getTourId());
 		}
-		
-
 
 		order.setOrderStatus(orderStatus);
 		
 		// set last modify
 		LocalDate today = LocalDateUtil.getDateNow();
-		Account account = iAccountDetailService.getCurrentAccount();
+		
 		order.setLastModifiedBy(account.getAccountId());
 		order.setLastModifiedAt(today);
 		
@@ -610,30 +634,48 @@ public class OrderService implements IOrderService{
 			VNPayRefund.setVnPaymentId(order.getPayment().get(0).getVnPaymentId());
 			VNPayRefund.setOrderInfo("Hoàn tiền cho đơn hàng bị hủy: " + orderStatusUpdate.getMessage());
 			VNPayRefund.setCreateBy(account.getAccountId());
-			iVNPayService.refundPayment(null, orderStatus);
+			iVNPayService.refundPayment(VNPayRefund, "127.0.0.0");
 			
 			// send mail
-			String discountString = "Để bù đắp, chúng tôi xin gửi tặng Quý khách mã giảm giá: "
-					+ orderStatusUpdate.getDiscountCode() + " cho lần mua hàng tiếp theo. ";
+			AccountDTO accountSendMail = new AccountDTO();
+			accountSendMail = iAccountService.getDetailAccount(order.getCreatedBy());
+			if (account.getRole().equals("CUSTOMER")) {
+				EmailDTO emailDTO = new EmailDTO();
+				emailDTO.setTo(accountSendMail.getEmail());
+				emailDTO.setSubject("Thông báo về việc hủy đơn hàng");
+				emailDTO.setContent("Kính gửi Quý khách,<br>\r\n"
+						+ "<br>\r\n"
+						+ "Chúng tôi rất tiếc phải thông báo rằng đơn hàng của Quý khách đã bị hủy "
+						+ "theo yêu cầu của Quý khách. Chúng tôi rất mong được phục vụ Quý khách trong tương lai.<br>\r\n"
+						+ "<br>\r\n"
+						+ "Trân trọng,<br>\r\n"
+						+ "Đội ngũ Travelover.");
+				iEmailService.sendMail(emailDTO);
+			} else {
+				String discountString = "Để bù đắp, chúng tôi xin gửi tặng Quý khách mã giảm giá: "
+						+ orderStatusUpdate.getDiscountCode() + " cho lần mua hàng tiếp theo. ";
+				
+				EmailDTO emailDTO = new EmailDTO();
+				emailDTO.setTo(accountSendMail.getEmail());
+				emailDTO.setSubject("Thông báo về việc hủy đơn hàng");
+				emailDTO.setContent("Chào Kính gửi Quý khách,<br>\r\n"
+						+ "<br>\r\n"
+						+ "Chúng tôi rất tiếc phải thông báo rằng đơn hàng tour du lịch của Quý khách "
+						+ "(Mã đơn hàng: " + order.getOrderId() + ") đã bị hủy vì lý do: " + orderStatusUpdate.getMessage() + "<br>\r\n"
+						+ "<br>\r\n"
+						+ "Chúng tôi hiểu rằng việc này có thể gây ra sự bất tiện cho Quý khách và chúng tôi xin lỗi vì điều này. "
+						+ discountString
+						+ "Nếu Quý khách có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, "
+						+ "vui lòng liên hệ với chúng tôi qua email này.<br>\r\n"
+						+ "<br>\r\n"
+						+ "Chúng tôi rất mong được phục vụ Quý khách trong tương lai gần.<br>\r\n"
+						+ "<br>\r\n"
+						+ "Trân trọng,<br>\r\n"
+						+ "Đội ngũ Travelover.");
+				iEmailService.sendMail(emailDTO);
+			}
 			
-			EmailDTO emailDTO = new EmailDTO();
-			emailDTO.setTo(order.getCreatedBy());
-			emailDTO.setSubject("Thông báo về việc hủy đơn hàng");
-			emailDTO.setContent("Chào Kính gửi Quý khách,<br>\r\n"
-					+ "<br>\r\n"
-					+ "Chúng tôi rất tiếc phải thông báo rằng đơn hàng tour du lịch của Quý khách "
-					+ "(Mã đơn hàng: " + order.getOrderId() + ") đã bị hủy vì lý do: " + orderStatusUpdate.getMessage() + "<br>\r\n"
-					+ "<br>\r\n"
-					+ "Chúng tôi hiểu rằng việc này có thể gây ra sự bất tiện cho Quý khách và chúng tôi xin lỗi vì điều này. "
-					+ discountString
-					+ "Nếu Quý khách có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, "
-					+ "vui lòng liên hệ với chúng tôi qua email này.<br>\r\n"
-					+ "<br>\r\n"
-					+ "Chúng tôi rất mong được phục vụ Quý khách trong tương lai gần.<br>\r\n"
-					+ "<br>\r\n"
-					+ "Trân trọng,<br>\r\n"
-					+ "Đội ngũ Travelover.");
-			iEmailService.sendMail(emailDTO);
+			order.setReasonCancel(orderStatusUpdate.getMessage());
 		}
 
 		// update order

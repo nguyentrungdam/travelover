@@ -9,6 +9,7 @@ public interface ICommissionService {
 	public CommissionDTO updateCommission(CommissionDTO commissionDTO);
 	public CommissionDTO getDetailCommission(String commissionId);
 	public CommissionDTO enableCommission(String commissionId);
+	public CommissionDTO getCurrentCommission();
 	
 	public void initData(CommissionDTO commissionDTO);
 	

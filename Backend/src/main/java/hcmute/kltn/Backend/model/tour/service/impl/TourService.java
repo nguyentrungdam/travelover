@@ -22,6 +22,8 @@ import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
 import hcmute.kltn.Backend.model.base.image.service.IImageService;
 import hcmute.kltn.Backend.model.base.video.service.IVideoService;
+import hcmute.kltn.Backend.model.commission.dto.CommissionDTO;
+import hcmute.kltn.Backend.model.commission.service.ICommissionService;
 import hcmute.kltn.Backend.model.generatorSequence.dto.GeneratorSequenceDTO;
 import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceService;
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
@@ -88,6 +90,8 @@ public class TourService implements ITourService{
 	private IEHotelService IEHotelService;
 	@Autowired
 	private IEVehicleService iEVehicleService;
+	@Autowired
+	private ICommissionService iCommissionService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -1368,6 +1372,10 @@ public class TourService implements ITourService{
 		
 		// search with number of people
 		
+		// get commission
+		CommissionDTO commissionDTO = new CommissionDTO();
+		commissionDTO = iCommissionService.getCurrentCommission();
+		
 		// create result
 		List<TourSearchRes2> tourSearchRes2List = new ArrayList<>(); 
 		for(Tour itemTour : tourList) {
@@ -1380,6 +1388,10 @@ public class TourService implements ITourService{
 			tourSearchRes2.setTour(tour);
 			totalPrice = (tourSearch.getNumberOfAdult() * itemTour.getPriceOfAdult())
 							+ (tourSearch.getNumberOfChildren() * itemTour.getPriceOfChildren());
+			
+
+			totalPrice = totalPrice * (100 + commissionDTO.getRate()) / 100;
+			
 			tourSearchRes2.setTourPriceNotDiscount(totalPrice);
 			if (itemTour.getDiscount().getIsDiscount() == true) {
 				tourSearchRes2.setTourPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
@@ -1430,11 +1442,14 @@ public class TourService implements ITourService{
 							room2List.add(room2);
 						}
 						option.setRoomList(room2List);
-						option.setTotalPriceNotDiscount(itemRoomSearchRes.getTotalPrice());
+						
+						totalPrice = itemRoomSearchRes.getTotalPrice() * (100 + commissionDTO.getRate()) / 100;
+						
+						option.setTotalPriceNotDiscount(totalPrice);
 						if (itemTour.getDiscount().getIsDiscount() == true) {
-							option.setTotalPrice(itemRoomSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+							option.setTotalPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
 						} else {
-							option.setTotalPrice(itemRoomSearchRes.getTotalPrice());
+							option.setTotalPrice(totalPrice);
 						}
 						optionRoomList.add(option);
 					}
@@ -1509,11 +1524,14 @@ public class TourService implements ITourService{
 							coachList.add(coach);
 						}
 						coachOption.setCoachList(coachList);
-						coachOption.setTotalPriceNotDiscount(itemCoachSearchRes.getTotalPrice());
+						
+						totalPrice = itemCoachSearchRes.getTotalPrice() * (100 + commissionDTO.getRate()) / 100;
+						
+						coachOption.setTotalPriceNotDiscount(totalPrice);
 						if (itemTour.getDiscount().getIsDiscount() == true) {
-							coachOption.setTotalPrice(itemCoachSearchRes.getTotalPrice() * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+							coachOption.setTotalPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
 						} else {
-							coachOption.setTotalPrice(itemCoachSearchRes.getTotalPrice());
+							coachOption.setTotalPrice(totalPrice);
 						}
 						
 						optionCoachList.add(coachOption);
@@ -1551,6 +1569,125 @@ public class TourService implements ITourService{
 //                return result;
 //            }
 //        });
+
+		return tourSearchRes2List;
+	}
+
+	@Override
+	public List<TourSearchRes2> searchFilter2(TourFilter tourFilter, List<TourSearchRes2> tourSearchRes2List) {
+		try {
+			// price filter
+			int minPrice = Integer.valueOf(tourFilter.getMinPrice());
+			int maxPrice = Integer.valueOf(tourFilter.getMaxPrice());
+			if (minPrice >= 0 && maxPrice >= minPrice) {
+				List<TourSearchRes2> tourSearchResListClone = new ArrayList<>();
+				tourSearchResListClone.addAll(tourSearchRes2List);
+				for (TourSearchRes2 itemTourSearchRes2 : tourSearchResListClone) {
+					int totalPrice = 
+							itemTourSearchRes2.getTourPrice() 
+							+ itemTourSearchRes2.getHotelList().get(0).getOptionList().get(0).getTotalPrice()
+							+ itemTourSearchRes2.getVehicleList().get(0).getOptionList().get(0).getTotalPrice();
+					if (totalPrice < minPrice || totalPrice > maxPrice) {
+						tourSearchRes2List.remove(itemTourSearchRes2);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search filter min max: " + e.getMessage());
+		}
+		
+		try {
+			// rating filter
+			int ratingFilter = Integer.valueOf(tourFilter.getRatingFilter());
+			if (ratingFilter >= 1 && ratingFilter <= 5) {
+				List<TourSearchRes2> tourSearchResListClone = new ArrayList<>();
+				tourSearchResListClone.addAll(tourSearchRes2List);
+				for (TourSearchRes2 itemTourSearchRes2 : tourSearchResListClone) {
+					if (itemTourSearchRes2.getTour().getRate() < ratingFilter) {
+						tourSearchRes2List.remove(itemTourSearchRes2);
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search filter rating: " + e.getMessage());
+		}
+		
+		return tourSearchRes2List;
+	}
+
+	@Override
+	public List<TourSearchRes2> searchSort2(TourSort tourSort, List<TourSearchRes2> tourSearchRes2List) {
+		// sort by popular
+		try {
+			if (tourSort.getSortBy().equals("popular")) {
+				Collections.sort(tourSearchRes2List, new Comparator<TourSearchRes2>() {
+		            @Override
+		            public int compare(TourSearchRes2 e1, TourSearchRes2 e2) {
+		            	int result = 0;
+		            	if (tourSort.getOrder().equals("asc")) {
+		            		result = Integer.compare(e1.getTour().getNumberOfOrdered(), e2.getTour().getNumberOfOrdered());
+		            	} else if (tourSort.getOrder().equals("desc")) {
+		            		result = Integer.compare(e2.getTour().getNumberOfOrdered(), e1.getTour().getNumberOfOrdered());
+		            	} else {
+		            		result = 0;
+		            	}
+		                return result;
+		            }
+		        });
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search sort by popular: " + e.getMessage());
+		}
+		
+		// sort by price
+		try {
+			if (tourSort.getSortBy().equals("price")) {
+				Collections.sort(tourSearchRes2List, new Comparator<TourSearchRes2>() {
+		            @Override
+		            public int compare(TourSearchRes2 e1, TourSearchRes2 e2) {
+						int totalPrice1 = 
+								e1.getTourPrice() 
+								+ e1.getHotelList().get(0).getOptionList().get(0).getTotalPrice()
+								+ e1.getVehicleList().get(0).getOptionList().get(0).getTotalPrice();
+						
+						int totalPrice2 = 
+								e2.getTourPrice() 
+								+ e2.getHotelList().get(0).getOptionList().get(0).getTotalPrice()
+								+ e2.getVehicleList().get(0).getOptionList().get(0).getTotalPrice();
+		            	
+		            	int result = 0;
+		            	if (tourSort.getOrder().equals("asc")) {
+		            		result = Integer.compare(totalPrice1, totalPrice2);
+		            	} else if (tourSort.getOrder().equals("desc")) {
+		            		result = Integer.compare(totalPrice2, totalPrice1);
+		            	} else {
+		            		result = 0;
+		            	}
+		                return result;
+		            }
+		        });
+			}
+		} catch (Exception e) {
+			System.out.println("Tour search sort by price: " + e.getMessage());
+		}
+		
+		// sort by promotion
+		try {	
+//		if (tourSort.getSortBy().equals("promotion")) {
+//			Collections.sort(tourSearchResList, new Comparator<TourSearchRes>() {
+//	            @Override
+//	            public int compare(TourSearchRes e1, TourSearchRes e2) {
+//	                int result = Integer.compare(e1.getTour().getNumberOfOrdered(), e2.getTour().getNumberOfOrdered());
+////		                if (result == 0) {
+////		                    result = e1.field2.compareTo(e2.field2);
+////		                }
+//	                return result;
+//	            }
+//	        });
+//		}	
+		} catch (Exception e) {
+			System.out.println("Tour search sort by promotion: " + e.getMessage());
+		}
 
 		return tourSearchRes2List;
 	}

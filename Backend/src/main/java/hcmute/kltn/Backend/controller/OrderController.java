@@ -36,7 +36,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 		description = "APIs for managing orders\n\n"
 				+ "__03/01/2024__\n\n"
 				+ "__1:40AM__\n\n"
-				+ "Cập nhật: api order create đã fix để hoạt động lại, phải nhập thêm vehicleId và coachIdList nha",
+				+ "Cập nhật: api order create đã fix để hoạt động lại, phải nhập thêm vehicleId và coachIdList nha\n\n"
+				+ "__7:00AM__\n\n"
+				+ "Cập nhật: api status update, nếu là customer thì bắt buộc nhập lý do hủy đơn vào message",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
@@ -99,8 +101,9 @@ public class OrderController {
 			+ "- 3 : underway\n"
 			+ "- 4 : finished\n";
 	@RequestMapping(value = "/status/update", method = RequestMethod.PUT)
-	@Operation(summary = "Update order status - ADMIN / STAFF", description = updateOrderStatus)
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	@Operation(summary = "Update order status - ADMIN / STAFF / CUSTOMER", description = updateOrderStatus)
+//	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	@PreAuthorize("isAuthenticated()")
 	ResponseEntity<ResponseObject> updateOrderStatus(
 			@RequestBody OrderStatusUpdate orderStatusUpdate) {
 		OrderDTO orderDTO = iOrderService.updateOrderStatus(orderStatusUpdate);
