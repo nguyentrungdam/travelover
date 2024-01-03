@@ -30,7 +30,7 @@ const toursApi = {
     return axios.get(url);
   },
   searchTour2: (tour) => {
-    const url = `/tours/search2?keyword=${tour.keyword}&province=${tour.province}&startDate=${tour.startDate}&numberOfDay=${tour.numberOfDay}&numberOfAdult=${tour.numberOfAdult}&numberOfChildren=${tour.numberOfChildren}&numberOfRoom=${tour.numberOfRoom}&pageSize=${tour.pageSize}&pageNumber=${tour.pageNumber}&minPrice=${tour.minPrice}&maxPrice=${tour.maxPrice}&ratingFilter=${tour.ratingFilter}&sortBy=${tour.sortBy}&order=${tour.order}`;
+    const url = `/tours/search2?keyword=${tour.keyword}&startLocation=${tour.startLocation}&province=${tour.province}&startDate=${tour.startDate}&numberOfDay=${tour.numberOfDay}&numberOfAdult=${tour.numberOfAdult}&numberOfChildren=${tour.numberOfChildren}&numberOfRoom=${tour.numberOfRoom}&pageSize=${tour.pageSize}&pageNumber=${tour.pageNumber}&minPrice=${tour.minPrice}&maxPrice=${tour.maxPrice}&ratingFilter=${tour.ratingFilter}&sortBy=${tour.sortBy}&order=${tour.order}`;
     return axios.get(url);
   },
   searchTourAdmin: (tour) => {

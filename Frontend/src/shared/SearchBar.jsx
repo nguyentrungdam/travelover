@@ -28,10 +28,12 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
   const [numberOfAdult, setNumberOfAdult] = useState(1);
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const [numberOfRoom, setNumberOfRoom] = useState(1);
-  const [selectedLocation, setSelectedLocation] = useState("");
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
   const handleSearch = () => {
     const newState = {
-      selectedLocation,
+      startLocation,
+      endLocation,
       startDate,
       numberOfDay,
       numberOfAdult,
@@ -39,6 +41,7 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
       numberOfRoom,
       selectedDate,
     };
+    // console.log(newState);
     if (isTours) {
       updateParentState(newState);
       onSearch(newState);
@@ -54,7 +57,10 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
   };
 
   const handleSelectLocation = (location) => {
-    setSelectedLocation(location);
+    setEndLocation(location);
+  };
+  const handleSelectLocation3 = (location) => {
+    setStartLocation(location);
   };
   const handleOption = (category, operation) => {
     if (operation === "decrease") {
@@ -92,13 +98,24 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
     };
   }, []);
   return (
-    <Col lg="12">
+    <Col lg="12" className="mt-5">
       <div className="search__bar">
         <div className="headerSearch ">
+          <div className="headerSearchItem form__group-fast ratatata">
+            <FontAwesomeIcon className="icon-search" icon={faLocationDot} />
+            <div className="headerSearch-location">
+              <h5>Điểm đi</h5>
+              <LocationSelect
+                onSelectLocation3={handleSelectLocation3}
+                pickProvince
+                searchProvince3
+              />
+            </div>
+          </div>
           <div className="headerSearchItem form__group-fast">
             <FontAwesomeIcon className="icon-search" icon={faLocationDot} />
             <div className="headerSearch-location">
-              <h5>Địa điểm</h5>
+              <h5>Điểm đến</h5>
               <LocationSelect
                 onSelectLocation={handleSelectLocation}
                 pickProvince
@@ -120,7 +137,7 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
               />
             </div>
           </div>
-          <div className="headerSearchItem form__group-fast">
+          <div className="headerSearchItem form__group-fast pe-3">
             <FontAwesomeIcon icon={faCalendarDays} className="icon-search" />
             <div className="headerSearch-date">
               <h5>Số ngày </h5>
@@ -138,7 +155,7 @@ const SearchBar = ({ isTours, parentState, updateParentState, onSearch }) => {
               </select>
             </div>
           </div>
-          <div className="headerSearchItem headerSearchItem1 ">
+          <div className="headerSearchItem  ">
             <FontAwesomeIcon icon={faPeopleGroup} className="icon-search" />
             <div className="headerSearch-location w280">
               <h5>Số người</h5>

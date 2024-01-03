@@ -37,7 +37,7 @@ const Home = () => {
           <a href="#hot-sale" className="announcement__link">
             <span className="announcement__text">
               Siêu sale giáng sinh, nhanh tay áp mã{" "}
-              <span className="text-voucher">NOEL200K</span> số lượng có hạn!{" "}
+              <span className="text-voucher">SALE200K</span> số lượng có hạn!{" "}
             </span>
           </a>
         </div>

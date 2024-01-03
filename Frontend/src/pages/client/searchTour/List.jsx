@@ -33,11 +33,13 @@ const List = () => {
   const dispatch = useDispatch();
   const { loading, tours, totalData } = useSelector((state) => state.tour);
   const [province, setProvince] = useState(
-    location.state.selectedLocation
-      ? location.state.selectedLocation.province
-      : ""
+    location.state.endLocation ? location.state.endLocation.province : ""
+  );
+  const [startLocation, setStartLocation] = useState(
+    location.state.startLocation ? location.state.startLocation.province : ""
   );
   const [province2, setProvince2] = useState("");
+  const [startLocation2, setStartLocation2] = useState("");
   const [startDate, setStartDate] = useState(location.state.startDate);
   const [numberOfDay, setNumberOfDay] = useState(location.state.numberOfDay);
   const [numberOfAdult, setNumberOfAdult] = useState(
@@ -68,6 +70,7 @@ const List = () => {
     await dispatch(
       searchTour2({
         keyword: "",
+        startLocation: startLocation2 ? startLocation2 : startLocation,
         province,
         startDate,
         numberOfDay,
@@ -85,13 +88,16 @@ const List = () => {
     ).unwrap();
     window.scrollTo(0, 0);
   };
-  console.log(totalData);
+  console.log(startLocation);
+  console.log(province);
 
   useEffect(() => {
-    setProvince(location.state.selectedLocation.province);
+    setStartLocation(location.state.startLocation.province);
+    setProvince(location.state.endLocation.province);
     const res = dispatch(
       searchTour2({
         keyword: "",
+        startLocation,
         province,
         startDate,
         numberOfDay,
@@ -133,6 +139,9 @@ const List = () => {
   const handleSelectLocation = (location) => {
     setProvince(location.province);
   };
+  const handleSelectLocation3 = (location) => {
+    setStartLocation2(location.province);
+  };
 
   const handleDateChange = (date) => {
     const formattedDisplayDate = format(date, "yyyy-MM-dd");
@@ -159,27 +168,40 @@ const List = () => {
     }
   };
 
-  const handleViewDetailOrPayNow = (tourId, number) => {
+  const handleViewDetailOrPayNow = (tourId, number, priceRoom, priceCar) => {
+    const roomList = tours[0]?.hotelList[0]?.optionList[0]?.roomList;
+    const roomIdList = roomList ? roomList.map((room) => room.roomId) : [];
+
     if (number === 1) {
       navigate(`/tours/tour-detail/${tourId}`, {
         state: {
-          province: province || location.state.province,
+          province: province2 ? province2 : province,
+          startLocation: startLocation2 ? startLocation2 : startLocation,
           startDate,
+          selectedDate,
           numberOfDay,
           numberOfAdult,
           numberOfChildren,
           numberOfRoom,
+          priceRoom: priceRoom,
+          priceCar: priceCar,
         },
       });
     } else {
       navigate(`/tours/tour-booking/${tourId}`, {
         state: {
-          province: province || location.state.province,
+          province: province2 ? province2 : province,
+          startLocation: startLocation2 ? startLocation2 : startLocation,
           startDate,
           numberOfDay,
           numberOfAdult,
           numberOfChildren,
           numberOfRoom,
+          priceRoom: priceRoom,
+          priceCar: priceCar,
+          vehicleId: tours[0]?.vehicleList[0].evehicleId,
+          hotelId: tours[0]?.hotelList[0].ehotelId,
+          roomIdList,
         },
       });
     }
@@ -190,6 +212,7 @@ const List = () => {
     dispatch(
       searchTour2({
         keyword: "",
+        startLocation: startLocation2 ? startLocation2 : startLocation,
         province: location,
         startDate,
         numberOfDay,
@@ -211,6 +234,7 @@ const List = () => {
       await dispatch(
         searchTour2({
           keyword: "",
+          startLocation: startLocation2 ? startLocation2 : startLocation,
           province: province2 ? province2 : province,
           startDate,
           numberOfDay,
@@ -241,13 +265,26 @@ const List = () => {
             <div className="sidebar-inner">
               <h2 className="page-title d-none">Bộ lọc tìm kiếm</h2>
               <div>
-                <div className="tour-search-result__filter__heading  px-1 py-2 d-flex justify-content-between align-items-center">
+                <div className=" px-1 py-1 d-flex justify-content-between align-items-center position-relative">
+                  <h5 className="s-title me-1 mt-1 ">Điểm đi: </h5>
+                  <LocationSelect
+                    searchProvince={
+                      startLocation2
+                        ? startLocation2
+                        : location.state.startLocation.province
+                    }
+                    onSelectLocation3={handleSelectLocation3}
+                    pickProvince
+                  />
+                </div>
+
+                <div className="tour-search-result__filter__heading  px-1 py-1 d-flex justify-content-between align-items-center">
                   <h5 className="s-title me-1 mt-1 ">Điểm đến: </h5>
                   <LocationSelect
                     searchProvince={
                       province2
                         ? province2
-                        : location.state.selectedLocation.province
+                        : location.state.endLocation.province
                     }
                     onSelectLocation={handleSelectLocation}
                     pickProvince
@@ -528,13 +565,13 @@ const List = () => {
                           <p className="tour-item__departure mb-2">
                             Khách sạn:{" "}
                             <span className="font-weight-bold">
-                              {item.hotel?.hotelName}
+                              {item.hotelList[0]?.ehotelName}
                             </span>
                           </p>
                           <p className="tour-item__departure mb-2">
-                            Số phòng:{" "}
+                            Nhà xe:{" "}
                             <span className="font-weight-bold">
-                              {item.hotel?.room?.length}
+                              {item.vehicleList[0].evehicleName}
                             </span>
                           </p>{" "}
                           <p className="tour-item__departure mb-2">
@@ -548,12 +585,23 @@ const List = () => {
                             <div className="tour-item__price__wrapper">
                               <div className=" ">
                                 <span className="tour-item__price--current__number pe-2 mb-0">
-                                  {formatCurrencyWithoutD(item?.totalPrice)}₫
+                                  {formatCurrencyWithoutD(
+                                    item?.tourPrice +
+                                      item?.hotelList[0]?.optionList[0]
+                                        ?.totalPrice +
+                                      item?.vehicleList[0]?.optionList[0]
+                                        ?.totalPrice
+                                  )}
+                                  ₫
                                 </span>
                                 {item.tour?.discount.isDiscount ? (
                                   <span className="tour-item__price--old pe-2 mb-0">
                                     {formatCurrencyWithoutD(
-                                      item?.totalPriceNotDiscount
+                                      item?.tourPriceNotDiscount +
+                                        item?.hotelList[0]?.optionList[0]
+                                          ?.totalPriceNotDiscount +
+                                        item?.vehicleList[0]?.optionList[0]
+                                          ?.totalPriceNotDiscount
                                     )}
                                     ₫
                                   </span>
@@ -566,7 +614,11 @@ const List = () => {
                                     onClick={() =>
                                       handleViewDetailOrPayNow(
                                         item.tour?.tourId,
-                                        2
+                                        2,
+                                        item?.hotelList[0]?.optionList[0]
+                                          ?.totalPrice,
+                                        item?.vehicleList[0]?.optionList[0]
+                                          ?.totalPrice
                                       )
                                     }
                                   >
@@ -582,7 +634,11 @@ const List = () => {
                                   onClick={() =>
                                     handleViewDetailOrPayNow(
                                       item.tour?.tourId,
-                                      1
+                                      1,
+                                      item?.hotelList[0]?.optionList[0]
+                                        ?.totalPrice,
+                                      item?.vehicleList[0]?.optionList[0]
+                                        ?.totalPrice
                                     )
                                   }
                                 >

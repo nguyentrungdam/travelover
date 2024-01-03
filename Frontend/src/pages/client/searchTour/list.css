@@ -399,3 +399,19 @@ strong {
 .li:hover {
   background-color: pink;
 }
+.ratatata:hover::before {
+  content: "Nếu không chọn thì mặc định điểm đi sẽ cùng chỗ với điểm đến";
+  position: absolute;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  z-index: 1;
+  white-space: nowrap;
+  bottom: -50px; /* Điều chỉnh vị trí theo yêu cầu */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 1;
+  transition: opacity 0.3s;
+  font-size: 12px;
+}

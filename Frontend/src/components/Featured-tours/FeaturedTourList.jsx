@@ -22,27 +22,40 @@ const FeaturedTourList = () => {
   console.log(tours);
   const tomorrow = addDays(new Date(), 1);
 
-  const handleViewDetailOrPayNow = (tour, number) => {
+  const handleViewDetailOrPayNow = (tour, number, priceRoom, priceCar) => {
+    console.log(priceRoom);
+    console.log(priceCar);
+    const roomId = tours[0]?.hotel2?.roomList[0]?.roomId;
+    const roomIdList = roomId ? [roomId] : [];
     if (number === 1) {
       navigate(`/tours/tour-detail/${tour.tourId}`, {
         state: {
           province: tour.address.province,
+          startLocation: tour.address.province,
           startDate: format(tomorrow, "yyyy-MM-dd"),
           numberOfDay: mapDaysToOptionValue(tour.numberOfDay),
           numberOfAdult: 1,
           numberOfChildren: 0,
           numberOfRoom: 1,
+          priceRoom: priceRoom,
+          priceCar: priceCar,
         },
       });
     } else {
       navigate(`/tours/tour-booking/${tour.tourId}`, {
         state: {
           province: tour.address.province,
+          startLocation: tour.address.province,
           startDate: format(tomorrow, "yyyy-MM-dd"),
           numberOfDay: mapDaysToOptionValue(tour.numberOfDay),
           numberOfAdult: 1,
           numberOfChildren: 0,
           numberOfRoom: 1,
+          priceRoom: priceRoom,
+          priceCar: priceCar,
+          vehicleId: tours[0]?.vehicle.evehicleId,
+          hotelId: tours[0]?.hotel2.ehotelId,
+          roomIdList,
         },
       });
     }
@@ -192,7 +205,18 @@ const FeaturedTourList = () => {
                             <div
                               className=" btn-sm btnOptionTour"
                               onClick={() =>
-                                handleViewDetailOrPayNow(item.tour, 2)
+                                handleViewDetailOrPayNow(
+                                  item?.tour,
+                                  2,
+                                  item?.hotel2?.roomList[0]?.price *
+                                    (item?.tour.numberOfNight + 0.5) *
+                                    (1 -
+                                      item?.tour.discount.discountValue / 100),
+                                  item?.vehicle?.coach[0]?.pricePerDay *
+                                    item?.tour.numberOfDay *
+                                    (1 -
+                                      item?.tour.discount.discountValue / 100)
+                                )
                               }
                             >
                               <FontAwesomeIcon
@@ -205,7 +229,18 @@ const FeaturedTourList = () => {
                           <div
                             className="btn-block"
                             onClick={() =>
-                              handleViewDetailOrPayNow(item.tour, 1)
+                              handleViewDetailOrPayNow(
+                                item?.tour,
+                                1,
+                                item?.hotel2?.roomList[0]?.price *
+                                  (item?.tour?.numberOfNight + 0.5) *
+                                  (1 -
+                                    item?.tour?.discount?.discountValue / 100),
+                                item?.vehicle?.coach[0]?.pricePerDay *
+                                  item?.tour?.numberOfDay *
+                                  (1 -
+                                    item?.tour?.discount?.discountValue / 100)
+                              )
                             }
                           >
                             Xem chi tiết

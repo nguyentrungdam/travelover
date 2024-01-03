@@ -4,7 +4,7 @@ import Header from "../../../components/Header/Header";
 import Footer from "../../../components/Footer/Footer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarMinus, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { searchTour } from "../../../slices/tourSlice";
+import { searchTour, searchTour2 } from "../../../slices/tourSlice";
 import { useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { orderTour } from "../../../slices/orderSlice";
@@ -35,11 +35,20 @@ const TourBooking = () => {
 
   const { state } = location;
   const province = state.province;
+  const startLocation = state.startLocation || "";
   const startDate = state.startDate;
   const numberOfDay = state.numberOfDay;
   const numberOfAdult = state.numberOfAdult;
   const numberOfChildren = state.numberOfChildren;
   const numberOfRoom = state.numberOfRoom;
+  const priceRoom = state.priceRoom;
+  const priceCar = state.priceCar;
+  const vehicleId = state.vehicleId;
+  const hotelId = state.hotelId;
+  const roomIdList = state.roomIdList;
+  console.log(vehicleId);
+  console.log(hotelId);
+  console.log(roomIdList);
   const [adultArray, setAdultArray] = useState(
     Array.from({ length: numberOfAdult - 1 }, (_, index) => ({
       fullName: "",
@@ -59,9 +68,10 @@ const TourBooking = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     const res = dispatch(
-      searchTour({
+      searchTour2({
         keyword: tourId,
         province,
+        startLocation,
         startDate,
         numberOfDay,
         numberOfAdult,
@@ -73,6 +83,7 @@ const TourBooking = () => {
     ).unwrap();
   }, []);
 
+  console.log(tours);
   useEffect(() => {
     // Combine both adultArray and childrenArray into one member array
     const combinedArray = [...adultArray, ...childrenArray];
@@ -87,7 +98,7 @@ const TourBooking = () => {
     }));
   }, [externalMember]);
 
-  // console.log(tours);
+  console.log(tours);
   // validate date
   const startDateString = new Date(startDate);
   const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
@@ -160,10 +171,10 @@ const TourBooking = () => {
         orderTour({
           startDate: startDate,
           tourId,
-          hotelId: tours[0]?.hotel?.hotelId,
-          roomIdList: tours[0]?.hotel?.room.map((room) => room.roomId),
-          vehivleId: "",
-          carIdList: [],
+          hotelId,
+          roomIdList,
+          vehivleId: vehicleId,
+          coachIdList: ["1"],
           guiderId: "",
           personIdList: [],
           customerInformation,
@@ -214,9 +225,7 @@ const TourBooking = () => {
     setTotalSaleOff(0);
   };
   console.log(customerInformation);
-  const totalRoom = tours[0]?.hotel?.room.reduce((accumulator, currentRoom) => {
-    return accumulator + currentRoom.price;
-  }, 0);
+
   return (
     <div>
       <Header />
@@ -249,10 +258,20 @@ const TourBooking = () => {
                         Điểm đến: <b>{tours[0]?.tour?.address?.province}</b>
                       </span>
                       <span>
-                        Khách sạn: <b>{tours[0]?.hotel?.hotelName}</b>
+                        Khách sạn:{" "}
+                        <b>
+                          {tours[0]?.hotelList
+                            ? tours[0]?.hotelList[0]?.ehotelName
+                            : ""}
+                        </b>
                       </span>
                       <span>
-                        Số lượng phòng: <b>{tours[0]?.hotel?.room.length}</b>
+                        Nhà xe:{" "}
+                        <b>
+                          {tours[0]?.vehicleList
+                            ? tours[0]?.vehicleList[0]?.evehicleName
+                            : ""}
+                        </b>
                       </span>
                     </div>
                   </div>
@@ -588,76 +607,34 @@ const TourBooking = () => {
                       </tr>
 
                       <tr>
-                        <td>
-                          Người lớn:{" "}
-                          <span className=" text-right ">{numberOfAdult}</span>
-                        </td>
+                        <td>Giá tour: </td>
                         <td className="t-price text-right">
-                          {formatCurrencyWithoutD(
-                            tours[0]?.tour?.priceOfAdult * numberOfAdult
-                          )}
-                          ₫
+                          {formatCurrencyWithoutD(tours[0]?.tourPrice)}₫
                         </td>
                       </tr>
-                      {numberOfChildren > 0 ? (
-                        <tr>
-                          <td>
-                            Trẻ em:{" "}
-                            <span className="text-right">
-                              {numberOfChildren}
-                            </span>
-                          </td>
-                          <td className="text-right">
-                            {" "}
-                            {formatCurrencyWithoutD(
-                              tours[0]?.tour?.priceOfChildren * numberOfChildren
-                            )}
-                            ₫
-                          </td>
-                        </tr>
-                      ) : null}
+
                       <tr>
-                        <td>
-                          Giá phòng:{" "}
-                          <span className="text-right">
-                            {tours[0]?.tour?.numberOfDay} ngày{" "}
-                            {tours[0]?.tour?.numberOfNight} đêm
-                          </span>
-                        </td>
+                        <td>Giá khách sạn: </td>
                         <td className="text-right">
-                          {formatCurrencyWithoutD(
-                            totalRoom * tours[0]?.tour?.numberOfDay
-                          )}
-                          ₫
+                          {formatCurrencyWithoutD(priceRoom)}₫
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Giá phương tiện: </td>
+                        <td className="text-right">
+                          {formatCurrencyWithoutD(priceCar)}₫
                         </td>
                       </tr>
                       <tr>
                         <td>Tổng</td>
                         <td className="text-right">
                           {formatCurrencyWithoutD(
-                            tours[0]?.totalPriceNotDiscount
+                            tours[0]?.tourPrice + priceRoom + priceCar
                           )}
                           ₫
                         </td>
                       </tr>
-                      {tours[0]?.tour?.discount.isDiscount ? (
-                        <tr>
-                          <td>
-                            Giảm giá:{" "}
-                            <span className="text-right">
-                              {tours[0]?.tour?.discount.discountValue}%
-                            </span>
-                          </td>
-                          <td className="text-right">
-                            -
-                            {formatCurrencyWithoutD(
-                              (tours[0]?.tour?.discount.discountValue / 100) *
-                                tours[0]?.totalPriceNotDiscount
-                            )}
-                            ₫
-                          </td>
-                        </tr>
-                      ) : null}
+
                       <tr className="cuppon position-relative ">
                         <td>Mã giảm giá </td>
                         <td className="cp-form text-right ">
@@ -709,15 +686,22 @@ const TourBooking = () => {
                         <td className="t-price text-right" id="TotalPrice">
                           {totalSaleOff && !errorMessage ? (
                             <span className="tour-item__price--old pe-2 mb-0">
-                              {formatCurrencyWithoutD(tours[0]?.totalPrice)}₫
+                              {formatCurrencyWithoutD(
+                                tours[0]?.tourPrice + priceRoom + priceCar
+                              )}
+                              ₫
                             </span>
                           ) : null}
                           {totalSaleOff && !errorMessage
                             ? formatCurrencyWithoutD(
-                                tours[0]?.totalPrice - totalSaleOff
+                                tours[0]?.tourPrice +
+                                  priceRoom +
+                                  priceCar -
+                                  totalSaleOff
                               ) + "₫"
-                            : formatCurrencyWithoutD(tours[0]?.totalPrice) +
-                              "₫"}
+                            : formatCurrencyWithoutD(
+                                tours[0]?.tourPrice + priceRoom + priceCar
+                              ) + "₫"}
                         </td>
                       </tr>
                     </tbody>
