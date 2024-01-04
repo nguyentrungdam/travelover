@@ -1290,6 +1290,7 @@ public class TourService implements ITourService{
 		List<Tour> tourListClone = new ArrayList<>();
 		int totalPriceNotDiscount = 0;
 		int totalPrice = 0;
+		double priceTemp = 0;
 		
 		if(tourSearch.getKeyword() != null) {
 			tourList = search(tourSearch.getKeyword());
@@ -1392,11 +1393,13 @@ public class TourService implements ITourService{
 							+ (tourSearch.getNumberOfChildren() * itemTour.getPriceOfChildren());
 			
 
-			totalPrice = totalPrice * (100 + commissionDTO.getRate()) / 100;
+			priceTemp = (double)totalPrice * (100 + commissionDTO.getRate()) / 100;
+			totalPrice = (int)priceTemp;
 			
 			tourSearchRes2.setTourPriceNotDiscount(totalPrice);
 			if (itemTour.getDiscount().getIsDiscount() == true) {
-				tourSearchRes2.setTourPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+				priceTemp = (double)totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100;
+				tourSearchRes2.setTourPrice((int)priceTemp);
 			} else {
 				tourSearchRes2.setTourPrice(totalPrice);
 			};
@@ -1445,11 +1448,13 @@ public class TourService implements ITourService{
 						}
 						option.setRoomList(room2List);
 						
-						totalPrice = itemRoomSearchRes.getTotalPrice() * (100 + commissionDTO.getRate()) / 100;
+						priceTemp = (double)itemRoomSearchRes.getTotalPrice() * (100 + commissionDTO.getRate()) / 100;
+						totalPrice = (int)priceTemp;
 						
 						option.setTotalPriceNotDiscount(totalPrice);
 						if (itemTour.getDiscount().getIsDiscount() == true) {
-							option.setTotalPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+							priceTemp = (double)totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100;
+							option.setTotalPrice((int)priceTemp);
 						} else {
 							option.setTotalPrice(totalPrice);
 						}
@@ -1527,11 +1532,13 @@ public class TourService implements ITourService{
 						}
 						coachOption.setCoachList(coachList);
 						
-						totalPrice = itemCoachSearchRes.getTotalPrice() * (100 + commissionDTO.getRate()) / 100;
+						priceTemp = (double)itemCoachSearchRes.getTotalPrice() * (100 + commissionDTO.getRate()) / 100;
+						totalPrice = (int)priceTemp;
 						
 						coachOption.setTotalPriceNotDiscount(totalPrice);
 						if (itemTour.getDiscount().getIsDiscount() == true) {
-							coachOption.setTotalPrice(totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100);
+							priceTemp = (double)totalPrice * (100 - itemTour.getDiscount().getDiscountValue()) / 100;
+							coachOption.setTotalPrice((int)priceTemp);
 						} else {
 							coachOption.setTotalPrice(totalPrice);
 						}

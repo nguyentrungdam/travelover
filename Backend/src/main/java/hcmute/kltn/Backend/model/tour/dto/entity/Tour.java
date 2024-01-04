@@ -48,6 +48,7 @@ public class Tour extends BaseEntity{
 	private double rate;
 	private List<Reviewer> reviewer;
 	private Discount discount;
+	private int dailyTourLimit;
 }
 
 

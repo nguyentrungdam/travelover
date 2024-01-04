@@ -40,4 +40,5 @@ public class TourDTO extends BaseEntity{
 	private double rate;
 	private List<Reviewer> reviewer;
 	private Discount discount;
+	private int dailyTourLimit;
 }
