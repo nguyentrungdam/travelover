@@ -30,5 +30,5 @@ public class OrderCreate {
 	private String discountCode;
 	private CustomerInformation customerInformation; // not null
 	private String note;
-//	private int finalPrice;
+	private int finalPrice;
 }

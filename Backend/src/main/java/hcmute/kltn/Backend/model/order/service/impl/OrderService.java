@@ -499,6 +499,13 @@ public class OrderService implements IOrderService{
 			discount.setDiscountCode(orderCreate.getDiscountCode());
 			discount.setDiscountCodeValue(actualDiscountValue);
 		}
+		
+		if (orderCreate.getFinalPrice() != totalPrice) {
+			int uneven = Math.abs(totalPrice - orderCreate.getFinalPrice());
+			if (uneven < 1000) {
+				totalPrice = orderCreate.getFinalPrice();
+			}
+		}
 
 		order.setDiscount(discount);
 		order.setOrderDetail(orderDetail);
