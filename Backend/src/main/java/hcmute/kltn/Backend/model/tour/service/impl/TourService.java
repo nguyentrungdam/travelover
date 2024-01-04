@@ -1404,7 +1404,7 @@ public class TourService implements ITourService{
 					if (
 							itemOrderDTO.getOrderDetail().getTourId().equals(itemTour.getTourId())
 							&& (itemOrderDTO.getStartDate().isBefore(currentDate) || itemOrderDTO.getStartDate().equals(currentDate))
-							&& itemOrderDTO.getEndDate().isAfter(currentDate) || itemOrderDTO.getEndDate().equals(currentDate)) {
+							&& (itemOrderDTO.getEndDate().isAfter(currentDate) || itemOrderDTO.getEndDate().equals(currentDate))) {
 						numberOfTour += 1;
 					}
 				}
