@@ -22,6 +22,7 @@ import hcmute.kltn.Backend.model.base.response.service.IResponseObjectService;
 import hcmute.kltn.Backend.model.order.dto.OrderCreate;
 import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
+import hcmute.kltn.Backend.model.order.dto.Rating;
 import hcmute.kltn.Backend.model.order.service.IOrderService;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -33,7 +34,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/orders")
 @Tag(
 		name = "Orders", 
-		description = "APIs for managing orders\n\n",
+		description = "APIs for managing orders\n\n"
+				+ "__04/01/2024__\n\n"
+				+ "__10:20AM__\n\n"
+				+ "Tạo mới: api rating để đánh giá đơn hàng đã đặt",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1G8DN3460uuAVgkwhOTvseSdWPT_4nAP3/view?usp=sharing")
@@ -218,6 +222,27 @@ public class OrderController {
 			{
 				setMessage("Payment check successfully");
 				setData(paymentCheck);
+			}
+		});
+	}
+	
+	private final String ratingDesc = "Các field bắt buộc phải nhập:\n\n"
+			+ "- 'orderId': ''\n"
+			+ "- 'rate': '' (1 <= rate <= 5)\n"
+			+ "- 'review': ''\n\n"
+			+ "Chỉ được đánh giá đơn hàng do tài khoản đang đang nhập tạo\n\n"
+			+ "Chỉ được đánh giá đơn hàng đã hoàn thành\n\n"
+			+ "Mỗi đơn hàng chỉ được đánh giá 1 lần";
+	@RequestMapping(value = "/rating", method = RequestMethod.POST)
+	@Operation(summary = "Rating order - CUSTOMER", description = ratingDesc)
+	@PreAuthorize("hasAnyRole('ROLE_CUSTOMER')")
+	ResponseEntity<ResponseObject> rating(
+			@RequestBody Rating rating) {
+		iOrderService.rating(rating);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Rating order successfully");
 			}
 		});
 	}

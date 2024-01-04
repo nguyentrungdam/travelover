@@ -43,6 +43,7 @@ import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
+import hcmute.kltn.Backend.model.order.dto.Rating;
 import hcmute.kltn.Backend.model.order.dto.entity.Order;
 import hcmute.kltn.Backend.model.order.dto.extend.CustomerInformation;
 import hcmute.kltn.Backend.model.order.dto.extend.Discount;
@@ -57,6 +58,8 @@ import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.payment.vnpay.dto.VNPayRefund;
 import hcmute.kltn.Backend.model.payment.vnpay.service.IVNPayService;
 import hcmute.kltn.Backend.model.tour.dto.TourDTO;
+import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
+import hcmute.kltn.Backend.model.tour.dto.extend.Reviewer;
 import hcmute.kltn.Backend.model.tour.service.ITourService;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.EHotelDTO;
 import hcmute.kltn.Backend.model.z_enterprise.eHotel.dto.entity.EHotel;
@@ -462,6 +465,8 @@ public class OrderService implements IOrderService{
 		orderDetail.setVehicleDetail(vehicleDetailList);		
 		
 		// get guider information
+		
+		// get commission detail
 		commission.setOriginalPrice(totalPrice);
 		commission.setProfit(totalPrice * commissionDTO.getRate() / 100);
 		totalPrice = totalPrice * (100 + commissionDTO.getRate()) / 100;
@@ -495,6 +500,7 @@ public class OrderService implements IOrderService{
 		order.setFinalPrice(totalPrice);
 		order.setCommission(commission);
 		order.setOrderStatus("create");
+		order.setIsRated(false);
 //		order.setOrderStatus(getOrderStatus("1"));
 		
 		// create order
@@ -897,5 +903,52 @@ public class OrderService implements IOrderService{
 		Order order = getDetail(orderId);
 
 		return getOrderDTO(order);
+	}
+
+	@Override
+	public void rating(Rating rating) {
+		// get order
+		Order order = new Order();
+		order = getDetail(rating.getOrderId());
+		
+		// check fail
+		if (!order.getOrderStatus().equals("finished") || order.getStatus() != true) {
+			throw new CustomException("Incomplete orders can't be rated");
+		}
+		
+		if (order.getIsRated() == true) {
+			throw new CustomException("Order can only be rated 1 time");
+		}
+		
+		Account account = new Account();
+		account = iAccountDetailService.getCurrentAccount();
+		
+		if (!account.getAccountId().equals(order.getCreatedBy())) {
+			throw new CustomException("Only rated orders placed by the current account");
+		}
+		
+		if (rating.getRate() < 1 || rating.getRate() > 5) {
+			throw new CustomException("The rate must be between 1 and 5");
+		}
+		
+		// update review tour
+		Reviewer reviewer = new Reviewer();
+		reviewer.setAccountId(account.getAccountId());
+		reviewer.setAccountName(account.getFirstName());
+		reviewer.setAvatar(account.getAvatar());
+		reviewer.setRate(rating.getRate());
+		reviewer.setComment(rating.getReview());
+		
+		iTourService.updateReviewer(order.getOrderDetail().getTourId(), reviewer);
+		
+		// update isRated
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		
+		order.setIsRated(true);
+		order.setLastModifiedBy(account.getAccountId());
+		order.setLastModifiedAt2(currentDate);
+		
+		orderRepository.save(order);
+		
 	}
 }

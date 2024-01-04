@@ -44,4 +44,12 @@ public class Order extends BaseEntity{
 	private Commission commission;
 	private String reasonCancel;
 	private String orderStatus; 
+	private boolean isRated;
+	
+	public void setIsRated(boolean isRated) {
+		this.isRated = isRated;
+	}
+	public boolean getIsRated() {
+		return this.isRated;
+	}
 }

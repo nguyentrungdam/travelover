@@ -9,6 +9,7 @@ import hcmute.kltn.Backend.model.order.dto.OrderDTO;
 import hcmute.kltn.Backend.model.order.dto.OrderPaymentUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderStatusUpdate;
 import hcmute.kltn.Backend.model.order.dto.OrderUpdate;
+import hcmute.kltn.Backend.model.order.dto.Rating;
 import hcmute.kltn.Backend.model.order.dto.entity.Order;
 
 public interface IOrderService {
@@ -28,4 +29,5 @@ public interface IOrderService {
 	public boolean paymentCheck(String orderId);
 	
 	public void deleteUnpaidOrder();
+	public void rating(Rating rating);
 } 

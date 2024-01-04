@@ -40,7 +40,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/tours")
 @Tag(
 		name = "Tours", 
-		description = "APIs for managing tours\n\n",
+		description = "APIs for managing tours\n\n"
+				+ "__04/01/2024__\n\n"
+				+ "__10:20AM__\n\n"
+				+ "Cập nhật: hiển thị đánh giá cho từng tour\n\n"
+				+ "- field numberOfReviewer là số lượng người đã đánh giá\n\n"
+				+ "- field rate là số sao đánh giá (từ 1 đến 5, chưa ai đánh giá là 0)\n\n"
+				+ "- field reviewer là danh sách các đánh giá",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")

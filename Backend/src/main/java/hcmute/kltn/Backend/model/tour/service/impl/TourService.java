@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import hcmute.kltn.Backend.exception.CustomException;
+import hcmute.kltn.Backend.model.account.dto.entity.Account;
 import hcmute.kltn.Backend.model.account.service.IAccountDetailService;
 import hcmute.kltn.Backend.model.base.BaseEntity;
 import hcmute.kltn.Backend.model.base.extend.Address;
@@ -49,6 +50,7 @@ import hcmute.kltn.Backend.model.tour.dto.extend.OneHotel;
 import hcmute.kltn.Backend.model.tour.dto.extend.OneVehicle;
 import hcmute.kltn.Backend.model.tour.dto.extend.Option;
 import hcmute.kltn.Backend.model.tour.dto.extend.ReasonableTime;
+import hcmute.kltn.Backend.model.tour.dto.extend.Reviewer;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room;
 import hcmute.kltn.Backend.model.tour.dto.extend.Room2;
 import hcmute.kltn.Backend.model.tour.dto.extend.Schedule;
@@ -1690,5 +1692,31 @@ public class TourService implements ITourService{
 		}
 
 		return tourSearchRes2List;
+	}
+
+	@Override
+	public void updateReviewer(String tourId, Reviewer reviewer) {
+		Tour tour = new Tour();
+		tour = getDetail(tourId);
+		
+		List<Reviewer> reviewerList = new ArrayList<>();
+		if (tour.getReviewer() != null) {
+			reviewerList.addAll(tour.getReviewer());
+		}
+		
+		reviewerList.add(reviewer);
+		tour.setReviewer(reviewerList);
+		
+		int numberOfReviewer = 0;
+		int totalRate = 0;
+		for (Reviewer itemReviewer : reviewerList) {
+			totalRate += itemReviewer.getRate();
+			numberOfReviewer += 1;
+		}
+		
+		tour.setNumberOfReviewer(numberOfReviewer);
+		tour.setRate(((double)(double)totalRate / (double)numberOfReviewer));
+		
+		tourRepository.save(tour);		
 	}
 }

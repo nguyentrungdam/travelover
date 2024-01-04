@@ -5,4 +5,5 @@ import hcmute.kltn.Backend.model.statistic.dto.Time;
 
 public interface IStatisticService {
 	public StatisticDTO getTurnover(Time time);
+	public StatisticDTO getProfit(Time time);
 }

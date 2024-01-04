@@ -15,6 +15,7 @@ import hcmute.kltn.Backend.model.tour.dto.TourSearchRes2;
 import hcmute.kltn.Backend.model.tour.dto.TourSort;
 import hcmute.kltn.Backend.model.tour.dto.TourUpdate;
 import hcmute.kltn.Backend.model.tour.dto.entity.Tour;
+import hcmute.kltn.Backend.model.tour.dto.extend.Reviewer;
 
 public interface ITourService {
 	public TourDTO createTour(TourCreate tourCreate);
@@ -39,6 +40,8 @@ public interface ITourService {
 	public void updateNumberOfOrdered(String tourId);
 	public void updateIsDiscount();
 	public void updateIsDiscountNoCheck();
+	public void updateReviewer(String tourId, Reviewer reviewer);
+	
 	
 	public void autoUpdateId();
 	public TourDTO cloneTour(TourClone tourClone);
