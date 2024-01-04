@@ -3,12 +3,12 @@ export const menu = [
     id: 1,
     title: "Trang Chủ",
     listItems: [
-      // {
-      //   id: 1,
-      //   title: "Thống Kê",
-      //   url: "/dashboard",
-      //   icon: "/home.svg",
-      // },
+      {
+        id: 1,
+        title: "Thống Kê",
+        url: "/dashboard",
+        icon: "/home.svg",
+      },
       {
         id: 2,
         title: "Hồ Sơ",
@@ -33,12 +33,7 @@ export const menu = [
         url: "/tours-list",
         icon: "/travel-list.svg",
       },
-      {
-        id: 3,
-        title: "Hoa Hồng",
-        url: "/commissions",
-        icon: "/money.svg",
-      },
+
       {
         id: 4,
         title: "Đơn Hàng",
@@ -50,6 +45,12 @@ export const menu = [
         title: "Giảm Giá",
         url: "/discounts",
         icon: "/discount.svg",
+      },
+      {
+        id: 3,
+        title: "Hoa Hồng",
+        url: "/commissions",
+        icon: "/money.svg",
       },
     ],
   },
