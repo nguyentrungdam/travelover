@@ -30,4 +30,5 @@ public class TourCreate {
 	private String suitablePerson;
 	private String termAndCondition;
 	private Discount discount;
+	private int dailyTourLimit;
 }

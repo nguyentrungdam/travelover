@@ -21,6 +21,7 @@ public interface IOrderService {
 	public OrderDTO getDetailOrderNotCheckCreate(String orderId);
 	
 	public List<OrderDTO> getAllOrder();
+	public List<OrderDTO> getAllOrder2();
 	public List<OrderDTO> searchOrder(String keyword);
 	public List<OrderDTO> listOrderSearch(String keyword);
 	public List<OrderDTO> listOrderFilter(HashMap<String, String> filter, List<OrderDTO> orderDTOList);

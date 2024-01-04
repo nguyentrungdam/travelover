@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -30,6 +31,8 @@ import hcmute.kltn.Backend.model.generatorSequence.service.IGeneratorSequenceSer
 import hcmute.kltn.Backend.model.hotel.dto.HotelSearch;
 import hcmute.kltn.Backend.model.hotel.dto.RoomSearch;
 import hcmute.kltn.Backend.model.hotel.service.IHotelService;
+import hcmute.kltn.Backend.model.order.dto.OrderDTO;
+import hcmute.kltn.Backend.model.order.service.IOrderService;
 import hcmute.kltn.Backend.model.tour.dto.StatusUpdate;
 import hcmute.kltn.Backend.model.tour.dto.TourClone;
 import hcmute.kltn.Backend.model.tour.dto.TourCreate;
@@ -94,6 +97,8 @@ public class TourService implements ITourService{
 	private IEVehicleService iEVehicleService;
 	@Autowired
 	private ICommissionService iCommissionService;
+	@Autowired
+	private @Lazy IOrderService iOrderService;
 	
 	private List<TourDetail> deteilToList(String tourDetail) {
 		List<TourDetail> tourDetailList = new ArrayList<>();
@@ -1371,9 +1376,47 @@ public class TourService implements ITourService{
 			}
 		}
 		
-		// search with start date
+		// check daily tour limit
+		List<OrderDTO> orderDTOList = new ArrayList<>();
+		orderDTOList.addAll(iOrderService.getAllOrder2());	
+		List<OrderDTO> orderDTOListClone = new ArrayList<>();
+		orderDTOListClone.addAll(orderDTOList);
+		for (OrderDTO itemOrderDTO : orderDTOListClone) {
+			if (
+					itemOrderDTO.getOrderStatus().equals("canceled") 
+					|| itemOrderDTO.getOrderStatus().equals("finished")
+					|| itemOrderDTO.getStatus() == false) {
+				orderDTOList.remove(itemOrderDTO);
+				if (orderDTOList.size() <= 0) {
+					break;
+				}
+			}
+		}
 		
-		// search with number of people
+		tourListClone.clear();
+		tourListClone.addAll(tourList);
+		for(Tour itemTour : tourListClone) {
+			LocalDate currentDate = tourSearch.getStartDate();
+
+			for (int i = 1; i <= itemTour.getNumberOfDay(); i++) {
+				int numberOfTour = 0;
+				for (OrderDTO itemOrderDTO : orderDTOList) {
+					if (
+							itemOrderDTO.getOrderDetail().getTourId().equals(itemTour.getTourId())
+							&& (itemOrderDTO.getStartDate().isBefore(currentDate) || itemOrderDTO.getStartDate().equals(currentDate))
+							&& itemOrderDTO.getEndDate().isAfter(currentDate) || itemOrderDTO.getEndDate().equals(currentDate)) {
+						numberOfTour += 1;
+					}
+				}
+				if (numberOfTour > itemTour.getDailyTourLimit()) {
+					tourList.remove(itemTour);
+					if (tourList.size() <= 0) {
+						break;
+					}
+				}
+				currentDate.plusDays(1);
+			}
+		}
 		
 		// get commission
 		CommissionDTO commissionDTO = new CommissionDTO();
@@ -1725,5 +1768,22 @@ public class TourService implements ITourService{
 		tour.setRate(((double)(double)totalRate / (double)numberOfReviewer));
 		
 		tourRepository.save(tour);		
+	}
+
+	@Override
+	public void updateDailyTourLimit(String tourId, int dailyTourLimit) {
+		if (tourId != null && !tourId.isEmpty()) {
+			Tour tour = new Tour();
+			tour = getDetail(tourId);
+			tour.setDailyTourLimit(dailyTourLimit);
+			tourRepository.save(tour);
+		} else {
+			List<Tour> tourList = new ArrayList<>();
+			tourList.addAll(getAll());
+			for (Tour itemTour : tourList) {
+				itemTour.setDailyTourLimit(dailyTourLimit);
+				tourRepository.save(itemTour);
+			}
+		}
 	}
 }

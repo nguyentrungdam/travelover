@@ -368,4 +368,20 @@ public class TourController {
 			}
 		});
 	}
+	
+	private final String updateDailyTourLimitDesc = "Bỏ trống tourId để update cho toàn bộ tour";
+	@RequestMapping(value = "/update-daily-tour-limit", method = RequestMethod.GET)
+	@Operation(summary = "Update Daily Tour Limit - ADMIN / STAFF", description = updateDailyTourLimitDesc)
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
+	ResponseEntity<ResponseObject> updateDailyTourLimit(
+			@RequestParam(required = false) String tourId,
+			@RequestParam int dailyTourLimit) {
+		iTourService.updateDailyTourLimit(tourId, dailyTourLimit);
+		
+		return iResponseObjectService.success(new Response() {
+			{
+				setMessage("Update Daily Tour Limit successfully");
+			}
+		});
+	}
 }

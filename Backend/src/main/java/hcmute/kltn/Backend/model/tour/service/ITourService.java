@@ -42,7 +42,7 @@ public interface ITourService {
 	public void updateIsDiscountNoCheck();
 	public void updateReviewer(String tourId, Reviewer reviewer);
 	
-	
+	public void updateDailyTourLimit(String tourId, int dailyTourLimit);
 	public void autoUpdateId();
 	public TourDTO cloneTour(TourClone tourClone);
 }

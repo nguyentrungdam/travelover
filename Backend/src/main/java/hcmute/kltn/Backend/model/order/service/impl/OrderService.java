@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -87,8 +88,6 @@ public class OrderService implements IOrderService{
 	@Autowired
 	private IHotelService iHotelService;
 	@Autowired
-	private ITourService iTourService;
-	@Autowired
 	private IDiscountService iDiscountService;
 	@Autowired
 	private IVNPayService iVNPayService;
@@ -102,6 +101,9 @@ public class OrderService implements IOrderService{
 	private ICommissionService iCommissionService;
 	@Autowired
 	private IAccountService iAccountService;
+	@Autowired
+	private ITourService iTourService;
+
 	
 	private String getOrderStatus(String orderStatus) {
 		int index = Integer.valueOf(orderStatus);
@@ -965,5 +967,13 @@ public class OrderService implements IOrderService{
 		
 		orderRepository.save(order);
 		
+	}
+
+	@Override
+	public List<OrderDTO> getAllOrder2() {
+		List<Order> orderList = new ArrayList<>(getAll());
+		defaultSort(orderList);
+
+		return getOrderDTOList(hideOrderUnpaid(orderList));
 	}
 }
