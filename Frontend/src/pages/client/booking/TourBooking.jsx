@@ -184,23 +184,23 @@ const TourBooking = () => {
         })
       ).unwrap();
       console.log(res);
-      if (res.data.status === "ok") {
-        let orderVNPayData = {
-          amount: res.data.data.finalPrice,
-          orderType: "tour",
-          orderInfo: res.data.data.orderId,
-          returnUrl: "http://localhost:3000/thank-you",
-        };
-        console.log(orderVNPayData);
-        axiosInstance
-          .post("/payments/vnpay/create", orderVNPayData)
-          .then((response) => {
-            window.location.href = response.data.data;
-          })
-          .catch((error) => {
-            console.error("Lỗi khi gọi API:", error);
-          });
-      }
+      // if (res.data.status === "ok") {
+      //   let orderVNPayData = {
+      //     amount: res.data.data.finalPrice,
+      //     orderType: "tour",
+      //     orderInfo: res.data.data.orderId,
+      //     returnUrl: "http://localhost:3000/thank-you",
+      //   };
+      //   console.log(orderVNPayData);
+      //   axiosInstance
+      //     .post("/payments/vnpay/create", orderVNPayData)
+      //     .then((response) => {
+      //       window.location.href = response.data.data;
+      //     })
+      //     .catch((error) => {
+      //       console.error("Lỗi khi gọi API:", error);
+      //     });
+      // }
     } catch (err) {
       alert(err);
     }
@@ -225,7 +225,7 @@ const TourBooking = () => {
     setTotalSaleOff(0);
   };
   console.log(customerInformation);
-
+  console.log(tours);
   return (
     <div>
       <Header />

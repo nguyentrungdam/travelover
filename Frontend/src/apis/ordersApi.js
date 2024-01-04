@@ -33,6 +33,10 @@ const ordersApi = {
     const url = `/statistics/profit?year=${year}`;
     return axios.get(url);
   },
+  orderRating: (order) => {
+    const url = "/orders/rating";
+    return axios.post(url, order);
+  },
 };
 
 export default ordersApi;

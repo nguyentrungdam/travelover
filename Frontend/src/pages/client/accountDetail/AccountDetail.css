@@ -129,3 +129,15 @@
 .status-4 {
   color: #9f8888;
 }
+.star-container {
+  font-size: 24px;
+}
+
+.star-container img {
+  cursor: pointer;
+}
+
+.rate {
+  width: 20px;
+  margin-right: 4px;
+}

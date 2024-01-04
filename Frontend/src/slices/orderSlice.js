@@ -12,6 +12,17 @@ export const orderTour = createAsyncThunk(
     }
   }
 );
+export const orderRating = createAsyncThunk(
+  "orders/rating",
+  async (order, { rejectWithValue }) => {
+    try {
+      const response = await ordersApi.orderRating(order);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const getAllOrders = createAsyncThunk(
   "orders/list",
   async (rejectWithValue) => {
@@ -112,7 +123,18 @@ export const orderSlice = createSlice({
     },
     [orderTour.fulfilled]: (state, action) => {
       state.loading = false;
-      state.tour = action.payload.data.data;
+      state.order = action.payload.data.data;
+    },
+    [orderRating.pending]: (state) => {
+      state.loading = true;
+    },
+    [orderRating.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [orderRating.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.order = action.payload.data.data;
     },
     [getAllOrders.pending]: (state) => {
       state.loading = true;

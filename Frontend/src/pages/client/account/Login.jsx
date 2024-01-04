@@ -60,7 +60,7 @@ const Login = () => {
               res?.data?.data.role === "ADMIN"
             ) {
               saveToLocalStorage("role", res.data.data.role);
-              navigate("/tours-list");
+              navigate("/dashboard");
             } else if (
               res.data.status === "ok" &&
               res?.data?.data.role === "ENTERPRISE"

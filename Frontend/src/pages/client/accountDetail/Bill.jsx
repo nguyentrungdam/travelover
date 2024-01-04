@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   getAllOrders,
   getOrderDetail,
+  orderRating,
   updateOrder,
 } from "../../../slices/orderSlice";
 import {
@@ -98,6 +99,9 @@ const Bill = () => {
   const [showModal, setShowModal] = useState(false);
   const [cancellationMessage, setCancellationMessage] = useState("");
   const [showModalCancel, setShowModalCancel] = useState(false);
+  const [showModalReview, setShowModalReview] = useState(false);
+  const [rate, setRate] = useState(0); // Trạng thái số sao, mặc định là 0
+  const [review, setReview] = useState(""); // Trạng thái nội dung đánh giá, mặc định là chuỗi trống
 
   const transformedData =
     orders && Array.isArray(orders)
@@ -127,6 +131,8 @@ const Bill = () => {
   };
   const closeModal = () => {
     setShowModal(false);
+    setShowModalCancel(false);
+    setShowModalReview(false);
     document.body.classList.remove("modal-open");
   };
   const handleOverlayClick = (e) => {
@@ -143,12 +149,12 @@ const Bill = () => {
   }, []);
   console.log(order);
   const handleSaveStatus = async () => {
-    console.log(order.orderId);
+    console.log(order?.orderId);
     console.log(cancellationMessage);
     try {
       const res = await dispatch(
         updateOrder({
-          orderId: order.orderId,
+          orderId: order?.orderId,
           status: 0,
           message: cancellationMessage,
         })
@@ -169,6 +175,20 @@ const Bill = () => {
           pauseOnHover: true,
           onClose: resolve,
         });
+      } else if (prop === 3) {
+        toast.success("Đánh giá thành công! 👌", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
+      } else if (prop === 4) {
+        toast.error("Đánh giá thất bại, vui lòng thử lại", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
       } else {
         toast.error("Hủy đơn thất bại, vui lòng thử lại", {
           position: toast.POSITION.TOP_RIGHT,
@@ -179,6 +199,34 @@ const Bill = () => {
       }
     });
   };
+  //! xử lý đánh giá
+  const handleStarClick = (selectedRate) => {
+    setRate(selectedRate);
+  };
+  const handleReviewChange = (event) => {
+    setReview(event.target.value);
+  };
+  const getStarImagePath = (star) => {
+    // Lấy đường dẫn của hình ảnh dựa trên số sao
+    return star <= rate ? "/star2.svg" : "/star1.svg";
+  };
+  const handleReview = async () => {
+    try {
+      await dispatch(
+        orderRating({
+          orderId: order?.orderId,
+          rate: rate,
+          review: review,
+        })
+      ).unwrap();
+      dispatch(getOrderDetail(order.orderId)).unwrap();
+      setShowModalReview(!showModalReview);
+      notify(3);
+    } catch (error) {
+      notify(4);
+    }
+  };
+
   return (
     <div>
       {/* Billing history card*/}
@@ -221,44 +269,46 @@ const Bill = () => {
                           <div>
                             Trạng thái:{" "}
                             <span>
-                              {getVietNameseNameOfProcess(order.orderStatus)}
+                              {getVietNameseNameOfProcess(order?.orderStatus)}
                             </span>
                           </div>
                           <div>
                             Ngày đặt:{" "}
-                            <span>{formatDateAndHour(order?.createdAt2)}</span>
+                            {/* <span>{formatDateAndHour(order?.createdAt2)}</span> */}
                           </div>
                           <div>Thông tin khách hàng:</div>
                           <ul>
                             <li>
                               Họ Tên:
-                              <span>{order.customerInformation.fullName}</span>
+                              <span>
+                                {order?.customerInformation?.fullName}
+                              </span>
                             </li>
                             <li>
                               Email:{" "}
-                              <span>{order.customerInformation.email}</span>
+                              <span>{order?.customerInformation?.email}</span>
                             </li>
                             <li>
                               Số điện thoại:{" "}
                               <span>
-                                {order.customerInformation.phoneNumber}
+                                {order?.customerInformation?.phoneNumber}
                               </span>
                             </li>
                           </ul>
                           <div>Chi tiết giảm giá:</div>
                           <ul>
-                            {order.discount.discountCode ? (
+                            {order?.discount.discountCode ? (
                               <>
                                 <li>
                                   Mã giảm giá:
-                                  <span> {order.discount.discountCode}</span>
+                                  <span> {order?.discount.discountCode}</span>
                                 </li>
                                 <li>
                                   Giá được giảm từ mã:
                                   <span>
                                     {" "}
                                     {formatCurrencyWithoutD(
-                                      order.discount.discountCodeValue
+                                      order?.discount.discountCodeValue
                                     )}
                                     đ
                                   </span>
@@ -269,13 +319,13 @@ const Bill = () => {
                                 <span>Tour không sử dụng mã giảm giá.</span>
                               </li>
                             )}
-                            {order.discount.discountTourValue > 0 ? (
+                            {order?.discount.discountTourValue > 0 ? (
                               <li>
                                 Giá tour được giảm:{" "}
                                 <span>
                                   {" "}
                                   {formatCurrencyWithoutD(
-                                    order.discount.discountTourValue
+                                    order?.discount.discountTourValue
                                   )}
                                   đ
                                 </span>
@@ -289,7 +339,7 @@ const Bill = () => {
                               Tổng cộng:{" "}
                               <span>
                                 {" "}
-                                {formatCurrencyWithoutD(order.finalPrice)}đ
+                                {formatCurrencyWithoutD(order?.finalPrice)}đ
                               </span>
                             </li>
                           </ul>
@@ -300,37 +350,37 @@ const Bill = () => {
                             <li className="d-flex ">
                               <img
                                 className="img-order-detail"
-                                src={order.orderDetail.tourDetail.thumbnailUrl}
-                                alt={order.orderDetail.tourDetail.tourTitle}
+                                src={order?.orderDetail.tourDetail.thumbnailUrl}
+                                alt={order?.orderDetail.tourDetail.tourTitle}
                               />
                               <div className="text-cut">
                                 Tên tour:{" "}
                                 <span>
-                                  {order.orderDetail.tourDetail.tourTitle}
+                                  {order?.orderDetail.tourDetail.tourTitle}
                                 </span>
                                 <div className="">
                                   Mã tour:{" "}
-                                  <span>{order.orderDetail.tourId}</span>
+                                  <span>{order?.orderDetail.tourId}</span>
                                 </div>
                               </div>
                             </li>
                             <li>
                               Ngày đi:{" "}
                               <span>
-                                {formatDateToVietnamese(order.startDate)}
+                                {formatDateToVietnamese(order?.startDate)}
                               </span>
                             </li>
                             <li>
                               Ngày về:{" "}
                               <span>
-                                {formatDateToVietnamese(order.endDate)}
+                                {formatDateToVietnamese(order?.endDate)}
                               </span>
                             </li>
                             <li>
                               Số ngày:{" "}
                               <span>
-                                {order.orderDetail.tourDetail.numberOfDay} ngày
-                                và {order.orderDetail.tourDetail.numberOfNight}{" "}
+                                {order?.orderDetail.tourDetail.numberOfDay} ngày
+                                và {order?.orderDetail.tourDetail.numberOfNight}{" "}
                                 đêm.
                               </span>
                             </li>
@@ -338,8 +388,8 @@ const Bill = () => {
                               Số người:
                               <span>
                                 {" "}
-                                {order.numberOfAdult} người lớn và{" "}
-                                {order.numberOfChildren} trẻ em.
+                                {order?.numberOfAdult} người lớn và{" "}
+                                {order?.numberOfChildren} trẻ em.
                               </span>
                             </li>
                             <li>
@@ -350,13 +400,28 @@ const Bill = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="wrap-modal-addtour">
-                      <div
-                        className="btn btn-danger"
-                        onClick={() => setShowModalCancel(!showModalCancel)}
-                      >
-                        Hủy Đơn
-                      </div>
+                    <div className="d-flex ">
+                      {order?.orderStatus === "pending" ||
+                      order?.orderStatus === "confirmed" ? (
+                        <div className="wrap-modal-addtour">
+                          <div
+                            className="btn btn-danger"
+                            onClick={() => setShowModalCancel(!showModalCancel)}
+                          >
+                            Hủy Đơn
+                          </div>
+                        </div>
+                      ) : null}
+                      {order?.orderStatus === "finished" && (
+                        <div className="wrap-modal-addtour">
+                          <div
+                            className="btn btn-primary"
+                            onClick={() => setShowModalReview(!showModalReview)}
+                          >
+                            Đánh giá
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="d-flex  wrap-modal-addtour mt-2 ms-0">
                       {/* Thêm select vào đây */}
@@ -379,6 +444,40 @@ const Bill = () => {
                             onClick={handleSaveStatus}
                           >
                             Lưu
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="d-flex  wrap-modal-addtour mt-2 ms-0">
+                      {/* Thêm select vào đây */}
+                      {showModalReview && (
+                        <div className="col-md-6  wrap-modal-addtour">
+                          <div className="star-container">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <img
+                                src={getStarImagePath(star)}
+                                alt="rate"
+                                key={star}
+                                className={`rate ${
+                                  star <= rate ? "selected" : ""
+                                }`}
+                                onClick={() => handleStarClick(star)}
+                              />
+                            ))}
+                          </div>
+                          <input
+                            type="text"
+                            id="cancellationMessage"
+                            className="form-control mt-2"
+                            placeholder="Nhập nội dung đánh giá..."
+                            value={review}
+                            onChange={handleReviewChange}
+                          />
+                          <button
+                            className="btn btn-primary wrap-modal-addtour mt-2 ms-0"
+                            onClick={handleReview}
+                          >
+                            Gửi đánh giá
                           </button>
                         </div>
                       )}
