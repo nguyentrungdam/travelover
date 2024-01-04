@@ -1408,7 +1408,7 @@ public class TourService implements ITourService{
 						numberOfTour += 1;
 					}
 				}
-				if (numberOfTour > itemTour.getDailyTourLimit()) {
+				if (numberOfTour >= itemTour.getDailyTourLimit()) {
 					tourList.remove(itemTour);
 					if (tourList.size() <= 0) {
 						break;
