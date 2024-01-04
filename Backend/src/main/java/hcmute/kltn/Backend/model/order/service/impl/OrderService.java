@@ -461,15 +461,20 @@ public class OrderService implements IOrderService{
 				}
 			}
 		}
+
 		orderDetail.setVehicleId(orderCreate.getVehivleId());
 		orderDetail.setVehicleDetail(vehicleDetailList);		
 		
 		// get guider information
 		
+		System.out.println("totalPrice = " + totalPrice);
+		
 		// get commission detail
 		commission.setOriginalPrice(totalPrice);
 		commission.setProfit(totalPrice * commissionDTO.getRate() / 100);
-		totalPrice = totalPrice * (100 + commissionDTO.getRate()) / 100;
+
+		double priceTemp = (double)totalPrice * (100 + commissionDTO.getRate()) / 100;
+		totalPrice = (int)priceTemp;
 		
 		order.setTotalPrice(totalPrice);
 		
