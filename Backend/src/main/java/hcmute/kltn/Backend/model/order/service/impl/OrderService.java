@@ -931,6 +931,9 @@ public class OrderService implements IOrderService{
 			throw new CustomException("The rate must be between 1 and 5");
 		}
 		
+		// update isRated
+		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
+		
 		// update review tour
 		Reviewer reviewer = new Reviewer();
 		reviewer.setAccountId(account.getAccountId());
@@ -938,11 +941,10 @@ public class OrderService implements IOrderService{
 		reviewer.setAvatar(account.getAvatar());
 		reviewer.setRate(rating.getRate());
 		reviewer.setComment(rating.getReview());
+		reviewer.setCreateAt(currentDate);
+		reviewer.setLastModifiedAt(currentDate);;
 		
 		iTourService.updateReviewer(order.getOrderDetail().getTourId(), reviewer);
-		
-		// update isRated
-		LocalDateTime currentDate = LocalDateTimeUtil.getCurentDate();
 		
 		order.setIsRated(true);
 		order.setLastModifiedBy(account.getAccountId());

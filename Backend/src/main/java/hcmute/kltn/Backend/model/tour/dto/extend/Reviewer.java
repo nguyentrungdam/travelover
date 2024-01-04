@@ -1,5 +1,7 @@
 package hcmute.kltn.Backend.model.tour.dto.extend;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,4 +15,6 @@ public class Reviewer {
 	private String avatar;
 	private int rate;
 	private String comment;
+	private LocalDateTime createAt;
+	private LocalDateTime lastModifiedAt;
 }
