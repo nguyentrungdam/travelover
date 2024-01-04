@@ -937,7 +937,8 @@ public class OrderService implements IOrderService{
 		// update review tour
 		Reviewer reviewer = new Reviewer();
 		reviewer.setAccountId(account.getAccountId());
-		reviewer.setAccountName(account.getFirstName());
+		reviewer.setFirstName(account.getFirstName());
+		reviewer.setLastName(account.getLastName());
 		reviewer.setAvatar(account.getAvatar());
 		reviewer.setRate(rating.getRate());
 		reviewer.setComment(rating.getReview());

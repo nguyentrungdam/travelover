@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Reviewer {
 	private String accountId;
-	private String accountName;
+	private String firstName;
+	private String lastName;
 	private String avatar;
 	private int rate;
 	private String comment;
