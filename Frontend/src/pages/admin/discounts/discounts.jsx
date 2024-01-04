@@ -91,7 +91,8 @@ const DiscountList = () => {
   useEffect(() => {
     dispatch(getAllDiscounts()).unwrap();
   }, []);
-  // console.log(discounts);
+
+  console.log(discounts);
   //!xử lý multi search
   const openMultiSearchModal = () => {
     setShowMultiSearchModal(true);

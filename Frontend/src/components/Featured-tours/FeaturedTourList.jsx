@@ -212,10 +212,12 @@ const FeaturedTourList = () => {
                                   2,
                                   item?.hotel2?.roomList[0]?.price *
                                     (item?.tour?.numberOfNight + 0.5) *
+                                    1.15 *
                                     (1 -
                                       item?.tour?.discount?.discountValue /
                                         100),
                                   item?.vehicle?.coach[0]?.pricePerDay *
+                                    1.15 *
                                     item?.tour?.numberOfDay *
                                     (1 -
                                       item?.tour?.discount?.discountValue / 100)
@@ -236,10 +238,12 @@ const FeaturedTourList = () => {
                                 item?.tour,
                                 1,
                                 item?.hotel2?.roomList[0]?.price *
+                                  1.15 *
                                   (item?.tour?.numberOfNight + 0.5) *
                                   (1 -
                                     item?.tour?.discount?.discountValue / 100),
                                 item?.vehicle?.coach[0]?.pricePerDay *
+                                  1.15 *
                                   item?.tour?.numberOfDay *
                                   (1 -
                                     item?.tour?.discount?.discountValue / 100)

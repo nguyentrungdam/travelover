@@ -33,10 +33,12 @@ const List = () => {
   const dispatch = useDispatch();
   const { loading, tours, totalData } = useSelector((state) => state.tour);
   const [province, setProvince] = useState(
-    location.state.endLocation ? location.state.endLocation.province : ""
+    location?.state?.endLocation ? location?.state?.endLocation?.province : ""
   );
   const [startLocation, setStartLocation] = useState(
-    location.state.startLocation ? location.state.startLocation.province : ""
+    location?.state?.startLocation
+      ? location?.state?.startLocation?.province
+      : ""
   );
   const [province2, setProvince2] = useState("");
   const [startLocation2, setStartLocation2] = useState("");
@@ -92,8 +94,8 @@ const List = () => {
   console.log(province);
 
   useEffect(() => {
-    setStartLocation(location.state.startLocation.province);
-    setProvince(location.state.endLocation.province);
+    setStartLocation(location?.state?.startLocation?.province);
+    setProvince(location?.state?.endLocation?.province);
     const res = dispatch(
       searchTour2({
         keyword: "",

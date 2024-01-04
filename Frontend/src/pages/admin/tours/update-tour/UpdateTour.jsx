@@ -42,6 +42,7 @@ const UpdateTour = () => {
     termAndCondition: "",
     image: [],
     imageList: tour?.image,
+    dailyTourLimit: 0,
     imageTotal: tour?.image,
     //discount
     startDateDiscount: "",
@@ -61,7 +62,7 @@ const UpdateTour = () => {
     }));
   }, [tour]);
 
-  console.log(formData.imageTotal);
+  // console.log(formData.imageTotal);
   //!xử lý check box
   useEffect(() => {
     setTourSchedule({
@@ -152,7 +153,7 @@ const UpdateTour = () => {
     }
     setFormData(updatedFormData);
   };
-  // console.log(tour);
+  console.log(tour);
   const handleUpdate = async (e) => {
     e.preventDefault();
     const formDataUpdate = new FormData();
@@ -173,6 +174,10 @@ const UpdateTour = () => {
 
     formDataUpdate.append("tourId", id);
     formDataUpdate.append("tourTitle", formData.tourTitle || tour.tourTitle);
+    formDataUpdate.append(
+      "dailyTourLimit",
+      formData.dailyTourLimit || tour.dailyTourLimit
+    );
     formDataUpdate.append(
       "thumbnailUrl",
       formData.thumbnailUrl || tour.thumbnailUrl
@@ -742,6 +747,18 @@ const UpdateTour = () => {
                     </div>
                   </>
                 ) : null}
+                <div className="row gx-3 mb-3">
+                  <div className="col-md-4">
+                    <label className="small mb-1">Giới hạn mỗi ngày</label>
+                    <input
+                      defaultValue={tour?.dailyTourLimit}
+                      name="dailyTourLimit"
+                      className="form-control"
+                      onChange={handleChange}
+                      placeholder="VD: 5"
+                    />
+                  </div>
+                </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 border-top">
                     <label className="small mb-1">

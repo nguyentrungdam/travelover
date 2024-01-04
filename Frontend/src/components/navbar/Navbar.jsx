@@ -32,6 +32,9 @@ const Navbar = () => {
                   alt={account.data.lastName}
                 />
                 <div className="DropDownContent DropDownContent1">
+                  <Link className="link1" to="/user-profile">
+                    <span className="SubA">Tài Khoản</span>
+                  </Link>
                   <span className="SubA seperate" onClick={handleLogout}>
                     Đăng Xuất
                   </span>

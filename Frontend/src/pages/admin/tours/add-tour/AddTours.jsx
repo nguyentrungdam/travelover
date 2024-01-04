@@ -33,6 +33,7 @@ const AddTours = () => {
     imageList: [],
     image: [],
     video: "",
+    dailyTourLimit: 0,
     //discount
     startDateDiscount: "",
     endDateDiscount: "",
@@ -133,6 +134,7 @@ const AddTours = () => {
     formDataObject.append("termAndCondition", formData.termAndCondition);
     formDataObject.append("priceOfAdult", formData.priceOfAdult);
     formDataObject.append("priceOfChildren", formData.priceOfChildren);
+    formDataObject.append("dailyTourLimit", formData.dailyTourLimit);
 
     //Thêm địa chỉ
     formDataObject.append("address[province]", selectedLocation.province);
@@ -637,6 +639,17 @@ const AddTours = () => {
                     </div>
                   </>
                 ) : null}
+                <div className="row gx-3 mb-3">
+                  <div className="col-md-4">
+                    <label className="small mb-1">Giới hạn mỗi ngày</label>
+                    <input
+                      name="dailyTourLimit"
+                      className="form-control"
+                      onChange={handleChange}
+                      placeholder="VD: 5"
+                    />
+                  </div>
+                </div>
                 <div className="row gx-3 mb-3">
                   <div className="col-md-12 ">
                     <label className="small mb-1">

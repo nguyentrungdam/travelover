@@ -9,12 +9,6 @@ export const menu = [
         url: "/dashboard",
         icon: "/home.svg",
       },
-      {
-        id: 2,
-        title: "Hồ Sơ",
-        url: "/user-profile",
-        icon: "/user.svg",
-      },
     ],
   },
   {

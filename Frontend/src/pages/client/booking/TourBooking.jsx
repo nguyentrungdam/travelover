@@ -41,14 +41,12 @@ const TourBooking = () => {
   const numberOfAdult = state.numberOfAdult;
   const numberOfChildren = state.numberOfChildren;
   const numberOfRoom = state.numberOfRoom;
-  const priceRoom = state.priceRoom;
-  const priceCar = state.priceCar;
+  const priceRoom = Math.round(state.priceRoom);
+  const priceCar = Math.round(state.priceCar);
   const vehicleId = state.vehicleId;
   const hotelId = state.hotelId;
   const roomIdList = state.roomIdList;
-  console.log(vehicleId);
-  console.log(hotelId);
-  console.log(roomIdList);
+
   const [adultArray, setAdultArray] = useState(
     Array.from({ length: numberOfAdult - 1 }, (_, index) => ({
       fullName: "",
@@ -98,7 +96,7 @@ const TourBooking = () => {
     }));
   }, [externalMember]);
 
-  console.log(tours);
+  // console.log(tours);
   // validate date
   const startDateString = new Date(startDate);
   const endDate = addDays(startDateString, tours[0]?.tour?.numberOfDay);
@@ -181,37 +179,45 @@ const TourBooking = () => {
           numberOfChildren,
           discountCode,
           numberOfAdult,
+          finalPrice: totalSaleOff
+            ? Math.round(
+                tours[0]?.tourPrice + priceRoom + priceCar - totalSaleOff
+              )
+            : Math.round(tours[0]?.tourPrice + priceRoom + priceCar),
         })
       ).unwrap();
-      console.log(res);
-      // if (res.data.status === "ok") {
-      //   let orderVNPayData = {
-      //     amount: res.data.data.finalPrice,
-      //     orderType: "tour",
-      //     orderInfo: res.data.data.orderId,
-      //     returnUrl: "http://localhost:3000/thank-you",
-      //   };
-      //   console.log(orderVNPayData);
-      //   axiosInstance
-      //     .post("/payments/vnpay/create", orderVNPayData)
-      //     .then((response) => {
-      //       window.location.href = response.data.data;
-      //     })
-      //     .catch((error) => {
-      //       console.error("Lỗi khi gọi API:", error);
-      //     });
-      // }
+      console.log(res.data);
+      if (res.data.status === "ok") {
+        let orderVNPayData = {
+          amount: res.data.data.finalPrice,
+          orderType: "tour",
+          orderInfo: res.data.data.orderId,
+          returnUrl: "http://localhost:3000/thank-you",
+        };
+        console.log(orderVNPayData);
+        axiosInstance
+          .post("/payments/vnpay/create", orderVNPayData)
+          .then((response) => {
+            window.location.href = response.data.data;
+          })
+          .catch((error) => {
+            console.error("Lỗi khi gọi API:", error);
+          });
+      }
     } catch (err) {
       alert(err);
     }
   };
   const handleApplyCoupon = async () => {
     setErrorMessage("");
+    console.log(tours[0]?.tourPrice + priceRoom + priceCar);
     try {
       const actionResult = await dispatch(
-        getCheckDiscount({ discountCode, totalPrice: tours[0]?.totalPrice })
+        getCheckDiscount({
+          discountCode,
+          totalPrice: Math.round(tours[0]?.tourPrice + priceRoom + priceCar),
+        })
       );
-
       setTotalSaleOff(actionResult.payload.data.data);
     } catch (error) {
       console.error(error); // In ra lỗi để kiểm tra
@@ -224,8 +230,8 @@ const TourBooking = () => {
     setErrorMessage(""); // Đặt giá trị của errorMessage về rỗng
     setTotalSaleOff(0);
   };
-  console.log(customerInformation);
-  console.log(tours);
+  console.log(priceRoom);
+  console.log(priceCar);
   return (
     <div>
       <Header />
@@ -690,20 +696,26 @@ const TourBooking = () => {
                           {totalSaleOff && !errorMessage ? (
                             <span className="tour-item__price--old pe-2 mb-0">
                               {formatCurrencyWithoutD(
-                                tours[0]?.tourPrice + priceRoom + priceCar
+                                Math.round(
+                                  tours[0]?.tourPrice + priceRoom + priceCar
+                                )
                               )}
                               ₫
                             </span>
                           ) : null}
                           {totalSaleOff && !errorMessage
                             ? formatCurrencyWithoutD(
-                                tours[0]?.tourPrice +
-                                  priceRoom +
-                                  priceCar -
-                                  totalSaleOff
+                                Math.round(
+                                  tours[0]?.tourPrice +
+                                    priceRoom +
+                                    priceCar -
+                                    totalSaleOff
+                                )
                               ) + "₫"
                             : formatCurrencyWithoutD(
-                                tours[0]?.tourPrice + priceRoom + priceCar
+                                Math.round(
+                                  tours[0]?.tourPrice + priceRoom + priceCar
+                                )
                               ) + "₫"}
                         </td>
                       </tr>

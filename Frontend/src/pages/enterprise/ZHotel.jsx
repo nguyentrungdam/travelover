@@ -38,6 +38,12 @@ const columns = [
     headerName: "Số điện thoại",
     width: 120,
   },
+  {
+    field: "address",
+    type: "string",
+    headerName: "Địa chỉ",
+    width: 200,
+  },
 ];
 
 const ZHotel = () => {
@@ -52,6 +58,7 @@ const ZHotel = () => {
           rooms: item?.room?.length || item?.room2?.length,
           stars: item?.numberOfStarRating || 1,
           phoneNumber: item?.phoneNumber || "0399999999",
+          address: item?.address.province,
         }))
       : [];
 
@@ -69,7 +76,12 @@ const ZHotel = () => {
       {loading ? (
         <Loading isTable />
       ) : (
-        <DataTable slug="hotelz" columns={columns} rows={transformedData} />
+        <DataTable
+          slug="hotelz"
+          columns={columns}
+          rows={transformedData}
+          width80
+        />
       )}
     </div>
   );

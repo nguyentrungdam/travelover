@@ -356,10 +356,10 @@ const TourDetail = () => {
             </div>
             <div className="d-flex align-items-center">
               {tours[0]?.tour?.numberOfReviewer > 0 && (
-                <div class="short-rating">
-                  <div class="s-rate">
+                <div className="short-rating">
+                  <div className="s-rate">
                     <span>{tours[0]?.tour?.rate}</span>
-                    <div class="s-comment">
+                    <div className="s-comment">
                       Tuyệt vời
                       <p>{tours[0]?.tour?.numberOfReviewer} đánh giá</p>
                     </div>
