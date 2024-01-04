@@ -67,12 +67,36 @@ export const searchOrderAdmin = createAsyncThunk(
     }
   }
 );
+export const getTurnover = createAsyncThunk(
+  "statistics/turnover",
+  async (year, { rejectWithValue }) => {
+    try {
+      const response = await ordersApi.getTurnover(year);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const getProfit = createAsyncThunk(
+  "statistics/profit",
+  async (year, { rejectWithValue }) => {
+    try {
+      const response = await ordersApi.getProfit(year);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 export const orderSlice = createSlice({
   name: "order",
   initialState: {
     totalData: 0,
     orders: [],
     order: {},
+    turnover: [],
+    profit: [],
     status: false,
     loading: false,
     error: null,
@@ -146,6 +170,28 @@ export const orderSlice = createSlice({
       state.loading = false;
       state.orders = action.payload.data.data;
       state.totalData = action.payload.data.totalData;
+    },
+    [getTurnover.pending]: (state) => {
+      state.loading = true;
+    },
+    [getTurnover.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [getTurnover.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.turnover = action.payload.data.data.valueList;
+    },
+    [getProfit.pending]: (state) => {
+      state.loading = true;
+    },
+    [getProfit.rejected]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [getProfit.fulfilled]: (state, action) => {
+      state.loading = false;
+      state.profit = action.payload.data.data.valueList;
     },
   },
 });

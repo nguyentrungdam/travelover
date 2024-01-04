@@ -6,23 +6,7 @@
   grid-auto-flow: dense;
 }
 
-.home .box {
-  padding: 20px;
-  border-radius: 10px;
-  border: 2px solid #ddd;
-}
-
-.home .box1 {
-  grid-column: span 1;
-  grid-row: span 3;
-}
-
-.home .box4 {
-  grid-column: span 1;
-  grid-row: span 3;
-}
-
 .home .box7 {
-  grid-column: span 2;
+  grid-column: span 4;
   grid-row: span 2;
 }

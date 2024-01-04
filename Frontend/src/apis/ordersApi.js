@@ -25,6 +25,14 @@ const ordersApi = {
     const url = `/orders/list/search?keyword=${order.keyword}&fullName=${order.fullName}&finalPrice=${order.finalPrice}&createdAt2=${order.createdAt2}&orderStatus=${order.orderStatus}&sortBy=${order.sortBy}&order=${order.order}`;
     return axios.get(url);
   },
+  getTurnover: (year) => {
+    const url = `/statistics/turnover?year=${year}`;
+    return axios.get(url);
+  },
+  getProfit: (year) => {
+    const url = `/statistics/profit?year=${year}`;
+    return axios.get(url);
+  },
 };
 
 export default ordersApi;
