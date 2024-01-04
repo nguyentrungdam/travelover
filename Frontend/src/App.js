@@ -39,6 +39,9 @@ import OrderZList from "./pages/enterprise/orderZ/orders";
 import ZVehicle from "./pages/enterprise/vehicle/ZVehicle";
 import AddVehicleZ from "./pages/enterprise/vehicle/add-vehicle/AddVehicleZ";
 import UpdateVehicleZ from "./pages/enterprise/vehicle/update-vehicle/UpdateVehicleZ";
+import CommissionList from "./pages/admin/commission/commission";
+import AddCommissions from "./pages/admin/commission/add-commission/AddCommissions";
+import UpdateCommissions from "./pages/admin/commission/update-commission/UpdateCommissions";
 
 function App() {
   const { isAuthenticated, role } = useSelector((state) => state.account);
@@ -101,6 +104,9 @@ function App() {
         <Route path="discounts" element={<DiscountList />} />
         <Route path="discounts/:id" element={<UpdateDiscount />} />
         <Route path="discounts/add-new" element={<AddDiscount />} />
+        <Route path="commissions" element={<CommissionList />} />
+        <Route path="commissions/add-new" element={<AddCommissions />} />
+        <Route path="commissions/:id" element={<UpdateCommissions />} />
       </Route>
 
       {/* enterprise  */}

@@ -12,8 +12,7 @@ import {
 } from "../../../../utils/validate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
-import ReactPaginate from "react-paginate";
-import { searchTour } from "../../../../slices/tourSlice";
+import { searchTour, searchTour2 } from "../../../../slices/tourSlice";
 import { addDays, format } from "date-fns";
 const TourGuideDetail = ({ data }) => {
   const navigate = useNavigate();
@@ -26,9 +25,10 @@ const TourGuideDetail = ({ data }) => {
   const tomorrow = addDays(new Date(), 1);
   useEffect(() => {
     const res = dispatch(
-      searchTour({
+      searchTour2({
         keyword: "",
         province: selectedBlog.province,
+        startLocation: selectedBlog.province,
         startDate: format(tomorrow, "yyyy-MM-dd"),
         numberOfDay: "4-7",
         numberOfAdult: 1,
@@ -44,6 +44,7 @@ const TourGuideDetail = ({ data }) => {
       })
     ).unwrap();
   }, []);
+  console.log(tours);
   const handleViewDetailOrPayNow = (tourId, number) => {
     if (number === 1) {
       navigate(`/tours/tour-detail/${tourId}`, {
@@ -76,16 +77,18 @@ const TourGuideDetail = ({ data }) => {
     <div>
       <Header />
       <div className="container d-flex justify-content-center my-3">
-        <div className="col-lg-12 col-12 ">
+        <div className="col-lg-12 col-12  ">
           <div className="selectedBlog-blog selectedBlog-list ">
-            <h3 className="fw-bold  mb-3">{selectedBlog.title}</h3>
-            <img
-              className="lazyload loaded w-75 mb-2 img-radius-0375 "
-              src={selectedBlog.image}
-              data-src={selectedBlog.image}
-              alt={selectedBlog.title}
-            />
-            <div className="block-content">
+            <div className="text-center">
+              <h3 className="fw-bold  mb-3 ">{selectedBlog.title}</h3>
+              <img
+                className="lazyload loaded w-75 mb-2 img-radius-0375 "
+                src={selectedBlog.image}
+                data-src={selectedBlog.image}
+                alt={selectedBlog.title}
+              />
+            </div>
+            <div className="block-content text-center">
               <div className="time-post mb-2">
                 <span className="mr-2 time">
                   <svg
@@ -125,16 +128,16 @@ const TourGuideDetail = ({ data }) => {
                   </svg>{" "}
                   {selectedBlog.author}
                 </span>
+                <p className="justify summary  d-lg-block px-5">
+                  {selectedBlog.summary}
+                </p>
               </div>
-              <p className="justify summary  d-lg-block w-75">
-                {selectedBlog.summary}
-              </p>
             </div>
             {loading ? (
               <Loading />
             ) : (
               <div className="col-md-12 col-12 main-content">
-                <section className="promotion-search-result__result pt-2">
+                <section className="promotion-search-result__result pt-2 ">
                   <div className="order-by-title mb-2">
                     {totalData > 0 ? (
                       <strong>
@@ -249,15 +252,15 @@ const TourGuideDetail = ({ data }) => {
                             <p className="tour-item__departure mb-2">
                               Khách sạn:{" "}
                               <span className="font-weight-bold">
-                                {item.hotel?.hotelName}
-                              </span>
-                            </p>
-                            <p className="tour-item__departure mb-2">
-                              Số phòng:{" "}
-                              <span className="font-weight-bold">
-                                {item.hotel?.room?.length}
+                                {item.hotelList[0]?.ehotelName}
                               </span>
                             </p>{" "}
+                            <p className="tour-item__departure mb-2">
+                              Nhà xe:{" "}
+                              <span className="font-weight-bold">
+                                {item.vehicleList[0]?.evehicleName}
+                              </span>
+                            </p>
                             <p className="tour-item__departure mb-2">
                               Ngày đi:{" "}
                               <span className="font-weight-bold">
@@ -269,12 +272,23 @@ const TourGuideDetail = ({ data }) => {
                               <div className="tour-item__price__wrapper">
                                 <div className=" ">
                                   <span className="tour-item__price--current__number pe-2 mb-0">
-                                    {formatCurrencyWithoutD(item?.totalPrice)}₫
+                                    {formatCurrencyWithoutD(
+                                      item?.tourPrice +
+                                        item?.hotelList[0]?.optionList[0]
+                                          ?.totalPrice +
+                                        item?.vehicleList[0]?.optionList[0]
+                                          ?.totalPrice
+                                    )}
+                                    ₫
                                   </span>
                                   {item.tour?.discount.isDiscount ? (
                                     <span className="tour-item__price--old pe-2 mb-0">
                                       {formatCurrencyWithoutD(
-                                        item?.totalPriceNotDiscount
+                                        item?.tourPriceNotDiscount +
+                                          item?.hotelList[0]?.optionList[0]
+                                            ?.totalPriceNotDiscount +
+                                          item?.vehicleList[0]?.optionList[0]
+                                            ?.totalPriceNotDiscount
                                       )}
                                       ₫
                                     </span>
@@ -287,7 +301,11 @@ const TourGuideDetail = ({ data }) => {
                                       onClick={() =>
                                         handleViewDetailOrPayNow(
                                           item.tour?.tourId,
-                                          2
+                                          2,
+                                          item?.hotelList[0]?.optionList[0]
+                                            ?.totalPrice,
+                                          item?.vehicleList[0]?.optionList[0]
+                                            ?.totalPrice
                                         )
                                       }
                                     >
@@ -303,7 +321,11 @@ const TourGuideDetail = ({ data }) => {
                                     onClick={() =>
                                       handleViewDetailOrPayNow(
                                         item.tour?.tourId,
-                                        1
+                                        1,
+                                        item?.hotelList[0]?.optionList[0]
+                                          ?.totalPrice,
+                                        item?.vehicleList[0]?.optionList[0]
+                                          ?.totalPrice
                                       )
                                     }
                                   >

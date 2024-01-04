@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getAllOrders, getOrderDetail } from "../../../slices/orderSlice";
+import {
+  getAllOrders,
+  getOrderDetail,
+  updateOrder,
+} from "../../../slices/orderSlice";
 import {
   formatCurrencyWithoutD,
   formatDateAndHour,
@@ -9,6 +13,8 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import DataTable from "../../../components/dataTable/DataTable";
 import Loading from "../../../components/Loading/Loading";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 const columns = [
   { field: "stt", headerName: "STT", width: 40, type: "string" },
   {
@@ -90,6 +96,8 @@ const Bill = () => {
   const dispatch = useDispatch();
   const { loading, orders, order } = useSelector((state) => state.order);
   const [showModal, setShowModal] = useState(false);
+  const [cancellationMessage, setCancellationMessage] = useState("");
+  const [showModalCancel, setShowModalCancel] = useState(false);
 
   const transformedData =
     orders && Array.isArray(orders)
@@ -134,6 +142,43 @@ const Bill = () => {
     }
   }, []);
   console.log(order);
+  const handleSaveStatus = async () => {
+    console.log(order.orderId);
+    console.log(cancellationMessage);
+    try {
+      const res = await dispatch(
+        updateOrder({
+          orderId: order.orderId,
+          status: 0,
+          message: cancellationMessage,
+        })
+      ).unwrap();
+      console.log(res.status);
+      setShowModalCancel(!showModalCancel);
+      notify(1);
+    } catch (error) {
+      notify(2);
+    }
+  };
+  const notify = (prop) => {
+    return new Promise((resolve) => {
+      if (prop === 1) {
+        toast.success("Hủy đơn thành công! 👌", {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 1000,
+          pauseOnHover: true,
+          onClose: resolve,
+        });
+      } else {
+        toast.error("Hủy đơn thất bại, vui lòng thử lại", {
+          position: toast.POSITION.TOP_RIGHT,
+          pauseOnHover: true,
+          autoClose: 1000,
+          onClose: resolve,
+        });
+      }
+    });
+  };
   return (
     <div>
       {/* Billing history card*/}
@@ -145,6 +190,8 @@ const Bill = () => {
             <Loading isTable />
           ) : (
             <>
+              <ToastContainer />
+
               <DataTable
                 customerRole
                 VietNamese
@@ -302,6 +349,39 @@ const Bill = () => {
                           </ul>
                         </div>
                       </div>
+                    </div>
+                    <div className="wrap-modal-addtour">
+                      <div
+                        className="btn btn-danger"
+                        onClick={() => setShowModalCancel(!showModalCancel)}
+                      >
+                        Hủy Đơn
+                      </div>
+                    </div>
+                    <div className="d-flex  wrap-modal-addtour mt-2 ms-0">
+                      {/* Thêm select vào đây */}
+                      {showModalCancel && (
+                        <div className="col-md-6  wrap-modal-addtour">
+                          <label htmlFor="cancellationMessage">
+                            Lý do hủy đơn <b className="b-red">*</b>
+                          </label>
+                          <input
+                            type="text"
+                            id="cancellationMessage"
+                            className="form-control"
+                            value={cancellationMessage}
+                            onChange={(e) =>
+                              setCancellationMessage(e.target.value)
+                            }
+                          />
+                          <button
+                            className="btn btn-primary wrap-modal-addtour mt-2 ms-0"
+                            onClick={handleSaveStatus}
+                          >
+                            Lưu
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

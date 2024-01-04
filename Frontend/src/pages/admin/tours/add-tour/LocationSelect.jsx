@@ -4,9 +4,11 @@ import "./AddTours.css";
 const LocationSelect = ({
   onSelectLocation,
   onSelectLocation2,
+  onSelectLocation3,
   pickProvince,
   searchProvince,
   searchProvince2,
+  searchProvince3,
   english,
 }) => {
   const [cities, setCities] = useState([]);
@@ -40,6 +42,13 @@ const LocationSelect = ({
 
     if (onSelectLocation) {
       onSelectLocation({
+        province: selectedCity,
+        district: selectedDistrict,
+        commune: selectedWard,
+      });
+    }
+    if (onSelectLocation3) {
+      onSelectLocation3({
         province: selectedCity,
         district: selectedDistrict,
         commune: selectedWard,
@@ -97,6 +106,8 @@ const LocationSelect = ({
             <option value={searchProvince}>{searchProvince}</option>
           ) : searchProvince2 ? (
             <option value="">Chọn tuyến đường ?</option>
+          ) : searchProvince3 ? (
+            <option value="">Nơi bạn bắt đầu ?</option>
           ) : (
             <option value="">Nơi bạn muốn đi ?</option>
           )}
