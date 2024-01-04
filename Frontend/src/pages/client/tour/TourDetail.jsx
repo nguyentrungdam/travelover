@@ -21,6 +21,7 @@ import { searchTour2 } from "../../../slices/tourSlice";
 import {
   FormatLine,
   formatCurrencyWithoutD,
+  formatDateAndHour,
   saveToLocalStorage,
   validateOriginalDate,
 } from "../../../utils/validate";
@@ -334,6 +335,7 @@ const TourDetail = () => {
               <h1 className="hotelTitle col-md-6">
                 {tours[0]?.tour?.tourTitle}
               </h1>
+
               <div className="col-md-6 d-flex gap-2  align-items-center justify-content-end">
                 <p className="mb-0">
                   <span className="price-total ">
@@ -352,13 +354,30 @@ const TourDetail = () => {
                 </button>
               </div>
             </div>
-            <div className="hotelAddress">
-              <FontAwesomeIcon icon={faLocationDot} />
-              <span className="fz-14">{tours[0]?.tour?.address.province}</span>
-            </div>
-            <div className="hotelAddress">
-              <FontAwesomeIcon icon={faTicket} />
-              <span className="fz-14">{tours[0]?.tour?.tourId}</span>
+            <div className="d-flex align-items-center">
+              {tours[0]?.tour?.numberOfReviewer > 0 && (
+                <div class="short-rating">
+                  <div class="s-rate">
+                    <span>{tours[0]?.tour?.rate}</span>
+                    <div class="s-comment">
+                      Tuyệt vời
+                      <p>{tours[0]?.tour?.numberOfReviewer} đánh giá</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="">
+                <div className="hotelAddress">
+                  <FontAwesomeIcon icon={faLocationDot} />
+                  <span className="fz-14">
+                    {tours[0]?.tour?.address.province}
+                  </span>
+                </div>
+                <div className="hotelAddress">
+                  <FontAwesomeIcon icon={faTicket} />
+                  <span className="fz-14">{tours[0]?.tour?.tourId}</span>
+                </div>
+              </div>
             </div>
             <div className="hotelImages">
               {tours[0]?.tour?.image.map((photo, i) => (
@@ -1002,6 +1021,33 @@ const TourDetail = () => {
                 </div>
               </div>
             </section>
+            {tours[0]?.tour?.reviewer?.length > 0 && (
+              <div className="col-md-6">
+                <h4>Danh sách đánh giá</h4>
+                {tours[0]?.tour?.reviewer.map((review, index) => (
+                  <div key={index} className="review2 mb-2">
+                    <div className="avatar2">
+                      <img src={review.avatar} alt="Avatar" />
+                    </div>
+                    <div className="info2">
+                      <div className="name2">
+                        {review.firstName} {review.lastName}
+                      </div>
+                      <div className="rating2">
+                        {/* Hiển thị số sao */}
+                        {Array.from({ length: review.rate }, (_, i) => (
+                          <img key={i} src="/star2.svg" alt="Star" />
+                        ))}
+                      </div>
+                      <div className="comment2">{review.comment}</div>
+                      <div className="timestamp2">
+                        {formatDateAndHour(review.createAt)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       ) : (

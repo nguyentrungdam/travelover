@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 const ChatBot = () => {
   const location = useLocation();
+  //id knowledge : NzA4MDQ1MzU2MTEzMzMwMTc2
   useEffect(() => {
     const isHomePage =
       location.pathname === "/" || location.pathname === "/home";
@@ -13,7 +14,7 @@ const ChatBot = () => {
       if (!hasKommunicateScript) {
         (function (d, m) {
           var kommunicateSettings = {
-            appId: "1c1d55d914ab11e8710c0911af991f870",
+            appId: "3fe27b00b54408e2e691f4d3f60141a7f",
             popupWidget: true,
             automaticChatOpenOnNavigation: true,
           };
