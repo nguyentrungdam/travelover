@@ -40,10 +40,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/tours")
 @Tag(
 		name = "Tours", 
-		description = "APIs for managing tours\n\n"
-				+ "__03/01/2024__\n\n"
-				+ "__1:40PM__\n\n"
-				+ "Cập nhật: api tour search2 đã sắp xếp giá thấp nhất lên trước",
+		description = "APIs for managing tours\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1jrATNUoOWUdZ64oVM93gr9x_sDQnMvmX/view?usp=sharing")

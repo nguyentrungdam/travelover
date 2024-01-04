@@ -25,11 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping(path = "/api/v1/commissions")
 @Tag(
 		name = "Commissions", 
-		description = "APIs for managing commissions\n\n"
-				+ "__03/01/2024__\n\n"
-				+ "__1:40AM__\n\n"
-				+ "Tạo mới: tạo api create, update, detail, list cho commision\n\n"
-				+ "Tạo mới: api enable để áp dụng hoa hồng mới",
+		description = "APIs for managing commissions\n\n",
 		externalDocs = @ExternalDocumentation(
 				description = "Update Api History", 
 				url = "https://drive.google.com/file/d/1dA0UtJCpz34hBvNURQfUxnuOsa-i_lfG/view?usp=sharing")
